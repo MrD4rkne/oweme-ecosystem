@@ -1,0 +1,13 @@
+services:
+  oweme.api:
+    environment:
+      - Serilog__WriteTo__1__Args__ResourceAttributes__service.name=OweMe.Api
+      - Serilog__WriteTo__1__Args__Endpoint=http://seq:5341/ingest/otlp/v1/logs
+      - Serilog__WriteTo__1__Args__Protocol=HttpProtobuf
+      - Serilog__WriteTo__1__Name=OpenTelemetry
+  oweme.identity:
+    environment:
+      - Serilog__WriteTo__1__Args__ResourceAttributes__service.name=OweMe.Identity
+      - Serilog__WriteTo__1__Args__Endpoint=http://seq:5341/ingest/otlp/v1/logs
+      - Serilog__WriteTo__1__Args__Protocol=HttpProtobuf
+      - Serilog__WriteTo__1__Name=OpenTelemetry
