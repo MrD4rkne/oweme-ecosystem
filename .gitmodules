@@ -1,0 +1,6 @@
+[submodule "owe-me-api"]
+	path = owe-me-api
+	url = https://github.com/MrD4rkne/owe-me-api
+[submodule "owe-me-identityserver"]
+	path = owe-me-identityserver
+	url = https://github.com/MrD4rkne/owe-me-identityserver
