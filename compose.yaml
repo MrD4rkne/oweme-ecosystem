@@ -3,17 +3,21 @@ include:
   - ./owe-me-api/compose.yaml
   - ./owe-me-identityserver/compose.yaml
 
-services:
-  seq:
-    image: datalust/seq:latest
-    container_name: seq
-    ports:
-      - "5341:80"
-    environment:
-      - ACCEPT_EULA=Y
-      - SEQ_FIRSTRUN_ADMINPASSWORD=YourStrongAdminPasswordHere
-    volumes:
-      - seq-data:/data
+seq:
+  image: datalust/seq:latest
+  container_name: seq
+  ports:
+    - "5341:80"
+  environment:
+    - ACCEPT_EULA=Y
+    - SEQ_FIRSTRUN_ADMINPASSWORD=YourStrongAdminPasswordHere
+  volumes:
+    - seq-data:/data
+  healthcheck:
+    test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+    interval: 30s
+    timeout: 10s
+    retries: 5
 
 volumes:
   seq-data:
