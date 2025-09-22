@@ -1,4 +1,3 @@
-
 include:
   - ./owe-me-api/compose.yaml
   - ./owe-me-identityserver/compose.yaml
@@ -19,6 +18,5 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
 volumes:
   seq-data:
