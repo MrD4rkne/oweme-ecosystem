@@ -1,3 +1,5 @@
+name: oweme-system
+
 include:
   - ./owe-me-api/compose.yaml
   - ./owe-me-identityserver/compose.yaml

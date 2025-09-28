@@ -1,0 +1,18 @@
+# Build compose file for OweMe Ecosystem
+# This file is used to build all Docker images at once
+# Usage: docker-compose -f compose.build.yaml build
+
+name: oweme-system-build
+
+services:
+  oweme.identity:
+    image: oweme.identity
+    build:
+      context: ./owe-me-identityserver
+      dockerfile: src/OweMe.Identity.Server/Dockerfile
+
+  oweme.api:
+    image: oweme.api
+    build:
+      context: ./owe-me-api
+      dockerfile: api/src/OweMe.Api/Dockerfile
