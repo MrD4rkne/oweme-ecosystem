@@ -1,0 +1,41 @@
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+- build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        run: docker-compose -f compose.build.yaml build
+
+      - name: Verify Docker images
+        run: |
+          # List of expected images
+          IMAGES=("oweme.identity" "oweme.api")
+
+          for IMAGE in "${IMAGES[@]}"; do
+            if [[ "$(docker images -q $IMAGE 2> /dev/null)" == "" ]]; then
+              echo "Error: Docker image $IMAGE not found!"
+              exit 1
+            else
+              echo "Docker image $IMAGE is present."
+            fi
+          done
+
+      - name: List Docker images
+        if: always()
+        run: docker images
+
+      - name: Run whole system verification
+        run: docker-compose -f compose.build.yaml up --abort-on-container-exit
