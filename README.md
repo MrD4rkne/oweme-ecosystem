@@ -11,27 +11,27 @@ The ecosystem consists of two main services that need to be built as Docker imag
 
 If you don't access to the images, just run
 
-> docker-compose -f .\compose.build.yaml build
+> docker compose -f .\compose.build.yaml build
 
 ## 🚀 Running the Ecosystem
 
 ### Production Mode (Using Pre-built Images)
 ```bash
-docker-compose up
+docker compose up
 ```
 
 ### Development Mode (With Live Building)
 
 ```bash
 # Build and run everything
-docker-compose -f compose.yaml -f compose.build.yaml up --build
+docker compose -f compose.yaml -f compose.build.yaml up --build
 
 # Or run individual services in debug mode
 cd owe-me-identityserver
-docker-compose -f ../compose.yaml -f compose.override.yaml up --build
+docker compose -f ../compose.yaml -f compose.override.yaml up --build
 
 cd ../owe-me-api  
-docker-compose -f ../compose.yaml -f compose.override.yaml up --build
+docker compose -f ../compose.yaml -f compose.override.yaml up --build
 ```
 
 ## 📊 Services and Ports
