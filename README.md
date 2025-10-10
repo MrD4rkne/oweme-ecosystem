@@ -28,10 +28,10 @@ docker-compose -f compose.yaml -f compose.build.yaml up --build
 
 # Or run individual services in debug mode
 cd owe-me-identityserver
-docker-compose -f compose.yaml -f compose.override.yaml up --build
+docker-compose -f ../compose.yaml -f compose.override.yaml up --build
 
 cd ../owe-me-api  
-docker-compose -f compose.yaml -f compose.override.yaml up --build
+docker-compose -f ../compose.yaml -f compose.override.yaml up --build
 ```
 
 ## 📊 Services and Ports
