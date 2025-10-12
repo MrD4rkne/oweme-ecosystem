@@ -1,3 +1,4 @@
+name: Build and Verify Docker setup
 
 on:
   push:
