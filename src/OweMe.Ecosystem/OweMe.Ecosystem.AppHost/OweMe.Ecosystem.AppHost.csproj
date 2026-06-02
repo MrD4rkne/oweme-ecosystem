@@ -8,4 +8,9 @@
     <UserSecretsId>16d163dc-1321-44a5-af66-fc439c7117c7</UserSecretsId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\oweme-api\api\src/OweMe.Api\OweMe.Api.csproj" />
+    <ProjectReference Include="..\..\oweme-identity\src\OweMe.Identity.Server\OweMe.Identity.Server.csproj" />
+  </ItemGroup>
+
 </Project>
