@@ -1,0 +1,8 @@
+[submodule "src/oweme-api"]
+	path = src/oweme-api
+	url = git@github.com:MrD4rkne/owe-me-api.git
+	branch = master
+[submodule "src/oweme-identity"]
+	path = src/oweme-identity
+	url = git@github.com:MrD4rkne/owe-me-identityserver.git
+	branch = master
