@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="src/OweMe.Ecosystem/OweMe.Ecosystem.AppHost/OweMe.Ecosystem.AppHost.csproj" />
+  <Project Path="src/OweMe.Ecosystem/OweMe.Ecosystem.ServiceDefaults/OweMe.Ecosystem.ServiceDefaults.csproj" />
+  <Project Path="src/oweme-api/api/src/OweMe.Api/OweMe.Api.csproj" />
+  <Project Path="src/oweme-identity/src/OweMe.Identity.Server/OweMe.Identity.Server.csproj" />
+</Solution>
