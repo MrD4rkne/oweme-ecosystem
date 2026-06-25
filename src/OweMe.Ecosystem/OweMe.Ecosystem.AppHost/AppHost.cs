@@ -4,6 +4,6 @@ var identityServer = builder.AddProject<Projects.OweMe_Identity_Server>("identit
 
 builder.AddProject<Projects.OweMe_Api>("webapi")
        .WithReference(identityServer)
-       .WithEnvironment("IdentitySettings__Authority", identityServer.GetEndpoint("https")); 
+       .WithEnvironment("IdentityServer__Authority", identityServer.GetEndpoint("https")); 
 
 builder.Build().Run();
