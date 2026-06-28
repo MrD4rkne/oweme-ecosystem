@@ -5,3 +5,5 @@ envVarGroups:
         value: Production
       - key: ASPNETCORE_URLS
         value: http://+:8080
+      - key: PORT
+        value: "8080"
