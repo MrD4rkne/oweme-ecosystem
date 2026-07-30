@@ -1,0 +1,83 @@
+name: build-and-test
+
+on:
+  workflow_call:
+    inputs:
+      sln_path:
+        required: true
+        type: string
+        description: 'Path to the solution file (e.g. src/api/OweMe.Api.sln)'
+      project_path:
+        required: true
+        type: string
+        description: 'Path to the project file (e.g. src/api/OweMe.Api/OweMe.Api.csproj)'
+      working_dir:
+        description: 'Directory where version.json lives (e.g. src/api)'
+        required: true
+        type: string
+      test_filter:
+        required: false
+        type: string
+      sonar_project_key:
+        required: true
+        type: string
+        default: ''
+      sonar_org:
+        required: false
+        type: string
+        default: 'mrd4rkne'
+    secrets:
+      SONAR_TOKEN:
+        required: true
+    outputs:
+      semver:
+        value: ${{ jobs.build.outputs.semver }}
+      image_ref:
+        value: ${{ jobs.push-to-ghcr.outputs.image_ref }}
+
+jobs:
+  build:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    outputs:
+      semver: ${{ steps.nbgv.outputs.SemVer2 }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ vars.DOTNET_VERSION }}
+
+      - name: Calculate Version via NBGV
+        uses: dotnet/nbgv@master
+        id: nbgv
+        with:
+          path: ${{ inputs.working_dir }}
+
+      - name: Evaluate test filter
+        run: |
+          echo "Test filter provided: ${{ inputs.test_filter }}"
+          
+          if [ -n "${{ inputs.test_filter }}" ]; then
+            # Do NOT escape quotes here
+            echo "FILTER_ARG=--filter \"${{ inputs.test_filter }}\"" >> $GITHUB_ENV
+          else
+            echo "FILTER_ARG=" >> $GITHUB_ENV
+          fi
+
+      - name: SonarQube Scan
+        uses: highbyte/sonarscan-dotnet@v2.5.1
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          sonarProjectKey: ${{ inputs.sonar_project_key }}
+          sonarProjectName: ${{ inputs.sonar_project_key }}
+          sonarOrganization: ${{ inputs.sonar_org }}
+          dotnetBuildArguments: ${{ inputs.working_dir }} --configuration Release
+          dotnetTestArguments: ${{ inputs.working_dir }} --logger trx --collect:"XPlat Code Coverage" ${{ env.FILTER_ARG }} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          sonarBeginArguments: /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.scanner.scanAll=false -d:sonar.qualitygate.wait=true -d:sonar.qualitygate.timeout=300 -d:sonar.exclusions="**/Pages/**,**/Migrations/**,**/wwwroot/**"
