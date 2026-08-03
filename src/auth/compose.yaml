@@ -1,0 +1,53 @@
+﻿name: oweme-system
+
+services:
+    oweme.identity.database:
+        image: "postgres:15"
+        container_name: oweme.identity.database
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: ${POSTGRES_DB}
+            POSTGRES_USER: ${POSTGRES_USER}
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    oweme.identity.migrator:
+        image: oweme.identity
+        container_name: oweme.identity.migrator
+        entrypoint: ["dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "migrate"]
+        environment:
+            ConnectionStrings__DefaultConnection: Host=oweme.identity.database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+        depends_on:
+            oweme.identity.database:
+                condition: service_healthy
+
+    oweme.identity.seeder:
+        image: oweme.identity
+        container_name: oweme.identity.seeder
+        entrypoint: [ "dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "seed" ]
+        environment:
+            ConnectionStrings__DefaultConnection: Host=oweme.identity.database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+        depends_on:
+            oweme.identity.database:
+                condition: service_healthy
+            oweme.identity.migrator:
+                condition: service_completed_successfully
+
+    oweme.identity:
+        image: oweme.identity
+        container_name: oweme.identity
+        ports:
+            - "5010:8080"
+            - "5011:8081"
+        environment:
+            ConnectionStrings__DefaultConnection: Host=oweme.identity.database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+        depends_on:
+            oweme.identity.migrator:
+                condition: service_completed_successfully
+            oweme.identity.database:
+                condition: service_healthy
