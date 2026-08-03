@@ -1,0 +1,67 @@
+name: Push to GHCR
+
+on:
+  workflow_call:
+    inputs:
+      image_name:
+        required: true
+        type: string
+        description: 'Name of the Docker image to build and push (e.g. oweme-api)'
+      dockerfile_path:
+        required: true
+        type: string
+      context:
+        required: false
+        type: string
+        default: '.'
+      working_dir:
+        description: 'Directory where version.json lives (e.g. src/api)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  push-to-ghcr:
+    name: Push Docker Image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      image_ref: ${{ inputs.image_name }}:${{ inputs.semver }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Calculate Version via NBGV
+        uses: dotnet/nbgv@master
+        id: nbgv
+        with:
+          path: ${{ inputs.working_dir }}
+
+      - name: Set image reference
+        id: set_image_ref
+        run: |
+          image_ref="ghcr.io/${GITHUB_REPOSITORY,,}/${{ inputs.image_name }}:${{ steps.nbgv.outputs.SemVer2 }}"
+          echo "image_ref=$image_ref" >> $GITHUB_OUTPUT
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ inputs.context }}
+          file: ${{ inputs.dockerfile_path }}
+          push: true
+          tags: ${{ steps.set_image_ref.outputs.image_ref }}
+
