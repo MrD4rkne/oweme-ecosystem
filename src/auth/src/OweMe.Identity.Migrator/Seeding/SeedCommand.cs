@@ -111,6 +111,7 @@ public sealed class SeedCommand(IServiceProvider serviceProvider, ILogger<SeedCo
             .Where(c => seedClientIds.Contains(c.ClientId))
             .Include(c => c.ClientSecrets)
             .Include(c => c.AllowedGrantTypes)
+            .AsSplitQuery()
             .ToDictionaryAsync(c => c.ClientId, cancellationToken);
 
         var clientsToAdd = new List<Duende.IdentityServer.EntityFramework.Entities.Client>();
