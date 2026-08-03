@@ -1,0 +1,19 @@
+name: Build Authentication
+
+on:
+  workflow_call:
+    secrets:
+      SONAR_AUTH_TOKEN:
+        required: true
+
+jobs:
+  build-and-test-auth:
+    name: Build & Test Authentication
+    uses: ./.github/workflows/build-and-test.yml
+    with:
+      sln_path: 'src/auth/OweMe.Identity.sln'
+      project_path: 'src/auth/OweMe.Identity/OweMe.Identity.csproj'
+      working_dir: 'src/auth'
+      sonar_project_key: ${{ vars.SONAR_AUTH_PROJECT_KEY }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_AUTH_TOKEN }}

@@ -1,0 +1,20 @@
+name: Build API
+
+on:
+  workflow_call:
+    secrets:
+      SONAR_API_TOKEN:
+        required: true
+
+jobs:
+  build-and-test-api:
+    name: Build & Test API
+    uses: ./.github/workflows/build-and-test.yml
+    with:
+      sln_path: 'src/api/OweMe.Api.sln'
+      project_path: 'src/api/OweMe.Api/OweMe.Api.csproj'
+      working_dir: 'src/api'
+      test_filter: 'FullyQualifiedName!~SmokeTests'
+      sonar_project_key: ${{ vars.SONAR_API_PROJECT_KEY }}
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_API_TOKEN }}
