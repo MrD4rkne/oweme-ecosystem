@@ -8,30 +8,16 @@ on:
     branches: [ main ]
 
 permissions:
-  contents: write
+  contents: read
   checks: write
-  packages: write
 
 jobs:
   verify-api:
     name: Verify API
-    uses: ./.github/workflows/build-and-test.yml
-    with:
-      sln_path: 'src/api/OweMe.Api.sln'
-      project_path: 'src/api/OweMe.Api/OweMe.Api.csproj'
-      working_dir: 'src/api'
-      test_filter: 'FullyQualifiedName!~SmokeTests'
-      sonar_project_key: ${{ vars.SONAR_API_PROJECT_KEY }}
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_API_TOKEN }}
+    uses: ./.github/workflows/build-api.yml
+    secrets: inherit
 
   verify-auth:
     name: Verify Authentication
-    uses: ./.github/workflows/build-and-test.yml
-    with:
-      sln_path: 'src/auth/OweMe.Identity.sln'
-      project_path: 'src/auth/OweMe.Identity/OweMe.Identity.csproj'
-      working_dir: 'src/auth'
-      sonar_project_key: ${{ vars.SONAR_AUTH_PROJECT_KEY }}
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_AUTH_TOKEN }}
+    uses: ./.github/workflows/build-auth.yml
+    secrets: inherit
