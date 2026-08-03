@@ -5,7 +5,9 @@ on:
     secrets:
       SONAR_AUTH_TOKEN:
         required: true
-
+    outputs:
+      semver:
+        value: ${{ jobs.build-and-test-auth.outputs.semver }}
 jobs:
   build-and-test-auth:
     name: Build & Test Authentication

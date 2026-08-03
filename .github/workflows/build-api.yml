@@ -5,6 +5,9 @@ on:
     secrets:
       SONAR_API_TOKEN:
         required: true
+    outputs:
+      semver:
+        value: ${{ jobs.build-and-test-api.outputs.semver }}
 
 jobs:
   build-and-test-api:

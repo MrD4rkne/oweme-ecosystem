@@ -1,0 +1,21 @@
+name: Publish API
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  checks: write
+  packages: write
+
+jobs:
+  publish-api:
+    name: Publish API
+    uses: ./.github/workflows/push-to-ghcr.yml
+    with:
+      image_name: 'oweme-api'
+      dockerfile_path: 'src/api/api/src/OweMe.Api/Dockerfile'
+      context: '.'
+      working_dir: 'src/api'

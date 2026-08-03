@@ -6,37 +6,38 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /repo
 
 # Copy only project files first for better layer caching
 COPY version.json ./
-COPY OweMe.Api.sln ./
-COPY Directory.Build.props ./
-COPY Directory.Packages.props ./
+COPY src/api/version.json ./src/api/
+COPY src/api/Directory.Build.props ./
+COPY src/api/Directory.Packages.props ./
+COPY src/api/OweMe.Api.sln ./src/api/
 
 # Copy all .csproj files to restore dependencies
-COPY api/src/OweMe.Api/*.csproj ./api/src/OweMe.Api/
-COPY api/src/OweMe.Application/*.csproj ./api/src/OweMe.Application/
-COPY api/src/OweMe.Domain/*.csproj ./api/src/OweMe.Domain/
-COPY api/src/OweMe.Infrastructure/*.csproj ./api/src/OweMe.Infrastructure/
-COPY api/src/OweMe.Persistence/*.csproj ./api/src/OweMe.Persistence/
-COPY client/OweMe.Api.Client/*.csproj ./client/OweMe.Api.Client/
+COPY src/api/api/src/OweMe.Api/*.csproj ./src/api/api/src/OweMe.Api/
+COPY src/api/api/src/OweMe.Application/*.csproj ./src/api/api/src/OweMe.Application/
+COPY src/api/api/src/OweMe.Domain/*.csproj ./src/api/api/src/OweMe.Domain/
+COPY src/api/api/src/OweMe.Infrastructure/*.csproj ./src/api/api/src/OweMe.Infrastructure/
+COPY src/api/api/src/OweMe.Persistence/*.csproj ./src/api/api/src/OweMe.Persistence/
+COPY src/api/client/OweMe.Api.Client/*.csproj ./src/api/client/OweMe.Api.Client/
 
 # Restore only the main project dependencies (excluding test projects)
-RUN dotnet restore ./api/src/OweMe.Api/OweMe.Api.csproj
-RUN dotnet restore ./client/OweMe.Api.Client/OweMe.Api.Client.csproj
+RUN dotnet restore ./src/api/api/src/OweMe.Api/OweMe.Api.csproj
+RUN dotnet restore ./src/api/client/OweMe.Api.Client/OweMe.Api.Client.csproj
 
 # Copy remaining source files
-COPY api/ ./api/
-COPY client/ ./client/
+COPY src/api/api/ ./src/api/api/
+COPY src/api/client/ ./src/api/client/
 
 # Build the project
-WORKDIR /src/api/src/OweMe.Api
-RUN dotnet build "OweMe.Api.csproj" -c "$BUILD_CONFIGURATION" --no-restore -o /app/build
+WORKDIR /repo/src/api/api/src/OweMe.Api
+RUN dotnet build "OweMe.Api.csproj" -c "$BUILD_CONFIGURATION" -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "OweMe.Api.csproj" -c "$BUILD_CONFIGURATION" --no-restore -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "OweMe.Api.csproj" -c "$BUILD_CONFIGURATION" -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 USER $APP_UID
