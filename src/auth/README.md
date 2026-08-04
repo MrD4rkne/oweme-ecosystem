@@ -1,5 +1,3 @@
-[![Quality Check](https://github.com/MrD4rkne/owe-me-identityserver/actions/workflows/sonarqube.yml/badge.svg)](https://github.com/MrD4rkne/owe-me-identityserver/actions/workflows/sonarqube.yml)
-
 # Owe me identity server
 
 ## Technologies
@@ -12,18 +10,20 @@
 ## Development
 
 ### Prerequisites
+
 - .NET 9.0 SDK
 - Docker (for local development)
 - PostgreSQL (via Docker Compose)
 
 ### Local Setup
+
 ```bash
 # Clone and navigate the ecosystem
 git clone https://github.com/MrD4rkne/oweme-ecosystem/
-cd owe-me-identityserver
+cd src/auth
 
 # Start
-docker compose -f ../compose.yaml -f compose.override.yaml up --build
+docker compose -f compose.yaml -f compose.override.yaml up --build
 ```
 
 ## Configuration
