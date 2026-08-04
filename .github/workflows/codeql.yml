@@ -28,10 +28,12 @@ jobs:
           - language: csharp
             build-mode: manual
             project-dir: ./src/auth
+            category: "/language:csharp:./src/auth"
 
           - language: csharp
             build-mode: manual
             project-dir: ./src/api
+            category: "/language:csharp:./src/api"
 
     steps:
     - name: Checkout repository
@@ -64,4 +66,4 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
       with:
-        category: "/language:${{ matrix.language }}${{ matrix.project-dir && format(':{0}', matrix.project-dir) || '' }}"
+        category: ${{ matrix.category || format('/language:{0}{1}', matrix.language, matrix.project-dir && format(':{0}', matrix.project-dir) || '') }}
