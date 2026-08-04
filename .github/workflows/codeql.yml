@@ -27,12 +27,12 @@ jobs:
 
           - language: csharp
             build-mode: manual
-            project-dir: ./src/auth
+            project-dir: ./auth
             category: "/language:csharp:./src/auth"
 
           - language: csharp
             build-mode: manual
-            project-dir: ./src/api
+            project-dir: ./api
             category: "/language:csharp:./src/api"
 
     steps:

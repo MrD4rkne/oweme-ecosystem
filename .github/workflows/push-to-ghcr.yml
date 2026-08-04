@@ -15,7 +15,7 @@ on:
         type: string
         default: '.'
       working_dir:
-        description: 'Directory where version.json lives (e.g. src/api)'
+        description: 'Directory where version.json lives (e.g. api)'
         required: true
         type: string
 

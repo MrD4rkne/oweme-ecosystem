@@ -6,13 +6,13 @@ on:
       sln_path:
         required: true
         type: string
-        description: 'Path to the solution file (e.g. src/api/OweMe.Api.sln)'
+        description: 'Path to the solution file (e.g. api/OweMe.Api.sln)'
       project_path:
         required: true
         type: string
-        description: 'Path to the project file (e.g. src/api/OweMe.Api/OweMe.Api.csproj)'
+        description: 'Path to the project file (e.g. api/OweMe.Api/OweMe.Api.csproj)'
       working_dir:
-        description: 'Directory where version.json lives (e.g. src/api)'
+        description: 'Directory where version.json lives (e.g. api)'
         required: true
         type: string
       test_filter:
