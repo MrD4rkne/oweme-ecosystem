@@ -1,4 +1,5 @@
 using System.CommandLine;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Testcontainers.PostgreSql;
@@ -12,24 +13,26 @@ public sealed class AppFixture : IAsyncLifetime
         .WithDatabase("testdb")
         .WithUsername("postgres")
         .WithPassword("postgres")
-        .WithPortBinding(5432, true)
         .Build();
 
     public string ConnectionString => _databaseContainer.GetConnectionString();
 
     public RootCommand Build(ITestOutputHelper testOutputHelper)
     {
-        Environment.SetEnvironmentVariable("ConnectionStrings__DefaultConnection", _databaseContainer.GetConnectionString());
-        return App.BuildRootCommand((services, _) => { services.AddLogging(logging => logging.AddXUnit(testOutputHelper)); });
+        return App.BuildRootCommand((services, _) =>
+        {
+            services.AddLogging(logging => logging.AddXUnit(testOutputHelper));
+        },
+        configBuilder =>
+        {
+            configBuilder.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["ConnectionStrings:DefaultConnection"] = ConnectionString
+            });
+        });
     }
 
-    public Task InitializeAsync()
-    {
-        return _databaseContainer.StartAsync();
-    }
+    public Task InitializeAsync() => _databaseContainer.StartAsync();
 
-    public Task DisposeAsync()
-    {
-        return _databaseContainer.DisposeAsync().AsTask();
-    }
+    public Task DisposeAsync() => _databaseContainer.DisposeAsync().AsTask();
 }
