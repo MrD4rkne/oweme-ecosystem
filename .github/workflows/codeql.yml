@@ -46,7 +46,7 @@ jobs:
         dotnet-version: ${{ vars.DOTNET_VERSION }}
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@v4.37.4
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
@@ -62,6 +62,6 @@ jobs:
       run: dotnet build ${{ matrix.target }} --configuration Release
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@v4.37.4
       with:
         category: "/language:${{ matrix.language }}${{ matrix.project-dir && format(':{0}', matrix.project-dir) || '' }}"
