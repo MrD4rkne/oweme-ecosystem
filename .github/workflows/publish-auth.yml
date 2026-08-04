@@ -17,6 +17,6 @@ jobs:
     uses: ./.github/workflows/push-to-ghcr.yml
     with:
       image_name: 'oweme-auth'
-      dockerfile_path: 'src/auth/src/OweMe.Identity.Server/Dockerfile'
+      dockerfile_path: 'auth/src/OweMe.Identity.Server/Dockerfile'
       context: '.'
-      working_dir: 'src/auth'
+      working_dir: 'auth'

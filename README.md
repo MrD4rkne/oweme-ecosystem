@@ -6,11 +6,11 @@ Manage your debts and credits with ease. OweMe is a simple and intuitive applica
 
 ## API
 
-API part of the system, you can find more information in the [API readme](./src/api/README.md).
+API part of the system, you can find more information in the [API readme](./api/README.md).
 
 ## Identity server
 
-Authentication service for the system, you can find more information in the [Identity server readme](./src/auth/README.md).
+Authentication service for the system, you can find more information in the [Identity server readme](./auth/README.md).
 
 ## License
 

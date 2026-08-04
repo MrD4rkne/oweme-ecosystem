@@ -17,6 +17,6 @@ jobs:
     uses: ./.github/workflows/push-to-ghcr.yml
     with:
       image_name: 'oweme-api'
-      dockerfile_path: 'src/api/api/src/OweMe.Api/Dockerfile'
+      dockerfile_path: 'api/api/src/OweMe.Api/Dockerfile'
       context: '.'
-      working_dir: 'src/api'
+      working_dir: 'api'
