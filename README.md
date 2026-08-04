@@ -4,6 +4,14 @@
 
 Manage your debts and credits with ease. OweMe is a simple and intuitive application that helps you keep track of who owes you money and who you owe money to.
 
+## API
+
+API part of the system, you can find more information in the [API readme](./src/api/README.md).
+
+## Identity server
+
+Authentication service for the system, you can find more information in the [Identity server readme](./src/auth/README.md).
+
 ## License
 
 See [License file](./LICENSE)
