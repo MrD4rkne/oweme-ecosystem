@@ -12,7 +12,7 @@ OweMe API is a .NET-based web API built with Clean Architecture principles. The 
 
 The solution follows Clean Architecture patterns with clear separation of concerns:
 
-```
+```text
 OweMe.Api/
 ├── api/src/                    # Main application source code
 │   ├── OweMe.Api/             # 🎯 Presentation Layer - Web API endpoints
@@ -37,32 +37,19 @@ OweMe.Api/
 ## Development
 
 ### Prerequisites
+
 - .NET 9.0 SDK
 - Docker (for local development)
 - PostgreSQL (via Docker Compose)
 - Images of relevant services (f.e. owe-me-identityserver)
 
 ### Local Setup
+
 ```bash
 # Clone and navigate the ecosystem
 git clone https://github.com/MrD4rkne/oweme-ecosystem/
-cd owe-me-api
+cd src/api
 
 # Start
-docker compose -f ../compose.yaml -f compose.override.yaml up --build
+docker compose -f compose.yaml -f compose.override.yaml up --build
 ```
-
-#### Side-note
-
-You can find how to acquire images of the dependencies in [oweme-ecosystem](https://github.com/MrD4rkne/oweme-ecosystem/)
-
-## CI/CD
-
-Project has CI/CD flow for easier development and deployment. See more in
-[CI/CD readme](./docs/ci-cd.MD).
-
-## Tests
-
-How I try to verify stuff works :)
-
-[Tests readme](./docs/tests.MD)
