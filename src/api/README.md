@@ -66,7 +66,3 @@ Project has CI/CD flow for easier development and deployment. See more in
 How I try to verify stuff works :)
 
 [Tests readme](./docs/tests.MD)
-
-## License
-
-See [License file](./LICENSE)
