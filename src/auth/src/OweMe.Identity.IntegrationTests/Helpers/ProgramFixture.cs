@@ -1,13 +1,11 @@
-﻿using Duende.IdentityServer.EntityFramework.Options;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OweMe.Identity.Server.Data;
 using Testcontainers.PostgreSql;
 using Xunit.Abstractions;
-
-namespace OweMe.Identity.IntegrationTests.Helpers;
 
 public class ProgramFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
@@ -28,27 +26,26 @@ public class ProgramFixture : WebApplicationFactory<Program>, IAsyncLifetime
 
     protected string ConnectionString => _databaseContainer.GetConnectionString();
 
-    public Task InitializeAsync()
+    public async Task InitializeAsync()
     {
-        return Task.CompletedTask;
+        await _databaseContainer.StartAsync();
     }
 
-    public new Task DisposeAsync()
+    public new async Task DisposeAsync()
     {
-        return _databaseContainer.DisposeAsync().AsTask();
+        await base.DisposeAsync();
+        await _databaseContainer.DisposeAsync();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        _databaseContainer.StartAsync().GetAwaiter().GetResult();
         var connectionString = _databaseContainer.GetConnectionString();
-
         builder.UseSetting($"ConnectionStrings:{Constants.ConnectionStringName}", connectionString);
-
-        builder.WithConfigure<OperationalStoreOptions>(options => { options.EnableTokenCleanup = false; });
 
         builder.ConfigureServices(services =>
         {
+            DisableTokenCleanup(services);
+
             services.AddLogging(logging =>
             {
                 if (TestOutputHelper != null)
@@ -57,5 +54,25 @@ public class ProgramFixture : WebApplicationFactory<Program>, IAsyncLifetime
                 }
             });
         });
+    }
+
+    /// <summary>
+    /// Disable Duende's token clean up.
+    /// </summary>
+    /// <remarks>
+    /// Disabling by overriding configuration lead to failures
+    /// during Teardown.
+    /// </remarks>
+    private static void DisableTokenCleanup(IServiceCollection services)
+    {
+        var cleanupServices = services
+            .Where(d => d.ServiceType == typeof(IHostedService) &&
+                        d.ImplementationType?.Name == "TokenCleanupHost")
+            .ToList();
+
+        foreach (var descriptor in cleanupServices)
+        {
+            services.Remove(descriptor);
+        }
     }
 }
