@@ -35,6 +35,11 @@ on:
       image_ref:
         value: ${{ jobs.push-to-ghcr.outputs.image_ref }}
 
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
   build:
     name: Build & Test
@@ -84,3 +89,18 @@ jobs:
           dotnetBuildArguments: ${{ inputs.working_dir }} --configuration Release
           dotnetTestArguments: ${{ inputs.working_dir }} --logger trx --collect:"XPlat Code Coverage" ${{ env.FILTER_ARG }} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           sonarBeginArguments: /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.scanner.scanAll=false -d:sonar.qualitygate.wait=true -d:sonar.qualitygate.timeout=300 -d:sonar.exclusions="**/Pages/**,**/Migrations/**,**/wwwroot/**"
+
+      - name: Upload Test Logs (.trx)
+        uses: actions/upload-artifact@v4
+        if: always() # Ensures logs are uploaded even if tests fail
+        with:
+          name: test-results-${{ inputs.sonar_project_key }}
+          path: '**/*.trx'
+          retention-days: 14
+
+      - name: Publish Test Results to Summary
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: '**/*.trx'
+          action_fail: false
