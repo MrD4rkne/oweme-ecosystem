@@ -35,7 +35,7 @@ jobs:
           mkdir -p ansible/inventory
           cat > ansible/inventory/hosts.ini <<EOF
           [vm]
-          oweme-vm ansible_host=${{ vars.VM_IP }} ansible_user=ubuntu
+          oweme-vm ansible_host=${{ SECRETS.VM_IP }} ansible_user=ubuntu
 
           [vm:vars]
           ansible_python_interpreter=/usr/bin/python3
