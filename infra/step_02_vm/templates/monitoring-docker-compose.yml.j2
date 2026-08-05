@@ -1,0 +1,36 @@
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: monitoring-prometheus
+    restart: unless-stopped
+    networks:
+      - web
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: monitoring-grafana
+    restart: unless-stopped
+    networks:
+      - web
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD={{ grafana_admin_password }}
+    volumes:
+      - grafana_data:/var/lib/grafana
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=host(`{{ grafana_subdomain }}.{{ base_domain }}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+volumes:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  web:
+    external: true

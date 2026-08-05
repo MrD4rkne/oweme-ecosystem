@@ -1,0 +1,117 @@
+---
+- hosts: all
+  become: yes
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install essential packages
+      apt:
+        name:
+          - curl
+          - git
+          - ufw
+        state: present
+
+    - name: Set up UFW firewall rules
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop:
+        - "22"
+        - "80"
+        - "443"
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+        policy: deny
+
+    - name: Add Docker official GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+        state: present
+
+    - name: Install Docker Engine and Compose plugin
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: present
+        update_cache: yes
+
+    - name: Ensure docker service is running and enabled
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Create 'deploy' user for CI/CD
+      user:
+        name: deploy
+        shell: /bin/bash
+        groups: docker
+        create_home: yes
+
+    - name: Create external Docker network 'web' for Traefik
+      docker_network:
+        name: web
+        state: present
+
+    # --- TRAEFIK INFRASTRUCTURE STACK ---
+    - name: Create Traefik directory structure
+      file:
+        path: /opt/traefik
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy Traefik docker-compose template to server
+      template:
+        src: traefik-docker-compose.yml.j2
+        dest: /opt/traefik/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start Traefik stack
+      community.docker.docker_compose_v2:
+        project_src: /opt/traefik
+        state: present
+
+    # --- MONITORING STACK (Grafana + Prometheus) ---
+    - name: Create Monitoring directory structure
+      file:
+        path: /opt/monitoring
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy Monitoring docker-compose template to server
+      template:
+        src: monitoring-docker-compose.yml.j2
+        dest: /opt/monitoring/docker-compose.yml
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Start Monitoring stack
+      community.docker.docker_compose_v2:
+        project_src: /opt/monitoring
+        state: present

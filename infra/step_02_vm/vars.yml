@@ -1,0 +1,8 @@
+---
+# Domain Configurations
+base_domain: "duckdns.org"
+grafana_subdomain: "oweme-grafana"
+
+# Let's Encrypt & Auth
+letsencrypt_email: "marcinsz.pv@gmail.com"
+grafana_admin_password: "change-this-secure-password"
