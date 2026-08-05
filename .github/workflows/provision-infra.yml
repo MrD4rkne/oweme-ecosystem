@@ -44,7 +44,7 @@ jobs:
           cd infra/step_02_vm
           echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
           echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
-          ansible-playbook provision-vm.yml \
+          ansible-playbook -i inventory/hosts.ini provision-vm.yml \
             --private-key deploy_key \
             --vault-password-file .vault_pass \
             -e "target_environment=${{ inputs.environment_name }}"
