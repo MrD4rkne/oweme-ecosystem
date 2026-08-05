@@ -1,4 +1,4 @@
-name: Provision Infrastructure
+name: Deploy
 
 on:
   workflow_call:
@@ -6,14 +6,19 @@ on:
       environment_name:
         required: true
         type: string
-        description: 'GitHub Environment to provision (e.g. staging, production)'
-
-permissions:
-  contents: read
+        description: 'GitHub Environment to deploy to (e.g. staging, production)'
+      app_name:
+        required: true
+        type: string
+        description: 'Must match a name in ansible/vars.yml apps: list'
+      image_tag:
+        required: true
+        type: string
+        description: 'Exact image tag to deploy (from a prior build job output)'
 
 jobs:
-  provision-vm:
-    name: Run Ansible (full provision) — ${{ inputs.environment_name }}
+  deploy:
+    name: Deploy ${{ inputs.app_name }} — ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
     steps:
@@ -36,7 +41,7 @@ jobs:
           ansible_python_interpreter=/usr/bin/python3
           EOF
 
-      - name: Run full provision
+      - name: Deploy ${{ inputs.app_name }} only
         env:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           VAULT_PW: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
@@ -44,7 +49,10 @@ jobs:
           cd ansible
           echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
           echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
-          ansible-playbook infra/step_02_vm/provision-vm.yml \
+          ansible-playbook site.yml \
+            --tags deploy \
             --private-key deploy_key \
             --vault-password-file .vault_pass \
+            -e "image_tag=${{ inputs.image_tag }}" \
+            -e "target_app=${{ inputs.app_name }}" \
             -e "target_environment=${{ inputs.environment_name }}"

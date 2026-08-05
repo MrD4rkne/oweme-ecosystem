@@ -1,0 +1,42 @@
+name: Deploy — api
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/push-to-ghcr.yml
+    with:
+      image_name: oweme-api
+      dockerfile_path: api/Dockerfile
+      working_dir: api
+      push_latest: true
+    permissions:
+      contents: read
+      packages: write
+
+  deploy-staging:
+    needs: build
+    uses: ./.github/workflows/deploy-only.yml
+    with:
+      environment_name: staging
+      app_name: api
+      image_tag: ${{ needs.build.outputs.image_ref }}
+    secrets: inherit
+
+  deploy-production:
+    needs: [build, deploy-staging]
+    if: |
+      !cancelled() &&
+      needs.build.result == 'success' &&
+      needs.deploy-staging.result == 'success'
+    uses: ./.github/workflows/deploy-only.yml
+    with:
+      environment_name: production
+      app_name: api
+      image_tag: ${{ needs.build.outputs.image_ref }}
+    secrets: inherit

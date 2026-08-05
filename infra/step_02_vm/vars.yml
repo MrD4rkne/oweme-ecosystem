@@ -1,8 +1,38 @@
----
-# Domain Configurations
-base_domain: "duckdns.org"
-grafana_subdomain: "oweme-grafana"
+# vars.yml — non-secret configuration. Safe to commit.
 
-# Let's Encrypt & Auth
+# SSH public key for the 'deploy' user (paste yours, or manage this out-of-band
+# and remove this var — Pulumi may already inject a key at VM creation time).
+deploy_user_ssh_pubkey: ""
+
+github_org_repo: "mrd4rkne/oweme-ecosystem"   # used to build ghcr.io/<org>/<repo>/<image>
+
+# Image tag to deploy — overridden per-run from CI with -e "image_tag=1.2.3"
+image_tag: "latest"
+
+grafana_admin_user: "admin"
+grafana_hostname: "oweme-grafana.duckdns.org"
 letsencrypt_email: "marcinsz.pv@gmail.com"
-grafana_admin_password: "change-this-secure-password"
+
+apps:
+  - name: identity
+    image_name: oweme-identity
+    hostname: oweme-auth.duckdns.org
+    container_port: 8080
+    db_name: identity
+    db_user: identity_user
+    depends_on: []
+    healthcheck_path: /health
+    extra_env:
+      IssuerUri: "https://oweme-auth.duckdns.org"
+
+  - name: api
+    image_name: oweme-api
+    hostname: oweme-api.duckdns.org
+    container_port: 8080
+    db_name: api
+    db_user: api_user
+    depends_on: ["identity"]
+    healthcheck_path: /health
+    extra_env:
+      Identity__Authority: "https://oweme-auth.duckdns.org"
+      Identity__RequireHttpsMetadata: "true"

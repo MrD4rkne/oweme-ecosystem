@@ -1,0 +1,42 @@
+name: Deploy — identity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "auth/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: ./.github/workflows/push-to-ghcr.yml
+    with:
+      image_name: oweme-identity
+      dockerfile_path: identity/Dockerfile
+      working_dir: identity
+      push_latest: true
+    permissions:
+      contents: read
+      packages: write
+
+  deploy-staging:
+    needs: build
+    uses: ./.github/workflows/deploy-only.yml
+    with:
+      environment_name: staging
+      app_name: identity
+      image_tag: ${{ needs.build.outputs.image_ref }}
+    secrets: inherit
+
+  deploy-production:
+    needs: [build, deploy-staging]
+    if: |
+      !cancelled() &&
+      needs.build.result == 'success' &&
+      needs.deploy-staging.result == 'success'
+    uses: ./.github/workflows/deploy-only.yml
+    with:
+      environment_name: production
+      app_name: identity
+      image_tag: ${{ needs.build.outputs.image_ref }}
+    secrets: inherit

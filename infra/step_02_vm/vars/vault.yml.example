@@ -1,0 +1,15 @@
+# Copy this to vars/vault.yml, fill in real values, then ENCRYPT IT:
+#   cp vars/vault.yml.example vars/vault.yml
+#   ansible-vault encrypt vars/vault.yml
+#
+# vars/vault.yml (encrypted) is safe to commit. This .example file, and any
+# plaintext copy, must NEVER be committed.
+
+vault_ghcr_username: "your-github-username"
+vault_ghcr_token: "ghp_xxxxxxxxxxxxxxxxxxxx"   # PAT with read:packages scope
+
+vault_app_db_passwords:
+  identity: "change-me-identity-db-password"
+  api: "change-me-api-db-password"
+
+vault_grafana_admin_password: "change-me-grafana-password"
