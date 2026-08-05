@@ -18,6 +18,11 @@ on:
         description: 'Directory where version.json lives (e.g. api)'
         required: true
         type: string
+      push_latest:
+        description: 'Whether this ref is allowed to move the "latest" tag'
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -31,7 +36,7 @@ jobs:
       contents: read
       packages: write
     outputs:
-      image_ref: ${{ inputs.image_name }}:${{ inputs.semver }}
+      image_ref: ${{ steps.set_image_ref.outputs.image_ref }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -44,11 +49,25 @@ jobs:
         with:
           path: ${{ inputs.working_dir }}
 
-      - name: Set image reference
+      - name: Compute tags
         id: set_image_ref
         run: |
-          image_ref="ghcr.io/${GITHUB_REPOSITORY,,}/${{ inputs.image_name }}:${{ steps.nbgv.outputs.SemVer2 }}"
-          echo "image_ref=$image_ref" >> $GITHUB_OUTPUT
+          repo_lower="${GITHUB_REPOSITORY,,}"
+          base="ghcr.io/${repo_lower}/${{ inputs.image_name }}"
+          semver_tag="${base}:${{ steps.nbgv.outputs.SemVer2 }}"
+
+          # sanitize branch name for use as a tag (slashes, etc. aren't valid in tags)
+          branch_tag_name=$(echo "${GITHUB_REF_NAME}" | tr '/' '-' | tr -cd 'a-zA-Z0-9._-')
+          branch_tag="${base}:${branch_tag_name}"
+
+          tags="${semver_tag},${branch_tag}"
+
+          if [[ "${{ inputs.push_latest }}" == "true" ]]; then
+            tags="${tags},${base}:latest"
+          fi
+
+          echo "image_ref=${semver_tag}" >> "$GITHUB_OUTPUT"
+          echo "tags=${tags}" >> "$GITHUB_OUTPUT"
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -63,5 +82,4 @@ jobs:
           context: ${{ inputs.context }}
           file: ${{ inputs.dockerfile_path }}
           push: true
-          tags: ${{ steps.set_image_ref.outputs.image_ref }}
-
+          tags: ${{ steps.set_image_ref.outputs.tags }}

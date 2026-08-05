@@ -18,5 +18,5 @@ jobs:
     with:
       image_name: 'oweme-auth'
       dockerfile_path: 'auth/src/OweMe.Identity.Server/Dockerfile'
-      context: '.'
       working_dir: 'auth'
+      push_latest: ${{ github.ref_name == 'main' }}
