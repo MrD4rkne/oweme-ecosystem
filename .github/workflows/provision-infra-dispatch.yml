@@ -1,0 +1,19 @@
+name: Provision Infrastructure (choose environment)
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to provision'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  provision:
+    uses: ./.github/workflows/provision-infra.yml
+    with:
+      environment_name: ${{ inputs.environment }}
+    secrets: inherit

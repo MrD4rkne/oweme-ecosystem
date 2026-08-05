@@ -1,0 +1,50 @@
+name: Provision Infrastructure
+
+on:
+  workflow_call:
+    inputs:
+      environment_name:
+        required: true
+        type: string
+        description: 'GitHub Environment to provision (e.g. staging, production)'
+
+permissions:
+  contents: read
+
+jobs:
+  provision-vm:
+    name: Run Ansible (full provision) — ${{ inputs.environment_name }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment_name }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Ansible
+        run: pipx install ansible-core
+
+      - name: Install collections
+        run: ansible-galaxy collection install community.docker
+
+      - name: Write inventory
+        run: |
+          mkdir -p ansible/inventory
+          cat > ansible/inventory/hosts.ini <<EOF
+          [vm]
+          oweme-vm ansible_host=${{ vars.VM_IP }} ansible_user=ubuntu
+
+          [vm:vars]
+          ansible_python_interpreter=/usr/bin/python3
+          EOF
+
+      - name: Run full provision
+        env:
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          VAULT_PW: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        run: |
+          cd ansible
+          echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
+          echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
+          ansible-playbook site.yml \
+            --private-key deploy_key \
+            --vault-password-file .vault_pass \
+            -e "target_environment=${{ inputs.environment_name }}"
