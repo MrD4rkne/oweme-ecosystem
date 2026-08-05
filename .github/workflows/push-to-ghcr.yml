@@ -82,4 +82,5 @@ jobs:
           context: ${{ inputs.context }}
           file: ${{ inputs.dockerfile_path }}
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: ${{ steps.set_image_ref.outputs.tags }}
