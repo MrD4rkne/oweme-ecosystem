@@ -31,7 +31,7 @@ apps:
     container_port: 8080
     db_name: api
     db_user: api_user
-    depends_on: ["identity"]
+    depends_on: []
     healthcheck_path: /health
     extra_env:
       Identity__Authority: "https://oweme-auth.duckdns.org"
