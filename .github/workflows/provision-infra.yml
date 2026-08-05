@@ -25,12 +25,23 @@ jobs:
       - name: Install collections
         run: ansible-galaxy collection install community.docker
 
+      - name: Validate VM IP secret
+        env:
+          VM_IP: ${{ secrets.VM_IP }}
+        run: |
+          if [ -z "$VM_IP" ]; then
+            echo "VM_IP secret is not set for environment '${{ inputs.environment_name }}'." >&2
+            exit 1
+          fi
+
       - name: Write inventory
+        env:
+          VM_IP: ${{ secrets.VM_IP }}
         run: |
           mkdir -p infra/step_02_vm/inventory
           cat > infra/step_02_vm/inventory/hosts.ini <<EOF
           [vm]
-          oweme-vm ansible_host=${{ secrets.VM_IP }} ansible_user=ubuntu
+          oweme-vm ansible_host=$VM_IP ansible_user=ubuntu
 
           [vm:vars]
           ansible_python_interpreter=/usr/bin/python3
