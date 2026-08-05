@@ -15,7 +15,7 @@ letsencrypt_email: "marcinsz.pv@gmail.com"
 
 apps:
   - name: identity
-    image_name: oweme-identity
+    image_name: oweme-auth
     hostname: oweme-auth.duckdns.org
     container_port: 8080
     db_name: identity

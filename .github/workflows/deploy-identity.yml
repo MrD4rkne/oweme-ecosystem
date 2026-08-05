@@ -11,7 +11,7 @@ jobs:
   build:
     uses: ./.github/workflows/push-to-ghcr.yml
     with:
-      image_name: oweme-identity
+      image_name: oweme-auth
       dockerfile_path: identity/Dockerfile
       working_dir: identity
       push_latest: true
