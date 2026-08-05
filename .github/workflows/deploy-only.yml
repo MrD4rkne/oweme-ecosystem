@@ -32,10 +32,10 @@ jobs:
 
       - name: Write inventory
         run: |
-          mkdir -p ansible/inventory
-          cat > ansible/inventory/hosts.ini <<EOF
+          mkdir -p infra/step_02_vm/inventory
+          cat > infra/step_02_vm/inventory/hosts.ini <<EOF
           [vm]
-          oweme-vm ansible_host=${{ SECRETS.VM_IP }} ansible_user=ubuntu
+          oweme-vm ansible_host=${{ secrets.VM_IP }} ansible_user=ubuntu
 
           [vm:vars]
           ansible_python_interpreter=/usr/bin/python3
@@ -46,10 +46,10 @@ jobs:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           VAULT_PW: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
-          cd ansible
+          cd infra/step_02_vm
           echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
           echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
-          ansible-playbook site.yml \
+          ansible-playbook -i inventory/hosts.ini site.yml \
             --tags deploy \
             --private-key deploy_key \
             --vault-password-file .vault_pass \
