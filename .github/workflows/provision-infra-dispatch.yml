@@ -20,5 +20,5 @@ jobs:
   provision:
     uses: ./.github/workflows/provision-infra.yml
     with:
-      environment_name: ${{ inputs.environment }}
+      environment_name: ${{ inputs.environment || 'staging' }}
     secrets: inherit
