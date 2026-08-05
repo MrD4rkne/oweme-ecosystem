@@ -23,10 +23,6 @@ on:
         required: false
         type: boolean
         default: false
-    outputs:
-      image_ref:
-        description: 'The fully-qualified image reference (including tag) that was pushed'
-        value: ${{ steps.set_image_ref.outputs.image_ref }}
 
 permissions:
   contents: read
