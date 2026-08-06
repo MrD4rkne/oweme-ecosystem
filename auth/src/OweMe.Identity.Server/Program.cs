@@ -3,6 +3,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using OpenTelemetry.Logs;
 using OweMe.Identity.Persistence;
+using OweMe.Identity.Persistence.Health;
 using OweMe.Identity.Server;
 using OweMe.Identity.Server.Data;
 
@@ -50,6 +51,9 @@ builder.Services.AddOpenTelemetry()
         b.AddOtlpExporter();
     }).WithLogging();
 
+builder.Services.AddHealthChecks()
+    .AddPersistenceHealthCheck();
+
 try
 {
     builder.AddConnectionStringFromEnv();
@@ -60,6 +64,9 @@ try
 
     var app = builder.Build()
         .ConfigurePipeline();
+
+    app.UseHealthChecks("/healthz");
+
     await app.RunAsync();
 }
 catch (Exception ex) when (ex is not HostAbortedException && ex.Source != "Microsoft.EntityFrameworkCore.Design") // see https://github.com/dotnet/efcore/issues/29923
