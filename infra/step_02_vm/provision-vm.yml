@@ -100,7 +100,13 @@
     # ============================================================
     # DOCKER
     # ============================================================
-    - name: Add Docker repository
+    - name: Ensure python3-debian is installed (required by deb822_repository)
+      apt:
+        name: python3-debian
+        state: present
+      tags: [base, docker]
+
+    - name: Add Docker repository (deb822 format)
       ansible.builtin.deb822_repository:
         name: docker
         types: [deb]
@@ -110,7 +116,6 @@
         architectures: [arm64]
         signed_by: "https://download.docker.com/linux/ubuntu/gpg"
         state: present
-        install_python_debian: true
       tags: [base, docker]
 
     - name: Install Docker Engine and Compose plugin
