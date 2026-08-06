@@ -14,7 +14,6 @@ public static class DependencyInjection
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        // Register the DatabaseOptions with configuration
         builder.Services.AddOptions<DatabaseOptions>()
             .Bind(builder.Configuration.GetSection(DatabaseOptions.SectionName))
             .ValidateOnStart();
