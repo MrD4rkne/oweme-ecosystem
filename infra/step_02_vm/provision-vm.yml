@@ -110,6 +110,7 @@
         architectures: [arm64]
         signed_by: "https://download.docker.com/linux/ubuntu/gpg"
         state: present
+        install_python_debian: true
       tags: [base, docker]
 
     - name: Install Docker Engine and Compose plugin
