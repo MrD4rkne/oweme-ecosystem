@@ -322,7 +322,7 @@
         path: /opt/apps/.env
         regexp: '^API_IMAGE_TAG='
         line: "API_IMAGE_TAG={{ image_tag }}"
-      when: target_app == 'api'
+      when: target_app is defined and target_app == 'api'
       tags: [apps, deploy]
 
     - name: Patch Auth image tag only
@@ -330,7 +330,7 @@
         path: /opt/apps/.env
         regexp: '^AUTH_IMAGE_TAG='
         line: "AUTH_IMAGE_TAG={{ image_tag }}"
-      when: target_app == 'auth'
+      when: target_app is defined and target_app == 'auth'
       tags: [apps, deploy]
 
     - name: Deploy single target service (fast path)
