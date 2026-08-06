@@ -1,0 +1,72 @@
+services:
+  auth-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auth
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks: [app-backend]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: api
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: ${API_DB_PASSWORD}
+    volumes:
+      - api-db-data:/var/lib/postgresql/data
+    networks: [app-backend]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U api"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-identity:${AUTH_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks: [web, app-backend, monitoring]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`{{ auth_hostname }}`)"
+      - "traefik.http.routers.auth.tls.certresolver=letsencrypt"
+
+  api:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:${API_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      api-db:
+        condition: service_healthy
+      auth:
+        condition: service_started
+    networks: [web, app-backend, monitoring]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`{{ api_hostname }}`)"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+
+networks:
+  web:
+    external: true
+  app-backend:
+    external: true
+  monitoring:
+    external: true
+
+volumes:
+  auth-db-data:
+  api-db-data:

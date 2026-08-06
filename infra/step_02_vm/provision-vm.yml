@@ -286,57 +286,70 @@
         password: "{{ vault_ghcr_token }}"
       tags: [apps, deploy]
 
-    - name: Create per-app directories
+    # ============================================================
+    # APPS (auth + api, single compose stack)
+    # ============================================================
+    - name: Create apps directory
       file:
-        path: "/opt/{{ item.name }}"
+        path: /opt/apps
         state: directory
         owner: deploy
         group: deploy
         mode: '0755'
-      loop: "{{ apps }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when: target_app is not defined or target_app == item.name
-      tags: [apps, deploy]
+      tags: [apps]
 
-    - name: Render per-app docker-compose.yml
+    - name: Render apps docker-compose.yml (structure changes only)
       template:
-        src: app-docker-compose.yml.j2
-        dest: "/opt/{{ item.name }}/docker-compose.yml"
+        src: apps-docker-compose.yml.j2
+        dest: /opt/apps/docker-compose.yml
         owner: deploy
         group: deploy
         mode: '0644'
-      loop: "{{ apps }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when: target_app is not defined or target_app == item.name
-      register: app_compose
-      tags: [apps, deploy]
+      tags: [apps]
 
-    - name: Render per-app .env
+    - name: Render apps .env (base — full provision only)
       template:
-        src: app.env.j2
-        dest: "/opt/{{ item.name }}/.env"
+        src: apps.env.j2
+        dest: /opt/apps/.env
         owner: deploy
         group: deploy
         mode: '0600'
-      loop: "{{ apps }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when: target_app is not defined or target_app == item.name
-      register: app_env
-      tags: [apps, deploy, secrets]
+        force: no
+      tags: [apps, secrets]
 
-    - name: Start/update each app stack
+    - name: Patch API image tag only
+      lineinfile:
+        path: /opt/apps/.env
+        regexp: '^API_IMAGE_TAG='
+        line: "API_IMAGE_TAG={{ image_tag }}"
+      when: target_app == 'api'
+      tags: [apps, deploy]
+
+    - name: Patch Auth image tag only
+      lineinfile:
+        path: /opt/apps/.env
+        regexp: '^AUTH_IMAGE_TAG='
+        line: "AUTH_IMAGE_TAG={{ image_tag }}"
+      when: target_app == 'auth'
+      tags: [apps, deploy]
+
+    - name: Deploy single target service (fast path)
       community.docker.docker_compose_v2:
-        project_src: "/opt/{{ item.name }}"
+        project_src: /opt/apps
         state: present
         pull: always
-      loop: "{{ apps }}"
-      loop_control:
-        label: "{{ item.name }}"
-      when: target_app is not defined or target_app == item.name
+        services:
+          - "{{ target_app }}"
+      when: target_app is defined
       tags: [apps, deploy]
+
+    - name: Deploy full apps stack (full provision, no target_app)
+      community.docker.docker_compose_v2:
+        project_src: /opt/apps
+        state: present
+        pull: always
+      when: target_app is not defined
+      tags: [apps]
 
   handlers:
     - name: restart docker
