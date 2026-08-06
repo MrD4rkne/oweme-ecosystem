@@ -100,6 +100,19 @@
     # ============================================================
     # DOCKER
     # ============================================================
+    - name: Remove legacy Docker apt source (pre-deb822 migration)
+      file:
+        path: /etc/apt/sources.list.d/download_docker_com_linux_ubuntu.list
+        state: absent
+      tags: [base, docker]
+
+    - name: Remove legacy Docker apt key (pre-deb822 migration)
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: absent
+      tags: [base, docker]
+
+
     - name: Ensure python3-debian is installed (required by deb822_repository)
       apt:
         name: python3-debian
