@@ -2,10 +2,7 @@ services:
   auth-db:
     image: postgres:16-alpine
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: auth
-      POSTGRES_USER: auth
-      POSTGRES_PASSWORD: ${AUTH_DB_PASSWORD}
+    env_file: auth.env
     volumes:
       - auth-db-data:/var/lib/postgresql/data
     networks: [app-backend]
@@ -18,10 +15,7 @@ services:
   api-db:
     image: postgres:16-alpine
     restart: unless-stopped
-    environment:
-      POSTGRES_DB: api
-      POSTGRES_USER: api
-      POSTGRES_PASSWORD: ${API_DB_PASSWORD}
+    env_file: api.env
     volumes:
       - api-db-data:/var/lib/postgresql/data
     networks: [app-backend]
@@ -34,7 +28,7 @@ services:
   auth:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
     restart: unless-stopped
-    env_file: .env
+    env_file: auth.env
     depends_on:
       auth-db:
         condition: service_healthy
@@ -47,7 +41,7 @@ services:
   api:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:${API_IMAGE_TAG:-latest}
     restart: unless-stopped
-    env_file: .env
+    env_file: api.env
     depends_on:
       api-db:
         condition: service_healthy

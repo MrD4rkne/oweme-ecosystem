@@ -298,19 +298,20 @@
         mode: '0755'
       tags: [apps]
 
-    - name: Render apps docker-compose.yml (structure changes only)
+    - name: Render auth.env (base — full provision only)
       template:
-        src: apps-docker-compose.yml.j2
-        dest: /opt/apps/docker-compose.yml
+        src: auth.env.j2
+        dest: /opt/apps/auth.env
         owner: deploy
         group: deploy
-        mode: '0644'
-      tags: [apps]
+        mode: '0600'
+        force: no
+      tags: [apps, secrets]
 
-    - name: Render apps .env (base — full provision only)
+    - name: Render api.env (base — full provision only)
       template:
-        src: apps.env.j2
-        dest: /opt/apps/.env
+        src: api.env.j2
+        dest: /opt/apps/api.env
         owner: deploy
         group: deploy
         mode: '0600'
@@ -319,7 +320,7 @@
 
     - name: Patch API image tag only
       lineinfile:
-        path: /opt/apps/.env
+        path: /opt/apps/api.env
         regexp: '^API_IMAGE_TAG='
         line: "API_IMAGE_TAG={{ image_tag }}"
       when: target_app is defined and target_app == 'api'
@@ -327,7 +328,7 @@
 
     - name: Patch Auth image tag only
       lineinfile:
-        path: /opt/apps/.env
+        path: /opt/apps/auth.env
         regexp: '^AUTH_IMAGE_TAG='
         line: "AUTH_IMAGE_TAG={{ image_tag }}"
       when: target_app is defined and target_app == 'auth'
