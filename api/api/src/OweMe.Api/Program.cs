@@ -14,6 +14,7 @@ using OweMe.Api.Identity.Description;
 using OweMe.Application;
 using OweMe.Infrastructure;
 using OweMe.Persistence;
+using OweMe.Persistence.Health;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -116,9 +117,11 @@ if (!CodeGeneration.IsRunningGeneration())
         .ValidateOnStart();
 }
 
+builder.Services.AddHealthChecks()
+    .AddPersistenceHealthCheck();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -140,5 +143,7 @@ app.MapEndpoints();
 
 app.UseExceptionHandler();
 app.UseStatusCodePages();
+
+app.UseHealthChecks("/healthz");
 
 return await app.RunJasperFxCommands(args);
