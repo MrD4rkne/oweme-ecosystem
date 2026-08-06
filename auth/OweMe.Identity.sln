@@ -5,14 +5,12 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FA1E4346-6FB6-4ED7-8C4D-258870169B3D}"
 	ProjectSection(SolutionItems) = preProject
-		compose.debug.yaml = src\compose.debug.yaml
 		README.md = README.md
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		version.json = version.json
-		LICENSE = LICENSE
 		compose.yaml = compose.yaml
 		compose.override.yaml = compose.override.yaml
 	EndProjectSection
