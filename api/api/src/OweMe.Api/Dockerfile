@@ -1,4 +1,10 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl && \
+    rm -rf /var/lib/apt/lists/*
+
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -24,12 +30,12 @@ COPY api/api/src/OweMe.Infrastructure/*.csproj ./api/api/src/OweMe.Infrastructur
 COPY api/api/src/OweMe.Persistence/*.csproj ./api/api/src/OweMe.Persistence/
 COPY api/client/OweMe.Api.Client/*.csproj ./api/client/OweMe.Api.Client/
 
-RUN dotnet restore ./api/api/src/OweMe.Api/OweMe.Api.csproj -a $TARGETARCH
-RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TARGETARCH
-
 # Copy remaining source files
 COPY api/api/ ./api/api/
 COPY api/client/ ./api/client/
+
+RUN dotnet restore ./api/api/src/OweMe.Api/OweMe.Api.csproj -a $TARGETARCH
+RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TARGETARCH
 
 WORKDIR /repo/api/api/src/OweMe.Api
 RUN dotnet publish "OweMe.Api.csproj" \
