@@ -21,11 +21,11 @@ COPY auth/src/OweMe.Identity.Server/*.csproj ./auth/src/OweMe.Identity.Server/
 COPY auth/src/OweMe.Identity.Persistence/*.csproj ./auth/src/OweMe.Identity.Persistence/
 COPY auth/src/OweMe.Identity.Migrator/*.csproj ./auth/src/OweMe.Identity.Migrator/
 
-RUN dotnet restore ./auth/src/OweMe.Identity.Server/OweMe.Identity.Server.csproj -a $TARGETARCH
-RUN dotnet restore ./auth/src/OweMe.Identity.Migrator/OweMe.Identity.Migrator.csproj -a $TARGETARCH
-
 # Copy remaining source files
 COPY auth/src/ ./auth/src/
+
+RUN dotnet restore ./auth/src/OweMe.Identity.Server/OweMe.Identity.Server.csproj -a $TARGETARCH
+RUN dotnet restore ./auth/src/OweMe.Identity.Migrator/OweMe.Identity.Migrator.csproj -a $TARGETARCH
 
 WORKDIR /repo/auth/src/OweMe.Identity.Server
 RUN dotnet publish "OweMe.Identity.Server.csproj" \
