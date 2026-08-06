@@ -32,7 +32,7 @@ services:
       retries: 10
 
   auth:
-    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-identity:${AUTH_IMAGE_TAG:-latest}
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
     restart: unless-stopped
     env_file: .env
     depends_on:
