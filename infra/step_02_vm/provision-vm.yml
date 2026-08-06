@@ -100,15 +100,15 @@
     # ============================================================
     # DOCKER
     # ============================================================
-    - name: Add Docker official GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
-      tags: [base, docker]
-
     - name: Add Docker repository
-      apt_repository:
-        repo: "deb [arch=arm64] https://download.docker.com/linux/ubuntu {{ ansible_facts['distribution_release'] }} stable"
+      ansible.builtin.deb822_repository:
+        name: docker
+        types: [deb]
+        uris: "https://download.docker.com/linux/ubuntu"
+        suites: "{{ ansible_facts['distribution_release'] }}"
+        components: [stable]
+        architectures: [arm64]
+        signed_by: "https://download.docker.com/linux/ubuntu/gpg"
         state: present
       tags: [base, docker]
 
