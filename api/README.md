@@ -1,9 +1,5 @@
 # OweMe API Documentation
 
-[![Build release](https://github.com/MrD4rkne/owe-me-api/actions/workflows/build-release.yml/badge.svg)](https://github.com/MrD4rkne/owe-me-api/actions/workflows/build-release.yml)
-[![Daily tests](https://github.com/MrD4rkne/owe-me-api/actions/workflows/build-regular.yml/badge.svg)](https://github.com/MrD4rkne/owe-me-api/actions/workflows/build-regular.yml)
-[![Run Smoke Tests](https://github.com/MrD4rkne/owe-me-api/actions/workflows/run-smoketests.yml/badge.svg)](https://github.com/MrD4rkne/owe-me-api/actions/workflows/run-smoketests.yml)
-
 ## Overview
 
 OweMe API is a .NET-based web API built with Clean Architecture principles. The application manages financial tracking and ledger operations with a focus on maintainability, testability, and scalability.
