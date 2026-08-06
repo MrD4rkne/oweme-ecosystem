@@ -37,7 +37,8 @@ RUN dotnet publish "OweMe.Api.csproj" \
     -a "$TARGETARCH" \
     -o /app/publish \
     --no-restore \
-    /p:UseAppHost=false
+    /p:UseAppHost=false \
+    /p:OpenApiGenerateDocuments=false
 
 FROM base AS final
 USER $APP_UID
