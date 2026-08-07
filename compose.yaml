@@ -5,7 +5,37 @@ include:
   - path: ./api/compose.yaml
 
 services:
+  oweme.seq:
+    image: datalust/seq:latest
+    container_name: oweme.seq
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+    ports:
+      - "5341:5341"   # ingestion (HTTP/OTLP)
+      - "8081:80"     # web UI
+    volumes:
+      - seq-data:/data
+
+  oweme.identity:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://oweme.seq:5341/ingest/otlp
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: oweme.identity
+    depends_on:
+      oweme.seq:
+        condition: service_started
+
   oweme.api:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://oweme.seq:5341/ingest/otlp
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: oweme.api
     depends_on:
       oweme.identity:
         condition: service_healthy
+      oweme.seq:
+        condition: service_started
+
+volumes:
+  seq-data:
