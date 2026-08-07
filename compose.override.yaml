@@ -1,0 +1,3 @@
+include:
+  - path: ./auth/compose.override.yaml
+  - path: ./api/compose.override.yaml
