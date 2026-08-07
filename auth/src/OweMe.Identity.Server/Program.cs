@@ -1,7 +1,8 @@
 ﻿using Duende.IdentityServer;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
-using OpenTelemetry.Logs;
 using OweMe.Identity.Persistence;
 using OweMe.Identity.Persistence.Health;
 using OweMe.Identity.Server;
@@ -25,27 +26,25 @@ builder.Logging.AddOpenTelemetry(logging =>
 {
     logging.IncludeScopes = true;
     logging.IncludeFormattedMessage = true;
-    logging.AddOtlpExporter();
 });
 
-builder.Services.AddOpenTelemetry()
-    .WithTracing(b =>
-    {
-        b.AddAspNetCoreInstrumentation();
-        b.AddHttpClientInstrumentation();
-        b.AddSource(IdentityServerConstants.Tracing.Basic)
-            .AddSource(IdentityServerConstants.Tracing.Cache)
-            .AddSource(IdentityServerConstants.Tracing.Services)
-            .AddSource(IdentityServerConstants.Tracing.Stores)
-            .AddSource(IdentityServerConstants.Tracing.Validation);
-        b.AddOtlpExporter();
-    })
+var otel = builder.Services.AddOpenTelemetry();
+otel.UseOtlpExporter();
+otel.WithTracing(b =>
+{
+    b.AddAspNetCoreInstrumentation();
+    b.AddHttpClientInstrumentation();
+    b.AddSource(IdentityServerConstants.Tracing.Basic)
+        .AddSource(IdentityServerConstants.Tracing.Cache)
+        .AddSource(IdentityServerConstants.Tracing.Services)
+        .AddSource(IdentityServerConstants.Tracing.Stores)
+        .AddSource(IdentityServerConstants.Tracing.Validation);
+})
     .WithMetrics(b =>
     {
         b.AddAspNetCoreInstrumentation();
         b.AddHttpClientInstrumentation();
-        b.AddOtlpExporter();
-    }).WithLogging();
+    });
 
 builder.Services.AddHealthChecks()
     .AddPersistenceHealthCheck();
