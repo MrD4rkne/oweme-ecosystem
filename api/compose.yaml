@@ -2,7 +2,7 @@
 
 services:
   oweme.api:
-    image: oweme.api
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:latest
     container_name: oweme.api
     ports:
       - "5000:8080"

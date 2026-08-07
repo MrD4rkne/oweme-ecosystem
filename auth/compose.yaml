@@ -1,6 +1,4 @@
-﻿name: oweme-system
-
-services:
+﻿services:
     oweme.identity.database:
         image: "postgres:15"
         container_name: oweme.identity.database
@@ -17,7 +15,7 @@ services:
             retries: 5
 
     oweme.identity.migrator:
-        image: oweme.identity
+        image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:latest
         container_name: oweme.identity.migrator
         entrypoint: ["dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "migrate"]
         environment:
@@ -27,7 +25,7 @@ services:
                 condition: service_healthy
 
     oweme.identity.seeder:
-        image: oweme.identity
+        image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:latest
         container_name: oweme.identity.seeder
         entrypoint: [ "dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "seed" ]
         environment:
@@ -39,7 +37,7 @@ services:
                 condition: service_completed_successfully
 
     oweme.identity:
-        image: oweme.identity
+        image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:latest
         container_name: oweme.identity
         ports:
             - "5010:8080"

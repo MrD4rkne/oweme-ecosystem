@@ -4,6 +4,16 @@
 
 Manage your debts and credits with ease. OweMe is a simple and intuitive application that helps you keep track of who owes you money and who you owe money to.
 
+## How to run it
+
+### Docker compose
+
+```bash
+git clone https://github.com/MrD4rkne/oweme-ecosystem.git
+cd oweme-ecosystem
+docker compose up
+```
+
 ## API
 
 API part of the system, you can find more information in the [API readme](./api/README.md).

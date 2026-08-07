@@ -1,0 +1,11 @@
+name: oweme-system
+
+include:
+  - path: ./auth/compose.yaml
+  - path: ./api/compose.yaml
+
+services:
+  oweme.api:
+    depends_on:
+      oweme.identity:
+        condition: service_healthy
