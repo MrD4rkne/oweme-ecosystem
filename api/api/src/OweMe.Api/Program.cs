@@ -39,14 +39,16 @@ var otel = builder.Services.AddOpenTelemetry();
 otel.UseOtlpExporter();
 otel.WithTracing(b =>
 {
+    b.AddAspNetCoreInstrumentation(options=>
+    {
+        options.Filter = context => !context.Request.Path.StartsWithSegments("/healthz");
+    });
+    b.AddHttpClientInstrumentation();
+}).WithMetrics(b =>
+{
     b.AddAspNetCoreInstrumentation();
     b.AddHttpClientInstrumentation();
-})
-    .WithMetrics(b =>
-    {
-        b.AddAspNetCoreInstrumentation();
-        b.AddHttpClientInstrumentation();
-    });
+});
 if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
 {
     otel.UseAzureMonitor();

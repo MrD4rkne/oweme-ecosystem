@@ -32,19 +32,21 @@ var otel = builder.Services.AddOpenTelemetry();
 otel.UseOtlpExporter();
 otel.WithTracing(b =>
 {
-    b.AddAspNetCoreInstrumentation();
+    b.AddAspNetCoreInstrumentation(options=>
+    {
+        options.Filter = context => !context.Request.Path.StartsWithSegments("/.well-known") && !context.Request.Path.StartsWithSegments("/healthz");
+    });
     b.AddHttpClientInstrumentation();
     b.AddSource(IdentityServerConstants.Tracing.Basic)
         .AddSource(IdentityServerConstants.Tracing.Cache)
         .AddSource(IdentityServerConstants.Tracing.Services)
         .AddSource(IdentityServerConstants.Tracing.Stores)
         .AddSource(IdentityServerConstants.Tracing.Validation);
-})
-    .WithMetrics(b =>
-    {
-        b.AddAspNetCoreInstrumentation();
-        b.AddHttpClientInstrumentation();
-    });
+}).WithMetrics(b =>
+{
+    b.AddAspNetCoreInstrumentation();
+    b.AddHttpClientInstrumentation();
+});
 
 builder.Services.AddHealthChecks()
     .AddPersistenceHealthCheck();
