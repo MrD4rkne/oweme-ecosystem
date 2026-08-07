@@ -29,10 +29,6 @@ builder.Logging.AddOpenTelemetry(logging =>
 });
 
 builder.Services.AddOpenTelemetry()
-    .WithLogging(b =>
-    {
-        b.AddOtlpExporter();
-    })
     .WithTracing(b =>
     {
         b.AddAspNetCoreInstrumentation();
