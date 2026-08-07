@@ -8,12 +8,11 @@ services:
       - "5000:8080"
       - "5001:8081"
     environment:
-      - Database__ConnectionString=Server=oweme.api.database;Database=OweMe.Api;Username=sa;Password=Password123;TrustServerCertificate=True;
-      - Database__RunMigrations=true
-      
-      - IdentityServer__Authority=http://oweme.identity:8080
-      - IdentityServer__ValidateAudience=false
-      - IdentityServer__RequireHttpsMetadata=false
+      Database__ConnectionString: Server=oweme.api.database;Database=OweMe.Api;Username=sa;Password=Password123;TrustServerCertificate=True;
+      Database__RunMigrations: true
+      IdentityServer__Authority: http://oweme.identity:8080
+      IdentityServer__ValidateAudience: false
+      IdentityServer__RequireHttpsMetadata: false
     depends_on:
       oweme.api.database:
         condition: service_healthy
@@ -28,9 +27,9 @@ services:
     ports:
       - "5442:5432"
     environment:
-      - POSTGRES_DB=OweMe.Api
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=Password123
+      POSTGRES_DB: OweMe.Api
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: Password123
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
