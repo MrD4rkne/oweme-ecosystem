@@ -91,7 +91,7 @@ jobs:
           sonarBeginArguments: /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.scanner.scanAll=false -d:sonar.qualitygate.wait=true -d:sonar.qualitygate.timeout=300 -d:sonar.exclusions="**/Pages/**,**/Migrations/**,**/wwwroot/**"
 
       - name: Upload Test Logs (.trx)
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always() # Ensures logs are uploaded even if tests fail
         with:
           name: test-results-${{ inputs.sonar_project_key }}
