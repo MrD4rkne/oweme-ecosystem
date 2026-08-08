@@ -52,13 +52,30 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Docker
-        uses: docker/setup-docker-action@v5
-
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
           dotnet-version: ${{ vars.DOTNET_VERSION }}
+          cache: true
+          cache-dependency-path: |
+            ${{ inputs.working_dir }}/**/packages.lock.json
+            ${{ inputs.working_dir }}/**/*.csproj
+
+      - name: Setup Java (required by sonar-scanner engine)
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Cache SonarQube packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-${{ inputs.sonar_project_key }}
+          restore-keys: ${{ runner.os }}-sonar-
+
+      - name: Install SonarScanner for .NET
+        run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Calculate Version via NBGV
         uses: dotnet/nbgv@master
@@ -77,18 +94,37 @@ jobs:
             echo "FILTER_ARG=" >> $GITHUB_ENV
           fi
 
-      - name: SonarQube Scan
-        uses: highbyte/sonarscan-dotnet@v2.5.1
+      - name: Sonar Begin
+        run: >
+          dotnet-sonarscanner begin
+          /k:"${{ inputs.sonar_project_key }}"
+          /n:"${{ inputs.sonar_project_key }}"
+          /o:"${{ inputs.sonar_org }}"
+          /d:sonar.scanner.skipJreProvisioning=true
+          /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+          /d:sonar.host.url="https://sonarcloud.io"
+          /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
+          /d:sonar.scanner.scanAll=false
+          /d:sonar.qualitygate.wait=true
+          /d:sonar.qualitygate.timeout=300
+          /d:sonar.exclusions="**/Pages/**,**/Migrations/**,**/wwwroot/**"
+
+      - name: Build
+        run: dotnet build ${{ inputs.working_dir }} --configuration Release
+
+      - name: Test
+        run: >
+          dotnet test ${{ inputs.working_dir }}
+          --configuration Release
+          --no-build
+          --logger trx
+          --collect:"XPlat Code Coverage" ${{ env.FILTER_ARG }}
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+
+      - name: Sonar End
+        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          sonarProjectKey: ${{ inputs.sonar_project_key }}
-          sonarProjectName: ${{ inputs.sonar_project_key }}
-          sonarOrganization: ${{ inputs.sonar_org }}
-          dotnetBuildArguments: ${{ inputs.working_dir }} --configuration Release
-          dotnetTestArguments: ${{ inputs.working_dir }} --logger trx --collect:"XPlat Code Coverage" ${{ env.FILTER_ARG }} -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
-          sonarBeginArguments: /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.scanner.scanAll=false -d:sonar.qualitygate.wait=true -d:sonar.qualitygate.timeout=300 -d:sonar.exclusions="**/Pages/**,**/Migrations/**,**/wwwroot/**"
 
       - name: Upload Test Logs (.trx)
         uses: actions/upload-artifact@v7
