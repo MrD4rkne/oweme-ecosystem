@@ -141,7 +141,7 @@ jobs:
           retention-days: 14
 
       - name: Publish Test Results to Summary
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         if: always()
         with:
           name: Test Results
