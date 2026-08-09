@@ -5,6 +5,12 @@ on:
     secrets:
       SONAR_API_TOKEN:
         required: true
+    inputs:
+      sonar_enforce_quality_gate:
+        description: 'If true, fail the build when the Sonar quality gate fails. Set to false for nightly/trend-only runs.'
+        required: false
+        type: boolean
+        default: true
     outputs:
       semver:
         value: ${{ jobs.build-and-test-api.outputs.semver }}
@@ -24,5 +30,6 @@ jobs:
       working_dir: 'api'
       test_filter: 'FullyQualifiedName!~SmokeTests'
       sonar_project_key: ${{ vars.SONAR_API_PROJECT_KEY }}
+      sonar_enforce_quality_gate: ${{ inputs.sonar_enforce_quality_gate }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_API_TOKEN }}

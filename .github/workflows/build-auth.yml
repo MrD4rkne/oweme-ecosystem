@@ -10,6 +10,12 @@ on:
     secrets:
       SONAR_AUTH_TOKEN:
         required: true
+    inputs:
+      sonar_enforce_quality_gate:
+        description: 'If true, fail the build when the Sonar quality gate fails. Set to false for nightly/trend-only runs.'
+        required: false
+        type: boolean
+        default: true
     outputs:
       semver:
         value: ${{ jobs.build-and-test-auth.outputs.semver }}
@@ -22,5 +28,6 @@ jobs:
       project_path: 'auth/OweMe.Identity/OweMe.Identity.csproj'
       working_dir: 'auth'
       sonar_project_key: ${{ vars.SONAR_AUTH_PROJECT_KEY }}
+      sonar_enforce_quality_gate: ${{ inputs.sonar_enforce_quality_gate }}
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_AUTH_TOKEN }}
