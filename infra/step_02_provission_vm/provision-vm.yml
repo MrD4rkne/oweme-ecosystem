@@ -298,6 +298,16 @@
         mode: '0755'
       tags: [apps]
 
+    - name: Copy Apps docker-compose template to server
+      template:
+        src: apps-docker-compose.yml.j2
+        dest: /opt/apps/docker-compose.yml
+        owner: deploy
+        group: deploy
+        mode: '0644'
+      register: apps_compose
+      tags: [apps, deploy]
+
     - name: Render auth.env (base — full provision only)
       template:
         src: auth.env.j2
