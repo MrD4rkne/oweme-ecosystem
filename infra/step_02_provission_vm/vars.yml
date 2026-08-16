@@ -8,5 +8,5 @@ grafana_admin_user: "admin"
 grafana_hostname: "oweme-grafana.duckdns.org"
 letsencrypt_email: "marcinsz.pv@gmail.com"
 
-auth_hostname: "oweme-auth.duckdns.org"
-api_hostname: "oweme-api.duckdns.org"
+auth_hostname: "https://oweme-auth.duckdns.org"
+api_hostname: "https://oweme-api.duckdns.org"
