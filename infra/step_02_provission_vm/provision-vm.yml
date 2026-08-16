@@ -354,6 +354,7 @@
       when: target_app is defined
       tags: [apps, deploy]
 
+# TODO: migrator and seeder
     - name: Deploy full apps stack (full provision, no target_app)
       community.docker.docker_compose_v2:
         project_src: /opt/apps
