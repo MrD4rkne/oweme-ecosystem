@@ -43,8 +43,8 @@ jobs:
         env:
           VM_IP: ${{ secrets.VM_IP }}
         run: |
-          mkdir -p infra/step_02_vm/inventory
-          cat > infra/step_02_vm/inventory/hosts.ini <<EOF
+          mkdir -p infra/step_02_provission_vm/inventory
+          cat > infra/step_02_provission_vm/inventory/hosts.ini <<EOF
           [vm]
           oweme-vm ansible_host=$VM_IP ansible_user=ubuntu
 
@@ -57,7 +57,7 @@ jobs:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
           VAULT_PW: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
         run: |
-          cd infra/step_02_vm
+          cd infra/step_02_provission_vm
           echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
           echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
           ansible-playbook -i inventory/hosts.ini site.yml \
