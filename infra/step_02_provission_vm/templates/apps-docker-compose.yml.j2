@@ -62,7 +62,7 @@ services:
     depends_on:
       auth-db:
         condition: service_healthy
-      auth.migrator:
+      auth-migrator:
           condition: service_completed_successfully
 
   api:
