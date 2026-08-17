@@ -32,7 +32,7 @@ services:
     depends_on:
       auth-db:
         condition: service_healthy
-      auth.migrator:
+      auth-migrator:
         condition: service_completed_successfully
     networks: [web, app-backend, monitoring]
     labels:
@@ -45,16 +45,15 @@ services:
       timeout: 5s
       retries: 5
 
-  auth.migrator:
+  auth-migrator:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
-    container_name: oweme.identity.migrator
     entrypoint: ["dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "migrate"]
     env_file: auth.env
     depends_on:
       auth-db:
         condition: service_healthy
 
-  auth.seeder:
+  auth-seeder:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
     entrypoint: [ "dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "seed" ]
     env_file: auth.env
