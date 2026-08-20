@@ -16,6 +16,10 @@ on:
     paths:
       - ".github/workflows/provision-infra-dispatch.yml"
 
+permissions:
+  contents: read
+  deployments: write
+
 jobs:
   provision:
     uses: ./.github/workflows/provision-infra.yml

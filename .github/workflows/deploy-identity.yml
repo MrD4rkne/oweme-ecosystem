@@ -7,6 +7,11 @@ on:
       - "auth/**"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  deployments: write
+  packages: write
+
 jobs:
   build:
     uses: ./.github/workflows/push-to-ghcr.yml

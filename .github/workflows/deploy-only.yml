@@ -16,6 +16,11 @@ on:
         type: string
         description: 'Exact image tag to deploy (from a prior build job output)'
 
+permissions:
+  contents: read
+  deployments: write
+  packages: write
+
 jobs:
   deploy:
     name: Deploy ${{ inputs.app_name }} — ${{ inputs.environment_name }}
