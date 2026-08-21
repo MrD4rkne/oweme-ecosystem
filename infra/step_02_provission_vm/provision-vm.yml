@@ -21,8 +21,9 @@
 - hosts: all
   become: yes
   vars_files:
-    - vars.yml
-    - vars/vault.yml
+    - "vars/common.yml"
+    - "vars/{{ target_environment }}/vars.yml"
+    - "vars/{{ target_environment }}/vault.yml"
 
   tasks:
     # ============================================================

@@ -1,0 +1,5 @@
+grafana_admin_user: "admin"
+
+grafana_hostname: "grafana.staging.oweme.szopa.dev"
+api_hostname: "api.staging.oweme.szopa.dev"
+auth_hostname: "auth.staging.oweme.szopa.dev"
