@@ -4,11 +4,8 @@
 # vars/vault.yml (encrypted) is safe to commit. Any
 # plaintext copy, must NEVER be committed.
 
-vault_ghcr_username: "your-github-username"
-vault_ghcr_token: "ghp_xxxxxxxxxxxxxxxxxxxx"   # PAT with read:packages scope
+vault_ghcr_username: "ghcr_username"
+vault_ghcr_token: "ghcr_token_for_dowloading_image"   # PAT with read:packages scope
 
-vault_app_db_passwords:
-  identity: "change-me-identity-db-password"
-  api: "change-me-api-db-password"
-
-vault_grafana_admin_password: "change-me-grafana-password"
+vault_auth_db_password: "your_auth_db_password"
+vault_api_db_password: "your_api_db_password"
