@@ -274,7 +274,7 @@
     - name: Register traefik bouncer with fixed key
       command: >
         docker compose exec -T crowdsec cscli bouncers add traefik-bouncer
-        --key {{ crowdsec_bouncer_key }}
+        --key {{ vault_crowdsec_bouncer_key }}
       args: { chdir: /opt/traefik }
       when: "'traefik-bouncer' not in (cs_bouncers.stdout | default('[]') | from_json | map(attribute='name') | list)"
       tags: [traefik]
