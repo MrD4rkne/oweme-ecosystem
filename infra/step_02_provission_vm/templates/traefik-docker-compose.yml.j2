@@ -31,6 +31,14 @@ services:
       - "--metrics.prometheus.addServicesLabels=true"
       - "--accesslog=true"
       - "--accesslog.filepath=/var/log/traefik/access.log"
+      - "--experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin"
+      - "--experimental.plugins.crowdsec-bouncer.version=v1.4.2"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.crowdsec-bouncer.plugin.crowdsec-bouncer.enabled=true"
+      - "traefik.http.middlewares.crowdsec-bouncer.plugin.crowdsec-bouncer.crowdsecLapiScheme=http"
+      - "traefik.http.middlewares.crowdsec-bouncer.plugin.crowdsec-bouncer.crowdsecLapiHost=crowdsec:8080"
+      - "traefik.http.middlewares.crowdsec-bouncer.plugin.crowdsec-bouncer.crowdsecLapiKey=${CROWDSEC_BOUNCER_KEY}"
     ports:
       - "80:80"
       - "443:443"
@@ -48,3 +56,16 @@ services:
         limits:
           cpus: "0.50"
           memory: 256M
+
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    restart: unless-stopped
+    environment:
+      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios"
+    volumes:
+      - ./crowdsec/config:/etc/crowdsec
+      - ./crowdsec/data:/var/lib/crowdsec/data
+      - /var/log/traefik:/var/log/traefik:ro
+    networks:
+      - web
+

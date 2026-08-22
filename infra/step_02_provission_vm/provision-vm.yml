@@ -182,6 +182,15 @@
     # ============================================================
     # TRAEFIK
     # ============================================================
+    - name: Ensure log directory exists for Traefik
+      file:
+        path: /var/log/traefik
+        state: directory
+        owner: deploy
+        group: deploy
+        mode: '0755'
+      tags: [traefik, base]
+
     - name: Create Traefik directory structure
       file:
         path: /opt/traefik/letsencrypt
@@ -226,6 +235,31 @@
         project_src: /opt/traefik
         state: present
         pull: "{{ 'always' if (traefik_compose.changed or traefik_env.changed) else 'missing' }}"
+      tags: [traefik]
+
+    - name: Wait for CrowdSec LAPI to become healthy
+      command: docker compose exec -T crowdsec cscli lapi status
+      args: { chdir: /opt/traefik }
+      register: cs_health
+      until: cs_health.rc == 0
+      retries: 10
+      delay: 3
+      changed_when: false
+      tags: [traefik]
+
+    - name: Check registered bouncers
+      command: docker compose exec -T crowdsec cscli bouncers list -o json
+      args: { chdir: /opt/traefik }
+      register: cs_bouncers
+      changed_when: false
+      tags: [traefik]
+
+    - name: Register traefik bouncer with fixed key
+      command: >
+        docker compose exec -T crowdsec cscli bouncers add traefik-bouncer
+        --key {{ crowdsec_bouncer_key }}
+      args: { chdir: /opt/traefik }
+      when: "'traefik-bouncer' not in (cs_bouncers.stdout | default('[]') | from_json | map(attribute='name') | list)"
       tags: [traefik]
 
     # ============================================================
