@@ -1,0 +1,28 @@
+---
+# site.yml
+#
+# USAGE:
+#   Full provision (first run, or after changing base packages/firewall):
+#     ansible-playbook site.yml -i inventory/hosts.ini --vault-password-file .vault_pass
+#
+#   Fast path — redeploy app(s) only, e.g. after a GHCR push (used by CI):
+#     ansible-playbook site.yml -i inventory/hosts.ini --tags deploy \
+#       --vault-password-file .vault_pass \
+#       -e "image_tag=1.2.3" -e "target_app=api"
+#
+#   Config/secret change only, no image pull:
+#     ansible-playbook site.yml --tags secrets ...
+
+- hosts: all
+  become: true
+  vars_files:
+    - "vars/common.yml"
+    - "vars/{{ target_environment }}/vars.yml"
+    - "vars/{{ target_environment }}/vault.yml"
+  roles:
+    - base
+    - firewall
+    - docker
+    - traefik
+    - monitoring
+    - apps

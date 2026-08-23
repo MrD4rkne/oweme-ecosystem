@@ -35,20 +35,6 @@ jobs:
             exit 1
           fi
 
-      - name: Write inventory
-        env:
-          VM_IP: ${{ secrets.VM_IP }}
-          ENV_NAME: ${{ inputs.environment_name }} 
-        run: |
-          mkdir -p infra/step_02_provission_vm/inventory
-          cat > infra/step_02_provission_vm/inventory/hosts.ini <<EOF
-          [vm]
-          oweme-vm-$ENV_NAME ansible_host=$VM_IP ansible_user=ubuntu
-
-          [vm:vars]
-          ansible_python_interpreter=/usr/bin/python3
-          EOF
-
       - name: Run full provision
         env:
           SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
@@ -58,7 +44,9 @@ jobs:
           cd infra/step_02_provission_vm
           echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
           echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
-          ansible-playbook -i inventory/hosts.ini provision-vm.yml \
+          ansible-playbook \
+            -i inventory/${{ inputs.environment_name }}/hosts.ini \
+            site.yml \
             --private-key deploy_key \
             --vault-password-file .vault_pass \
             -e "target_environment=${{ inputs.environment_name }}"

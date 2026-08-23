@@ -1,0 +1,28 @@
+---
+# Split out of main.yml: this is a distinct concern (health-check + retry
+# loop + bouncer registration) from standing the stack up.
+
+- name: Wait for CrowdSec LAPI to become healthy
+  command: docker compose exec -T crowdsec cscli lapi status
+  args: { chdir: /opt/traefik }
+  register: cs_health
+  until: cs_health.rc == 0
+  retries: 10
+  delay: 3
+  changed_when: false
+  tags: [traefik]
+
+- name: Check registered bouncers
+  command: docker compose exec -T crowdsec cscli bouncers list -o json
+  args: { chdir: /opt/traefik }
+  register: cs_bouncers
+  changed_when: false
+  tags: [traefik]
+
+- name: Register traefik bouncer with fixed key
+  command: >
+    docker compose exec -T crowdsec cscli bouncers add traefik-bouncer
+    --key {{ vault_crowdsec_bouncer_key }}
+  args: { chdir: /opt/traefik }
+  when: "'traefik-bouncer' not in (cs_bouncers.stdout | default('[]') | from_json | map(attribute='name') | list)"
+  tags: [traefik]

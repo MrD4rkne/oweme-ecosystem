@@ -1,0 +1,46 @@
+---
+# Package baseline, hostname, MOTD.
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  tags: [base]
+
+- name: Upgrade all packages
+  apt:
+    upgrade: dist
+  tags: [base]
+
+- name: Install essential packages
+  apt:
+    name:
+      - curl
+      - git
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+      - jq
+    state: present
+  tags: [base]
+
+- name: Enable unattended security upgrades
+  copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+      APT::Periodic::AutocleanInterval "7";
+  tags: [base]
+
+- name: Set system hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  tags: [base]
+
+- name: Configure custom MOTD (Message of the Day)
+  template:
+    src: 99-custom-motd.j2
+    dest: /etc/update-motd.d/99-custom-motd
+    mode: '0755'
+  tags: [base]
