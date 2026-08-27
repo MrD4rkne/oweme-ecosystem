@@ -33,6 +33,8 @@ jobs:
 
       - name: Deploy ${{ inputs.app_name }} only
         working-directory: infra/step_02_configure_vm
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
           ansible-playbook -i inventory/${{ inputs.environment_name }}/hosts.ini site.yml \
             --tags deploy \
