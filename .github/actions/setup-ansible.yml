@@ -1,0 +1,30 @@
+name: 'Setup Ansible & Credentials'
+description: 'Installs Ansible + collections, writes SSH key and vault password files'
+inputs:
+  ssh_key:
+    required: true
+  vault_password:
+    required: true
+  working-directory:
+    required: false
+    default: infra/step_02_configure_vm
+runs:
+  using: "composite"
+  steps:
+    - name: Install Ansible
+      shell: bash
+      run: pipx install ansible-core
+
+    - name: Install collections
+      shell: bash
+      run: ansible-galaxy collection install community.docker
+
+    - name: Write credential files
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      env:
+        SSH_KEY: ${{ inputs.ssh_key }}
+        VAULT_PW: ${{ inputs.vault_password }}
+      run: |
+        echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
+        echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
