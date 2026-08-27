@@ -26,7 +26,7 @@ jobs:
 
   deploy-staging:
     needs: build
-    uses: ./.github/workflows/deploy-only.yml
+    uses: ./.github/workflows/deploy-app.yml
     with:
       environment_name: staging
       app_name: api
@@ -39,7 +39,7 @@ jobs:
       !cancelled() &&
       needs.build.result == 'success' &&
       needs.deploy-staging.result == 'success'
-    uses: ./.github/workflows/deploy-only.yml
+    uses: ./.github/workflows/deploy-app.yml
     with:
       environment_name: production
       app_name: api
