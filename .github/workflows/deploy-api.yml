@@ -18,10 +18,10 @@ jobs:
   build:
     uses: ./.github/workflows/push-to-ghcr.yml
     with:
-      image_name: oweme-api
-      dockerfile_path: api/Dockerfile
-      working_dir: api
-      push_latest: true
+      image_name: 'oweme-api'
+      dockerfile_path: 'api/api/src/OweMe.Api/Dockerfile'
+      working_dir: 'api'
+      push_latest: ${{ github.ref_name == 'main' }}
     permissions:
       contents: read
       packages: write
