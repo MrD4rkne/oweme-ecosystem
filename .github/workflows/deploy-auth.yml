@@ -1,4 +1,4 @@
-name: Deploy — identity
+name: Deploy — auth
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
     uses: ./.github/workflows/deploy-app.yml
     with:
       environment_name: staging
-      app_name: identity
+      app_name: auth
       image_tag: ${{ needs.build.outputs.image_ref }}
     secrets: inherit
 
@@ -44,6 +44,6 @@ jobs:
     uses: ./.github/workflows/deploy-app.yml
     with:
       environment_name: production
-      app_name: identity
+      app_name: auth
       image_tag: ${{ needs.build.outputs.image_ref }}
     secrets: inherit
