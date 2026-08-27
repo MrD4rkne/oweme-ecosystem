@@ -17,14 +17,15 @@ permissions:
   deployments: write
 
 jobs:
-  provision:
+  configure-staging:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'staging'
     secrets: inherit
 
-  provision-prod:
+  configure-production:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'production'
     secrets: inherit
+    needs: configure-staging
