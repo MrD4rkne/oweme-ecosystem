@@ -32,7 +32,7 @@ jobs:
           vault_password: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Deploy ${{ inputs.app_name }} only
-        working-directory: infra/step_02_provission_vm
+        working-directory: infra/step_02_configure_vm
         run: |
           ansible-playbook -i inventory/${{ inputs.environment_name }}/hosts.ini site.yml \
             --tags deploy \

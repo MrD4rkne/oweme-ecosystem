@@ -29,7 +29,7 @@ jobs:
           vault_password: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
 
       - name: Run full provision
-        working-directory: infra/step_02_provission_vm
+        working-directory: infra/step_02_configure_vm
         env:
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
