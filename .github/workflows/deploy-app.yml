@@ -22,24 +22,18 @@ jobs:
   deploy:
     name: Deploy ${{ inputs.app_name }} — ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
-    concurrency:
-      group: deploy-${{ inputs.environment_name }}
-      cancel-in-progress: false
     environment: ${{ inputs.environment_name }}
     steps:
       - uses: actions/checkout@v7
-      - name: Install Ansible
-        run: pipx install ansible-core
-      - name: Install collections
-        run: ansible-galaxy collection install community.docker
+
+      - uses: ./.github/actions/setup-ansible
+        with:
+          ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          vault_password: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+
       - name: Deploy ${{ inputs.app_name }} only
-        env:
-          SSH_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
-          VAULT_PW: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+        working-directory: infra/step_02_provission_vm
         run: |
-          cd infra/step_02_configure_vm
-          echo "$SSH_KEY" > deploy_key && chmod 600 deploy_key
-          echo "$VAULT_PW" > .vault_pass && chmod 600 .vault_pass
           ansible-playbook -i inventory/${{ inputs.environment_name }}/hosts.ini site.yml \
             --tags deploy \
             --private-key deploy_key \
