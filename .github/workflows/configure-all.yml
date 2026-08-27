@@ -6,7 +6,8 @@ on:
   push:
     branches: [main]
     paths:
-      - ".github/workflows/deploy_environments.yml"
+      - ".github/workflows/configure-all.yml"
+      - ".github/workflows/reusable-configure-vm.yml"
       - "infra/**"
   pull_request:
     branches: [main]
@@ -17,13 +18,13 @@ permissions:
 
 jobs:
   provision:
-    uses: ./.github/workflows/provision-infra.yml
+    uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'staging'
     secrets: inherit
 
   provision-prod:
-    uses: ./.github/workflows/provision-infra.yml
+    uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'production'
     secrets: inherit
