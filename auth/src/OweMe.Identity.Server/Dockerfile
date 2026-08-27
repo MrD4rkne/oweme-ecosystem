@@ -1,4 +1,5 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 
 USER root
 RUN apt-get update && \
@@ -34,7 +35,8 @@ RUN dotnet restore ./auth/src/OweMe.Identity.Server/OweMe.Identity.Server.csproj
 RUN dotnet restore ./auth/src/OweMe.Identity.Migrator/OweMe.Identity.Migrator.csproj -a $TARGETARCH
 
 WORKDIR /repo/auth/src/OweMe.Identity.Server
-RUN dotnet publish "OweMe.Identity.Server.csproj" \
+RUN --mount=type=bind,source=.git,target=/repo/.git \
+    dotnet publish "OweMe.Identity.Server.csproj" \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
     -o /app/publish/server \
@@ -42,7 +44,8 @@ RUN dotnet publish "OweMe.Identity.Server.csproj" \
     /p:UseAppHost=false
 
 WORKDIR /repo/auth/src/OweMe.Identity.Migrator
-RUN dotnet publish "OweMe.Identity.Migrator.csproj" \
+RUN --mount=type=bind,source=.git,target=/repo/.git \
+    dotnet publish "OweMe.Identity.Migrator.csproj" \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
     -o /app/publish/migrator \
