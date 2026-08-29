@@ -1,0 +1,20 @@
+---
+# TODO: migrator and seeder
+
+- name: Deploy single target service (fast path)
+  community.docker.docker_compose_v2:
+    project_src: /opt/apps
+    state: present
+    pull: always
+    services:
+      - "{{ target_app }}"
+  when: target_app is defined
+  tags: [apps, deploy]
+
+- name: Deploy full apps stack (full provision, no target_app)
+  community.docker.docker_compose_v2:
+    project_src: /opt/apps
+    state: present
+    pull: always
+  when: target_app is not defined
+  tags: [apps]

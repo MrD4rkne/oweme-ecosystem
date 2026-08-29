@@ -1,0 +1,84 @@
+---
+# Docker Engine, deploy user, and the shared networks every stack depends on.
+
+- name: Ensure python3-debian is installed (required by deb822_repository)
+  apt:
+    name: python3-debian
+    state: present
+  tags: [base, docker]
+
+- name: Add Docker repository (deb822 format)
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: [deb]
+    uris: "https://download.docker.com/linux/ubuntu"
+    suites: "{{ ansible_facts['distribution_release'] }}"
+    components: [stable]
+    architectures: [arm64]
+    signed_by: "https://download.docker.com/linux/ubuntu/gpg"
+    state: present
+  tags: [base, docker]
+
+- name: Install Docker Engine and Compose plugin
+  apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    update_cache: yes
+  tags: [base, docker]
+
+- name: Configure Docker log rotation
+  copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "log-driver": "local",
+        "log-opts": {
+          "max-size": "10m",
+          "max-file": "3"
+        }
+      }
+  notify: restart docker
+  tags: [base, docker]
+
+- name: Ensure docker service is running and enabled
+  service:
+    name: docker
+    state: started
+    enabled: yes
+  tags: [base, docker]
+
+- name: Create 'deploy' user for CI/CD
+  user:
+    name: deploy
+    shell: /bin/bash
+    groups: docker
+    append: yes
+    create_home: yes
+  tags: [base, docker]
+
+- name: Add deploy user's authorized key
+  authorized_key:
+    user: deploy
+    key: "{{ deploy_user_ssh_pubkey }}"
+    state: present
+  when: deploy_user_ssh_pubkey is defined and deploy_user_ssh_pubkey | length > 0
+  tags: [base, docker]
+
+# NOTE: originally tagged [base, apps, deploy, monitoring] only — that meant
+# `--tags traefik` on a fresh host would fail because the `web` network
+# didn't exist yet. Added `docker` and `traefik` here so any entry point
+# that needs a network gets one.
+- name: Create shared Docker networks
+  docker_network:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - web           # Traefik <-> all apps (public routing)
+    - app-backend   # app <-> app service-to-service traffic
+    - monitoring    # Traefik/apps metrics <-> Prometheus
+  tags: [base, docker, apps, deploy, monitoring, traefik]

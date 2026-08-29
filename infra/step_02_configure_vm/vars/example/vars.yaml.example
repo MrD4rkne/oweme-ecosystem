@@ -1,0 +1,5 @@
+grafana_admin_user: "admin"
+
+grafana_hostname: "your-grafana-hostname.com"
+api_hostname: "your-api-hostname.com"
+auth_hostname: "your-auth-hostname.com"

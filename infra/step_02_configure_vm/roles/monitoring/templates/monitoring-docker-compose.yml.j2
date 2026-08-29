@@ -1,0 +1,50 @@
+name: monitoring
+
+networks:
+  monitoring:
+    external: true
+  web:
+    external: true   # only Grafana joins this, to be reachable via Traefik
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+      - web
+    depends_on:
+      - prometheus
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=web"
+      - "traefik.http.routers.grafana.rule=Host(`{{ grafana_hostname | default('grafana.yourdomain.com') }}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+volumes:
+  prometheus-data:
+  grafana-data:

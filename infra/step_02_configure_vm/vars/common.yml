@@ -1,0 +1,5 @@
+github_org_repo: "mrd4rkne/oweme-ecosystem"   # used to build ghcr.io/<org>/<repo>/<image>
+
+letsencrypt_email: "marcinsz.pv@gmail.com"
+
+identity_authority_url: "https://{{ auth_hostname }}"

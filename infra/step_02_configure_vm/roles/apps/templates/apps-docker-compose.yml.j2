@@ -1,0 +1,98 @@
+services:
+  auth-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: auth.env
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks: [app-backend]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file: api.env
+    volumes:
+      - api-db-data:/var/lib/postgresql/data
+    networks: [app-backend]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U api"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: auth.env
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      auth-migrator:
+        condition: service_completed_successfully
+    networks: [web, app-backend, monitoring]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.auth.rule=Host(`{{ auth_hostname }}`)"
+      - "traefik.http.routers.auth.tls.certresolver=letsencrypt"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/healthz" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-migrator:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
+    entrypoint: ["dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "migrate"]
+    env_file: auth.env
+    networks: [app-backend]
+    depends_on:
+      auth-db:
+        condition: service_healthy
+
+  auth-seeder:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:${AUTH_IMAGE_TAG:-latest}
+    entrypoint: [ "dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "seed" ]
+    env_file: auth.env
+    networks: [app-backend]
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      auth-migrator:
+          condition: service_completed_successfully
+
+  api:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:${API_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: api.env
+    depends_on:
+      api-db:
+        condition: service_healthy
+      auth:
+        condition: service_healthy
+    networks: [web, app-backend, monitoring]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`{{ api_hostname }}`)"
+      - "traefik.http.routers.api.tls.certresolver=letsencrypt"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/healthz" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  web:
+    external: true
+  app-backend:
+    external: true
+  monitoring:
+    external: true
+
+volumes:
+  auth-db-data:
+  api-db-data:

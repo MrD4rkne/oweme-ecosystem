@@ -1,0 +1,7 @@
+name: step_01_vm
+description: Create a VM to host the oweme system.
+runtime: dotnet
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: csharp

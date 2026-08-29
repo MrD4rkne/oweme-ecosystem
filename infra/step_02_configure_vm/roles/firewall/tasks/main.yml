@@ -1,0 +1,37 @@
+---
+# UFW rules + fail2ban. Kept separate from base so you can re-run just
+# firewall changes without touching apt/package tasks.
+
+- name: Set up UFW firewall rules
+  ufw:
+    rule: allow
+    port: "{{ item }}"
+    proto: tcp
+  loop:
+    - "22"
+    - "80"
+    - "443"
+  tags: [base, firewall]
+
+- name: Set UFW default policies
+  ufw:
+    policy: deny
+    direction: incoming
+  tags: [base, firewall]
+
+- name: Enable UFW
+  ufw:
+    state: enabled
+  tags: [base, firewall]
+
+- name: Configure fail2ban for sshd
+  copy:
+    dest: /etc/fail2ban/jail.local
+    content: |
+      [sshd]
+      enabled = true
+      maxretry = 5
+      bantime = 1h
+      findtime = 10m
+  notify: restart fail2ban
+  tags: [base, firewall]

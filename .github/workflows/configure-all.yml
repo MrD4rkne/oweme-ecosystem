@@ -1,0 +1,31 @@
+name: Configure Environments
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/configure-all.yml"
+      - ".github/workflows/reusable-configure-vm.yml"
+      - "infra/**"
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  configure-staging:
+    uses: ./.github/workflows/reusable-configure-vm.yml
+    with:
+      environment_name: 'staging'
+    secrets: inherit
+
+  configure-production:
+    uses: ./.github/workflows/reusable-configure-vm.yml
+    with:
+      environment_name: 'production'
+    secrets: inherit
+    needs: configure-staging

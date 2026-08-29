@@ -1,0 +1,11 @@
+# Fill in real values, then ENCRYPT IT:
+#   ansible-vault encrypt vault.yml
+#
+# vars/vault.yml (encrypted) is safe to commit. Any
+# plaintext copy, must NEVER be committed.
+
+vault_ghcr_username: "ghcr_username"
+vault_ghcr_token: "ghcr_token_for_dowloading_image"   # PAT with read:packages scope
+
+vault_auth_db_password: "your_auth_db_password"
+vault_api_db_password: "your_api_db_password"

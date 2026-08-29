@@ -1,4 +1,5 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 
 USER root
 RUN apt-get update && \
@@ -38,7 +39,8 @@ RUN dotnet restore ./api/api/src/OweMe.Api/OweMe.Api.csproj -a $TARGETARCH
 RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TARGETARCH
 
 WORKDIR /repo/api/api/src/OweMe.Api
-RUN dotnet publish "OweMe.Api.csproj" \
+RUN --mount=type=bind,source=.git,target=/repo/.git \
+    dotnet publish "OweMe.Api.csproj" \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
     -o /app/publish \

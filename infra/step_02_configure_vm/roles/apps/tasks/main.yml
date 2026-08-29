@@ -1,0 +1,7 @@
+---
+# Per-app deploy (auth + api). Split into env.yml (registry login, compose
+# template, secret rendering) and deploy.yml (the actual up/pull) since
+# `--tags secrets` should touch env.yml only, never deploy.yml.
+
+- import_tasks: env.yml
+- import_tasks: deploy.yml

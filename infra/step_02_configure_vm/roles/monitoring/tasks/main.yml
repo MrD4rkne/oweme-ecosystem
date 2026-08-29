@@ -1,0 +1,48 @@
+---
+# Prometheus + Grafana stack.
+
+- name: Create Monitoring directory structure
+  file:
+    path: /opt/monitoring
+    state: directory
+    owner: deploy
+    group: deploy
+    mode: '0755'
+  tags: [monitoring]
+
+- name: Copy Prometheus config
+  template:
+    src: prometheus.yml.j2
+    dest: /opt/monitoring/prometheus.yml
+    owner: deploy
+    group: deploy
+    mode: '0644'
+  register: prometheus_config
+  tags: [monitoring]
+
+- name: Copy Monitoring docker-compose template to server
+  template:
+    src: monitoring-docker-compose.yml.j2
+    dest: /opt/monitoring/docker-compose.yml
+    owner: deploy
+    group: deploy
+    mode: '0644'
+  register: monitoring_compose
+  tags: [monitoring]
+
+- name: Copy Monitoring .env
+  template:
+    src: monitoring.env.j2
+    dest: /opt/monitoring/.env
+    owner: deploy
+    group: deploy
+    mode: '0600'
+  register: monitoring_env
+  tags: [monitoring]
+
+- name: Start Monitoring stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/monitoring
+    state: present
+    pull: "{{ 'always' if (monitoring_compose.changed or monitoring_env.changed or prometheus_config.changed) else 'missing' }}"
+  tags: [monitoring]

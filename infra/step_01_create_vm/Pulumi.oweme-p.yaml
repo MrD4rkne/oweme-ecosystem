@@ -1,0 +1,7 @@
+config:
+  OciVmInfra:compartmentId: ocid1.compartment.oc1..aaaaaaaaygy6hhdhzu2vdxco67yru4exwjt4mqkq6zctahckxtintnh4svjq
+  OciVmInfra:availabilityDomain: voCO:EU-FRANKFURT-1-AD-1
+  OciVmInfra:imageId: ocid1.image.oc1.eu-frankfurt-1.aaaaaaaaxloe7grzdoamrmsm3eetkg34prf7rjqte5sewidrlfukaiurltta
+  OciVmInfra:sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP83bnIKYvt4nC+JFXqzi0mxFn+XiJsV1GkBHikbrVtW oweme-api-vm
+  oci:configFileProfile: DEFAULT
+  oci:region: eu-frankfurt-1

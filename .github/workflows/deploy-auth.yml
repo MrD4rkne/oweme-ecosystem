@@ -1,0 +1,49 @@
+name: Deploy — auth
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "auth/**"
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  deployments: write
+  packages: write
+
+jobs:
+  build:
+    uses: ./.github/workflows/push-to-ghcr.yml
+    with:
+      image_name: 'oweme-auth'
+      dockerfile_path: 'auth/src/OweMe.Identity.Server/Dockerfile'
+      working_dir: 'auth'
+      push_latest: ${{ github.ref_name == 'main' }}
+    permissions:
+      contents: read
+      packages: write
+
+  deploy-staging:
+    needs: build
+    uses: ./.github/workflows/deploy-app.yml
+    with:
+      environment_name: staging
+      app_name: auth
+      image_tag: ${{ needs.build.outputs.image_ref }}
+    secrets: inherit
+
+  deploy-production:
+    needs: [build, deploy-staging]
+    if: |
+      !cancelled() &&
+      needs.build.result == 'success' &&
+      needs.deploy-staging.result == 'success'
+    uses: ./.github/workflows/deploy-app.yml
+    with:
+      environment_name: production
+      app_name: auth
+      image_tag: ${{ needs.build.outputs.image_ref }}
+    secrets: inherit
