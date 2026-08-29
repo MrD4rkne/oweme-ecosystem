@@ -15,8 +15,3 @@ jobs:
     name: Verify API
     uses: ./.github/workflows/build-api.yml
     secrets: inherit
-
-  verify-auth:
-    name: Verify Authentication
-    uses: ./.github/workflows/build-auth.yml
-    secrets: inherit

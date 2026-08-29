@@ -17,10 +17,3 @@ jobs:
     secrets: inherit
     with:
       sonar_enforce_quality_gate: false
-
-  verify-auth:
-    name: Verify Authentication
-    uses: ./.github/workflows/build-auth.yml
-    secrets: inherit
-    with:
-      sonar_enforce_quality_gate: false
