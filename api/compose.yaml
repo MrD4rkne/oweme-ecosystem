@@ -1,18 +1,24 @@
-﻿name: oweme-system
-
-services:
+﻿services:
   oweme.api:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:latest
     container_name: oweme.api
     ports:
       - "5000:8080"
       - "5001:8081"
+    networks:
+      - oweme-network
+      - default
     environment:
+      ASPNETCORE_ENVIRONMENT: Development
       Database__ConnectionString: Server=oweme.api.database;Database=OweMe.Api;Username=sa;Password=Password123;TrustServerCertificate=True;
       Database__RunMigrations: true
-      IdentityServer__Authority: http://oweme.identity:8080
+      IdentityServer__Authority: http://localhost:8080/realms/oweme-dev
+      IdentityServer__MetadataAddress: http://keycloak:8080/realms/oweme-dev/.well-known/openid-configuration
       IdentityServer__ValidateAudience: false
       IdentityServer__RequireHttpsMetadata: false
+      # --- AUTH LOGGING OVERRIDES ---
+      Logging__LogLevel__Microsoft.AspNetCore.Authentication: Debug
+      Logging__LogLevel__Microsoft.IdentityModel: Debug
     depends_on:
       oweme.api.database:
         condition: service_healthy
@@ -35,3 +41,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+networks:
+  oweme-network:
+    driver: bridge

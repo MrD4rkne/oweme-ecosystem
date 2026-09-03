@@ -1,0 +1,59 @@
+{
+  "realm": "oweme-dev",
+  "enabled": true,
+  "clientScopes": [
+    {
+      "name": "oweme-api",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "true",
+        "display.on.consent.screen": "true"
+      },
+      "protocolMappers": [
+        {
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "config": {
+            "user.attribute": "email",
+            "claim.name": "email",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "oweme-api-user",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "defaultClientScopes": [
+        "email",
+        "oweme-api"
+      ]
+    }
+  ],
+  "users": [
+      {
+        "username": "apiuser",
+        "email": "apiuser@owe.me",
+        "firstName": "API",
+        "lastName": "User",
+        "enabled": true,
+        "emailVerified": true,
+        "credentials": [
+          {
+            "type": "password",
+            "value": "Password123!",
+            "temporary": false
+          }
+        ]
+      }
+  ]
+}

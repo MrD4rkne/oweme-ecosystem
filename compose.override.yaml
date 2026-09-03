@@ -1,3 +1,7 @@
-include:
-  - path: ./auth/compose.override.yaml
-  - path: ./api/compose.override.yaml
+services:
+  oweme.api:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://oweme.seq:5341/ingest/otlp
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://oweme.jaeger:4318/v1/traces
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: oweme.api
