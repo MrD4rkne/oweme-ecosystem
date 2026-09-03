@@ -39,12 +39,21 @@ RUN dotnet restore ./api/api/src/OweMe.Api/OweMe.Api.csproj -a $TARGETARCH
 RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TARGETARCH
 
 WORKDIR /repo/api/api/src/OweMe.Api
+
+RUN --mount=type=bind,source=.git,target=/repo/.git \
+    dotnet build "OweMe.Api.csproj" \
+    -c "$BUILD_CONFIGURATION" \
+    -a "$TARGETARCH" \
+    --no-restore
+
+RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -a "$TARGETARCH" -- codegen
+
 RUN --mount=type=bind,source=.git,target=/repo/.git \
     dotnet publish "OweMe.Api.csproj" \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
     -o /app/publish \
-    --no-restore \
+    --no-build \
     /p:UseAppHost=false \
     /p:OpenApiGenerateDocuments=false
 

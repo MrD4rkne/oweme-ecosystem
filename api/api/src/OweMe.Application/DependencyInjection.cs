@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OweMe.Application.Common;
 using OweMe.Application.Common.Middlewares;
+using OweMe.Application.User;
 using Wolverine;
 using Wolverine.FluentValidation;
 
@@ -18,7 +19,9 @@ public static class DependencyInjection
     public static void AddApplication(this IHostApplicationBuilder builder)
     {
         builder.Services.AddOptions<ApplicationOptions>();
-        
+
+        builder.Services.AddUserContext();
+
         builder.UseWolverine(opts =>
         {
             opts.Discovery.IncludeAssembly(typeof(DependencyInjection).Assembly);
@@ -35,6 +38,11 @@ public static class DependencyInjection
                     // I'm only going to care about this in production
                     cr.Production.AssertAllPreGeneratedTypesExist = true;
                 });
+            }
+            else
+            {
+                // Fallback to Auto for local development/debugging
+                opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
             }
         });
 

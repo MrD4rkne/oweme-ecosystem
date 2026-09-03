@@ -12,6 +12,7 @@ using OweMe.Api.Endpoints;
 using OweMe.Api.Identity;
 using OweMe.Api.Identity.Configuration;
 using OweMe.Api.Identity.Description;
+using OweMe.Api.User;
 using OweMe.Application;
 using OweMe.Infrastructure;
 using OweMe.Persistence;
@@ -71,7 +72,6 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddSingleton<IApiInformationProvider, ApiInformationProvider>();
 
 builder.Services.ConfigureOptions<ConfigureJwtBearerOptions>();
@@ -135,6 +135,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<UserContextMiddleware>();
 
 app.MapEndpoints();
 
