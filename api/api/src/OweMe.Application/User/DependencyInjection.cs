@@ -1,41 +1,45 @@
 using Microsoft.Extensions.DependencyInjection;
+using OweMe.Domain.Users;
 
 namespace OweMe.Application.User;
 
 public static class DependencyInjection
 {
-    public static void UseUserContext(this IServiceProvider services, IUserContext context)
+    public static void SetUserContext(this IServiceProvider services, UserId id, string email)
     {
         ArgumentNullException.ThrowIfNull(services);
-        ArgumentNullException.ThrowIfNull(context);
+        if(id == default) throw new ArgumentException("UserId cannot be default.", nameof(id));
+        ArgumentException.ThrowIfNullOrEmpty(email);
 
         var userContextSetter = services.GetRequiredService<IUserContextSetter>();
-        userContextSetter.SetContext(context);
+        userContextSetter.SetContext(id, email);
     }
     
     internal static IServiceCollection AddUserContext(this IServiceCollection services)
     {
-        services.AddScoped<UserContextProvider>();
-        services.AddScoped<IUserContextProvider>(sp => sp.GetRequiredService<UserContextProvider>());
-        services.AddScoped<IUserContextSetter>(sp => sp.GetRequiredService<UserContextProvider>());
+        services.AddScoped<UserContextManager>();
+        services.AddScoped<IUserContext>(sp => sp.GetRequiredService<UserContextManager>());
+        services.AddScoped<IUserContextSetter>(sp => sp.GetRequiredService<UserContextManager>());
         return services;
     }
 
-    private sealed class UserContextProvider : IUserContextProvider, IUserContextSetter
+    private sealed class UserContextManager : IUserContextSetter, IUserContext
     {
-        private IUserContext? _context;
+        private UserContext? _context;
 
-        public IUserContext Context =>
-            _context ?? throw new InvalidOperationException("User context has not been set.");
-
-        public void SetContext(IUserContext context)
+        public void SetContext(UserId id, string email)
         {
-            _context = context;
+            _context = new UserContext(id, email);
         }
+
+        public UserId Id => _context?.Id ?? throw new UserContextNotAvailableException();
+        public string Email => _context?.Email ?? throw new UserContextNotAvailableException();
     }
     
     private interface IUserContextSetter
     {
-        void SetContext(IUserContext context);
+        void SetContext(UserId id, string email);
     }
+    
+    private sealed record UserContext(UserId Id, string Email) : IUserContext;
 }

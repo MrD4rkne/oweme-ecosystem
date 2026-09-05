@@ -22,11 +22,9 @@ public class UserContextMiddleware(
                 return Task.CompletedTask;
             }
             
-            context.RequestServices.UseUserContext(new UserContext(new UserId(Guid.Parse(userId)), email));
+            context.RequestServices.SetUserContext(new UserId(Guid.Parse(userId)), email);
         }
 
         return next(context);
     }
-    
-    private sealed record UserContext(UserId Id, string Email) : IUserContext;
 }
