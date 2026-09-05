@@ -2,9 +2,14 @@ services:
   keycloak:
     image: keycloak/keycloak:latest
     command: start-dev --import-realm
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     depends_on:
       keycloak_db:
-          condition: service_healthy
+        condition: service_healthy
     ports:
       - "8080:8080"
     networks:
@@ -12,22 +17,24 @@ services:
       - default
     volumes:
       - ./realms:/opt/keycloak/data/import
+    env_file:
+      - path: .env
+        required: true
     environment:
-      - KC_BOOTSTRAP_ADMIN_USERNAME=${KEYCLOAK_ADMIN_USER}
-      - KC_BOOTSTRAP_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD}
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://keycloak_db:5432/${POSTGRES_DB}
-      - KC_DB_USERNAME=${POSTGRES_USER}
-      - KC_DB_PASSWORD=${POSTGRES_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
 
   keycloak_db:
     image: bitnami/postgresql:latest
-    environment:
-      - POSTGRESQL_USERNAME=${POSTGRES_USER}
-      - POSTGRESQL_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRESQL_DATABASE=${POSTGRES_DB}
+    env_file:
+      - path: .env
+        required: true
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRESQL_USERNAME -d $$POSTGRESQL_DATABASE"]
       interval: 10s
       timeout: 5s
       retries: 5
