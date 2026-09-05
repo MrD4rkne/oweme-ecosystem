@@ -11,7 +11,7 @@ public static class UserRegistration
         app.UseMiddleware<UserContextMiddleware>();
         return app;
     }
-    
+
     private static void ThrowIfUserContextNotRegistered(IServiceProvider serviceProvider)
     {
         var userContextProvider = serviceProvider.GetService<IUserContext>();

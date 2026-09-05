@@ -25,7 +25,7 @@ namespace OweMe.Api.Client
     using System = global::System;
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.5.0.0 (NJsonSchema v11.4.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class OweMeApiClient 
+    public partial class OweMeApiClient
     {
         private System.Net.Http.HttpClient _httpClient;
         private static System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings, true);
@@ -84,7 +84,7 @@ namespace OweMe.Api.Client
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
-                
+
                     // Operation Path: "api/info"
                     urlBuilder_.Append("api/info");
 
@@ -171,7 +171,7 @@ namespace OweMe.Api.Client
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
-                
+
                     // Operation Path: "api/ledgers/{ledgerId}"
                     urlBuilder_.Append("api/ledgers/");
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ledgerId, System.Globalization.CultureInfo.InvariantCulture)));
@@ -282,7 +282,7 @@ namespace OweMe.Api.Client
                     request_.Method = new System.Net.Http.HttpMethod("POST");
 
                     var urlBuilder_ = new System.Text.StringBuilder();
-                
+
                     // Operation Path: "api/ledgers"
                     urlBuilder_.Append("api/ledgers");
 
@@ -445,7 +445,7 @@ namespace OweMe.Api.Client
                     var field = System.Reflection.IntrospectionExtensions.GetTypeInfo(value.GetType()).GetDeclaredField(name);
                     if (field != null)
                     {
-                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute)) 
+                        var attribute = System.Reflection.CustomAttributeExtensions.GetCustomAttribute(field, typeof(System.Runtime.Serialization.EnumMemberAttribute))
                             as System.Runtime.Serialization.EnumMemberAttribute;
                         if (attribute != null)
                         {
@@ -457,7 +457,7 @@ namespace OweMe.Api.Client
                     return converted == null ? string.Empty : converted;
                 }
             }
-            else if (value is bool) 
+            else if (value is bool)
             {
                 return System.Convert.ToString((bool)value, cultureInfo).ToLowerInvariant();
             }

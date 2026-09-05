@@ -22,11 +22,11 @@ public class EndpointExtensionsTests
         var serviceProvider = services.BuildServiceProvider();
         var endpoints = serviceProvider.GetServices<IEndpoint>().ToList();
         endpoints.ShouldNotBeEmpty();
-        
+
         endpoints.ShouldContain(e => e is TestGetEndpoint);
         endpoints.ShouldContain(e => e is TestPostEndpoint);
     }
-    
+
     [Fact]
     public void MapEndpoints_ShouldMapEndpoints()
     {
@@ -42,12 +42,12 @@ public class EndpointExtensionsTests
         var endpoints = (app as IEndpointRouteBuilder).DataSources
             .SelectMany(ds => ds.Endpoints)
             .ToList();
-        
+
         endpoints.ShouldNotBeEmpty();
         endpoints.ShouldContain(e => e.DisplayName == "HTTP: GET /test");
         endpoints.ShouldContain(e => e.DisplayName == "HTTP: POST /test");
     }
-    
+
     private sealed class TestGetEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder builder)
@@ -55,7 +55,7 @@ public class EndpointExtensionsTests
             builder.MapGet("/test", () => "Test endpoint");
         }
     }
-    
+
     private sealed class TestPostEndpoint : IEndpoint
     {
         public void MapEndpoint(IEndpointRouteBuilder builder)

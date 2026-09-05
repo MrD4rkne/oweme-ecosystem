@@ -6,7 +6,7 @@ namespace OweMe.Api.SmokeTests;
 public class LoggingDelegatingHandler : DelegatingHandler
 {
     private readonly ILogger? _logger = TestContext.Current.TestOutputHelper?.ToLogger<LoggingDelegatingHandler>();
-    
+
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
@@ -22,7 +22,7 @@ public class LoggingDelegatingHandler : DelegatingHandler
         var response = await base.SendAsync(request, cancellationToken);
 
         _logger?.LogInformation("Response: {StatusCode} {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
-        
+
         string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
         _logger?.LogInformation("Response Body: {Body}", responseBody);
         _logger?.LogInformation("Response Headers: {Headers}", FormatHeaders(response.Headers));

@@ -3,6 +3,12 @@
     <deployment type="docker-compose.yml">
       <settings>
         <option name="commandLineOptions" value="--build" />
+        <option name="secondarySourceFiles">
+          <list>
+            <option value="../compose.override.yaml" />
+            <option value="compose.override.yaml" />
+          </list>
+        </option>
         <option name="sourceFilePath" value="../compose.yaml" />
       </settings>
     </deployment>

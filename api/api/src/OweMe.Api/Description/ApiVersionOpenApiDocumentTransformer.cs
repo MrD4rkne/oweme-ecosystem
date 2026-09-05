@@ -9,7 +9,7 @@ public class ApiVersionOpenApiDocumentTransformer(IApiInformationProvider apiInf
         CancellationToken cancellationToken)
     {
         var apiInfo = apiInformationProvider.GetApiInfo();
-        
+
         document.Info ??= new OpenApiInfo();
         document.Info.Title = apiInfo.Title;
         document.Info.Version = apiInfo.Version;
