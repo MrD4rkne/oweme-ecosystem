@@ -90,6 +90,8 @@ builder.AddPersistence();
 
 builder.Services.AddExceptionHandler<ExceptionProblemDetailsMatcher>();
 
+builder.Services.AddScoped<UserContextMiddleware>();
+
 builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
