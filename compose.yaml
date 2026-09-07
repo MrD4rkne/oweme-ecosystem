@@ -1,4 +1,6 @@
 name: oweme-system
 include:
   - path: ./auth/compose.yaml
+    project_directory: .
   - path: ./api/compose.yaml
+    project_directory: .

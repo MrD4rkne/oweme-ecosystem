@@ -2,14 +2,12 @@
   <configuration default="false" name="API debug" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
-        <option name="commandLineOptions" value="--build" />
         <option name="secondarySourceFiles">
           <list>
-            <option value="../compose.override.yaml" />
             <option value="compose.override.yaml" />
           </list>
         </option>
-        <option name="sourceFilePath" value="../compose.yaml" />
+        <option name="sourceFilePath" value="../api/compose.yaml" />
       </settings>
     </deployment>
     <EXTENSION ID="com.jetbrains.rider.docker.debug" isFastModeEnabled="true" isSslEnabled="false" />

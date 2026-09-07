@@ -1,5 +1,5 @@
 services:
-  oweme.api:
+  api:
     environment:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://oweme.seq:5341/ingest/otlp
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://oweme.jaeger:4318/v1/traces

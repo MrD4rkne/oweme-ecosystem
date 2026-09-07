@@ -42,3 +42,4 @@ services:
 networks:
   oweme-network:
     driver: bridge
+    name: oweme-network
