@@ -135,8 +135,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-app.UseAuthorization();
 app.UseMiddleware<UserContextMiddleware>();
+app.UseAuthorization();
 
 app.MapEndpoints();
 
