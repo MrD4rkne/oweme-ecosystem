@@ -80,6 +80,9 @@ jobs:
           key: ${{ runner.os }}-sonar-${{ inputs.sonar_project_key }}
           restore-keys: ${{ runner.os }}-sonar-
 
+      - name: Install Aspire CLI
+        run: dotnet tool install -g Aspire.Cli
+
       - name: Install SonarScanner for .NET
         run: dotnet tool install --global dotnet-sonarscanner
 
