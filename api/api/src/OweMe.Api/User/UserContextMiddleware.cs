@@ -1,30 +1,27 @@
 using System.Security.Claims;
 using OweMe.Application;
-using OweMe.Application.User;
 using OweMe.Domain.Users;
+using Wolverine;
+using DependencyInjection = OweMe.Application.User.DependencyInjection;
 
 namespace OweMe.Api.User;
-
-public class UserContextMiddleware(
-    ILogger<UserContextMiddleware> logger) : IMiddleware
+public static class UserContextWolverineMiddleware
 {
-    public Task InvokeAsync(HttpContext context, RequestDelegate next)
+    // Wolverine resolves these dependencies directly from the handler's active scope
+    public static void Before(
+        DependencyInjection.IUserContextSetter userContext,
+        IHttpContextAccessor httpContextAccessor)
     {
-        if (context.User.Identity?.IsAuthenticated == true)
+        var principal = httpContextAccessor.HttpContext?.User;
+        if (principal?.Identity?.IsAuthenticated == true)
         {
-            var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var email = context.User.FindFirstValue(ClaimTypes.Email);
+            var userIdStr = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var email = principal.FindFirstValue(ClaimTypes.Email);
 
-            if(string.IsNullOrWhiteSpace(userId) || string.IsNullOrWhiteSpace(email))
+            if (!string.IsNullOrEmpty(userIdStr) && Guid.TryParse(userIdStr, out var guid))
             {
-                logger.LogWarning("User context is missing required information.");
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return Task.CompletedTask;
+                userContext.SetContext(new UserId(guid), email ?? string.Empty);
             }
-
-            context.RequestServices.SetUserContext(new UserId(Guid.Parse(userId)), email);
         }
-
-        return next(context);
     }
 }

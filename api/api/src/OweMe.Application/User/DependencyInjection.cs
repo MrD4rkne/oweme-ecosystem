@@ -36,10 +36,10 @@ public static class DependencyInjection
         public string Email => _context?.Email ?? throw new UserContextNotAvailableException();
     }
     
-    private interface IUserContextSetter
+    public interface IUserContextSetter
     {
         void SetContext(UserId id, string email);
     }
     
-    private sealed record UserContext(UserId Id, string Email) : IUserContext;
+    private sealed record UserContext(UserId Id, string Email);
 }

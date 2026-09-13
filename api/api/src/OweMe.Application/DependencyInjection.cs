@@ -22,30 +22,6 @@ public static class DependencyInjection
 
         builder.Services.AddUserContext();
 
-        builder.UseWolverine(opts =>
-        {
-            opts.Discovery.IncludeAssembly(typeof(DependencyInjection).Assembly);
-
-            opts.Policies.AddMiddleware<PerformanceMiddleware>();
-
-            opts.UseFluentValidation(RegistrationBehavior.ExplicitRegistration);
-
-            if (builder.Environment.IsProduction())
-            {
-                opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
-                opts.Services.CritterStackDefaults(cr =>
-                {
-                    // I'm only going to care about this in production
-                    cr.Production.AssertAllPreGeneratedTypesExist = true;
-                });
-            }
-            else
-            {
-                // Fallback to Auto for local development/debugging
-                opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
-            }
-        });
-
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }
