@@ -2,4 +2,5 @@ github_org_repo: "mrd4rkne/oweme-ecosystem"   # used to build ghcr.io/<org>/<rep
 
 letsencrypt_email: "marcinsz.pv@gmail.com"
 
-identity_authority_url: "https://{{ auth_hostname }}"
+identity_authority_url: "https://{{ idp_hostname }}"
+keycloak_version: "26.7"
