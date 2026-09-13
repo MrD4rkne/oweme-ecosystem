@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using OweMe.Api.SmokeTests.Configuration;
+using Shouldly;
 
 namespace OweMe.Api.SmokeTests.Endpoints;
 
@@ -11,7 +12,7 @@ public sealed class GetApiInformationEndpointTests(OweMeClientFixture fixture)
     {
         // Arrange
         var client = fixture.GetClient(oweMeClientKey);
-        
+
         // Act
         var response = await client.GetApiInformationAsync(CancellationToken.None);
 

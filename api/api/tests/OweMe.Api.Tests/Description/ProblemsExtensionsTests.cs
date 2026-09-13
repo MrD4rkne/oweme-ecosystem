@@ -11,7 +11,7 @@ public class ProblemsExtensionsTests
     /// Represents the content type for problem details responses.
     /// </summary>
     private const string ProblemDetailsContentType = "application/problem+json";
-    
+
     [Fact]
     public void WithStandardProblems_ShouldReturnBuilder()
     {
@@ -22,12 +22,12 @@ public class ProblemsExtensionsTests
         var result = builder.WithStandardProblems();
 
         // Assert
-        
+
         result.ShouldBeOfType<MyBuilder>();
         result.ShouldBeAssignableTo<IEndpointConventionBuilder>();
         result.ShouldBe(builder);
     }
-    
+
     [Fact]
     public void WithStandardProblems_ShouldRegisterAllCommonErrors()
     {
@@ -37,11 +37,11 @@ public class ProblemsExtensionsTests
 
         // Act
         var result = builder.WithStandardProblems();
-        var action = result.EndpointConventionBuilders[0]; 
+        var action = result.EndpointConventionBuilders[0];
         var endpointBuilder = new MyEndpointBuilder();
-        
+
         action(endpointBuilder);
-        
+
         // Assert
         endpointBuilder.Metadata.Count.ShouldBe(expectedStatusCodes.Count);
         foreach (int statusCode in expectedStatusCodes)
@@ -56,7 +56,7 @@ public class ProblemsExtensionsTests
                 $"Should register problem details model: {nameof(ExtendedProblemDetails)} for code {statusCode}");
         }
     }
-    
+
     [Fact]
     public void ProducesExtendedProblem_ShouldReturnBuilder()
     {
@@ -72,7 +72,7 @@ public class ProblemsExtensionsTests
         result.ShouldBeAssignableTo<IEndpointConventionBuilder>();
         result.ShouldBe(builder);
     }
-    
+
     [Fact]
     public void ProducesExtendedProblem_ShouldRegisterProvidedCode()
     {
@@ -82,11 +82,11 @@ public class ProblemsExtensionsTests
 
         // Act
         var result = builder.ProducesExtendedProblem(code);
-        
-        var action = result.EndpointConventionBuilders[0]; 
+
+        var action = result.EndpointConventionBuilders[0];
         var endpointBuilder = new MyEndpointBuilder();
         action(endpointBuilder);
-        
+
         // Assert
         endpointBuilder.Metadata.Count.ShouldBe(1);
         endpointBuilder.Metadata[0].ShouldBeOfType<ProducesResponseTypeMetadata>();
@@ -94,7 +94,7 @@ public class ProblemsExtensionsTests
             new ProducesResponseTypeMetadata(code, typeof(ExtendedProblemDetails), [ProblemDetailsContentType]),
             $"Should register problem details content for code {code}, model: {nameof(ExtendedProblemDetails)}");
     }
-    
+
     private class MyEndpointBuilder : EndpointBuilder
     {
         public override Endpoint Build()
@@ -102,11 +102,11 @@ public class ProblemsExtensionsTests
             throw new NotImplementedException();
         }
     }
-    
+
     private class MyBuilder : IEndpointConventionBuilder
     {
         public List<Action<EndpointBuilder>> EndpointConventionBuilders { get; } = [];
-        
+
         public void Add(Action<EndpointBuilder> convention)
         {
             EndpointConventionBuilders.Add(convention);

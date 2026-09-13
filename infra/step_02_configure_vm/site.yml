@@ -19,6 +19,7 @@
     - "vars/common.yml"
     - "vars/{{ target_environment }}/vars.yml"
     - "vars/{{ target_environment }}/vault.yml"
+    - "vars/{{ target_environment }}/keycloak.yml"
   roles:
     - base
     - firewall

@@ -19,13 +19,13 @@ public class ExceptionProblemDetailsMatcherTests
         _mockProblemDetailsService = new Mock<IProblemDetailsService>();
         _matcher = new ExceptionProblemDetailsMatcher(_mockProblemDetailsService.Object);
         _httpContext = new DefaultHttpContext();
-        
+
         // Setup mock to return true by default
         _mockProblemDetailsService
             .Setup(x => x.TryWriteAsync(It.IsAny<ProblemDetailsContext>()))
             .ReturnsAsync(true);
     }
-    
+
     [Fact]
     public async Task TryHandleAsync_WithValidationException_ShouldReturnCorrectProblemDetails()
     {
@@ -58,17 +58,17 @@ public class ExceptionProblemDetailsMatcherTests
         problemDetails.Status.ShouldBe(StatusCodes.Status400BadRequest);
         problemDetails.Title.ShouldBe("Validation error");
         problemDetails.Detail.ShouldBe("Validation failed");
-        
+
         problemDetails.Extensions.ShouldNotContainKey("errors");
         problemDetails.Errors.ShouldNotBeNull();
         problemDetails.Errors.ShouldContainKey("Field1");
         problemDetails.Errors["Field1"].ShouldContain("Error1");
         problemDetails.Errors.ShouldContainKey("Field2");
         problemDetails.Errors["Field2"].ShouldContain("Error2");
-        
+
         _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
     }
-    
+
     [Fact]
     public async Task TryHandleAsync_WithNotFoundException_ShouldReturnCorrectProblemDetails()
     {
@@ -87,7 +87,7 @@ public class ExceptionProblemDetailsMatcherTests
         // Assert
         result.ShouldBeTrue();
         capturedContext.ShouldNotBeNull();
-        
+
         var problemDetails = capturedContext.ProblemDetails;
         problemDetails.ShouldNotBeNull();
         problemDetails.Status.ShouldBe(StatusCodes.Status404NotFound);
@@ -95,7 +95,7 @@ public class ExceptionProblemDetailsMatcherTests
         problemDetails.Detail.ShouldBe("Resource not found");
         _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status404NotFound);
     }
-    
+
     [Fact]
     public async Task TryHandleAsync_WithForbiddenException_ShouldReturnCorrectProblemDetails()
     {
@@ -114,7 +114,7 @@ public class ExceptionProblemDetailsMatcherTests
         // Assert
         result.ShouldBeTrue();
         capturedContext.ShouldNotBeNull();
-        
+
         var problemDetails = capturedContext.ProblemDetails;
         problemDetails.ShouldNotBeNull();
         problemDetails.Status.ShouldBe(StatusCodes.Status403Forbidden);
@@ -122,7 +122,7 @@ public class ExceptionProblemDetailsMatcherTests
         problemDetails.Detail.ShouldBe("Access denied");
         _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status403Forbidden);
     }
-    
+
     [Fact]
     public async Task TryHandleAsync_WithBadHttpRequestException_ShouldReturnCorrectProblemDetails()
     {
@@ -141,7 +141,7 @@ public class ExceptionProblemDetailsMatcherTests
         // Assert
         result.ShouldBeTrue();
         capturedContext.ShouldNotBeNull();
-        
+
         var problemDetails = capturedContext.ProblemDetails;
         problemDetails.ShouldNotBeNull();
         problemDetails.Status.ShouldBe(StatusCodes.Status400BadRequest);
@@ -149,7 +149,7 @@ public class ExceptionProblemDetailsMatcherTests
         problemDetails.Detail.ShouldBe("Invalid request");
         _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
     }
-    
+
     [Fact]
     public async Task TryHandleAsync_WithGenericException_ShouldReturnDefaultProblemDetails()
     {
@@ -171,7 +171,7 @@ public class ExceptionProblemDetailsMatcherTests
         // Assert
         result.ShouldBeTrue();
         capturedContext.ShouldNotBeNull();
-        
+
         var problemDetails = capturedContext.ProblemDetails;
         problemDetails.ShouldNotBeNull();
         problemDetails.Title.ShouldBe(defaultTitle);
@@ -180,13 +180,13 @@ public class ExceptionProblemDetailsMatcherTests
         problemDetails.Status.ShouldBe(StatusCodes.Status500InternalServerError);
         _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status500InternalServerError);
     }
-    
+
     [Fact]
     public async Task TryHandleAsync_WhenProblemDetailsServiceReturnsFalse_ShouldReturnFalse()
     {
         // Arrange
         var exception = new Exception("Test exception");
-        
+
         _mockProblemDetailsService
             .Setup(x => x.TryWriteAsync(It.IsAny<ProblemDetailsContext>()))
             .ReturnsAsync(false);

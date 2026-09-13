@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OweMe.Api.Client;
 
-namespace OweMe.Api.SmokeTests;
+namespace OweMe.Api.SmokeTests.Configuration;
 
 public class OweMeClientFixture
 {
-    public const string AuthenticatedClientKey = "authenticatedOweMeClient";
-    public const string UnauthenticatedClientKey = "unauthenticatedOweMeClient";
-    
+    public const string AuthenticatedClientKey = "Authenticated";
+    public const string UnauthenticatedClientKey = "Unauthenticated";
+
     private readonly IServiceProvider _serviceProvider;
 
     public OweMeClientFixture()
@@ -35,16 +35,35 @@ public class OweMeClientFixture
         services.Configure<UserSettings>(configuration.GetSection(UserSettings.SectionName));
         services.Configure<IdentityProviderSettings>(configuration.GetSection(IdentityProviderSettings.SectionName));
 
-        services.AddTransient<TokenClientOptions>(options =>
+        services.AddHttpClient();
+
+        services.AddTransient<TokenClientOptions>(sp =>
         {
-            var apiSettings = options.GetRequiredService<IOptions<IdentityProviderSettings>>().Value;
+            var providerSettings = sp.GetRequiredService<IOptions<IdentityProviderSettings>>().Value;
+            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
+
+            using var httpClient = httpClientFactory.CreateClient();
+
+            var discoveryDoc = httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
+            {
+                Address = providerSettings.Address,
+                Policy = { RequireHttps = false, }
+            }).GetAwaiter().GetResult();
+
+            if (discoveryDoc.IsError)
+            {
+                throw new InvalidOperationException(
+                    $"Failed to discover OIDC endpoints from authority '{providerSettings.Address}': {discoveryDoc.Error}");
+            }
+
             return new TokenClientOptions
             {
-                Address = $"{apiSettings.Address.TrimEnd('/')}/connect/token",
-                ClientId = apiSettings.ClientId,
-                ClientSecret = apiSettings.ClientSecret
+                Address = discoveryDoc.TokenEndpoint,
+                ClientId = providerSettings.ClientId,
+                ClientSecret = providerSettings.ClientSecret
             };
         });
+
         services.AddHttpClient<TokenClient>()
             .AddHttpMessageHandler<LoggingDelegatingHandler>();
 
