@@ -5,3 +5,4 @@
 
 - import_tasks: env.yml
 - import_tasks: deploy.yml
+- import_tasks: keycloak_realms.yml
