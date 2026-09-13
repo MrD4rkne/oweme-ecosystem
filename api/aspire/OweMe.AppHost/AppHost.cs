@@ -12,7 +12,7 @@ var keycloakDb = keycloakDbServer.AddDatabase("keycloak-db");
 
 var keycloak = builder.AddKeycloak("keycloak", port: 8080)
     .WithPostgres(keycloakDb)
-    .WithRealmImport("../../auth/realms")
+    .WithRealmImport("../../../auth/realms")
     .WithEnvironment("KC_HOSTNAME_STRICT", "false")
     .WithEnvironment("KC_CACHE", "local") // speed up local spin up
     .WithEnvironment("KC_FEATURES", "token-exchange")
