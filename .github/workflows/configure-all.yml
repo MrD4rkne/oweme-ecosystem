@@ -11,6 +11,11 @@ on:
       - "infra/**"
   pull_request:
     branches: [main]
+    paths:
+      - ".github/workflows/configure-all.yml"
+      - ".github/workflows/reusable-configure-vm.yml"
+      - "infra/**"
+  workflow_call:
 
 permissions:
   contents: read
