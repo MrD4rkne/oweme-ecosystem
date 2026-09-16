@@ -21,6 +21,11 @@ public static class DependencyInjection
         {
             _context = new UserContext(id, email);
         }
+        
+        public void ResetContext()
+        {
+            _context = null;
+        }
 
         public UserId Id => _context?.Id ?? throw new UserContextNotAvailableException();
         public string Email => _context?.Email ?? throw new UserContextNotAvailableException();

@@ -13,5 +13,13 @@ public static class ServiceProviderExtensions
 
         var userContextSetter = services.GetRequiredService<IUserContextSetter>();
         userContextSetter.SetContext(id, email);
-    } 
+    }
+    
+    public static void ResetUserContext(this IServiceProvider? services)
+    {
+        ArgumentNullException.ThrowIfNull(services);
+
+        var userContextSetter = services.GetRequiredService<IUserContextSetter>();
+        userContextSetter.ResetContext();
+    }
 }
