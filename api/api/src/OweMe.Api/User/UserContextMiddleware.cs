@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using OweMe.Application;
+using OweMe.Application.User;
 using OweMe.Domain.Users;
 using Wolverine;
 using DependencyInjection = OweMe.Application.User.DependencyInjection;
@@ -7,9 +8,8 @@ using DependencyInjection = OweMe.Application.User.DependencyInjection;
 namespace OweMe.Api.User;
 public static class UserContextWolverineMiddleware
 {
-    // Wolverine resolves these dependencies directly from the handler's active scope
     public static void Before(
-        DependencyInjection.IUserContextSetter userContext,
+        IUserContextSetter userContext,
         IHttpContextAccessor httpContextAccessor)
     {
         var principal = httpContextAccessor.HttpContext?.User;
