@@ -46,7 +46,8 @@ RUN --mount=type=bind,source=.git,target=/repo/.git \
     dotnet build "OweMe.Api.csproj" \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
-    --no-restore
+    --no-restore \
+    /p:OpenApiGenerateDocuments=false
 
 RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -a "$TARGETARCH" -- codegen
 
