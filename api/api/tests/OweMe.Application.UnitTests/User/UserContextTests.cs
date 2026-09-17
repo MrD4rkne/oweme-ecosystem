@@ -5,7 +5,7 @@ using OweMe.Domain.Users;
 namespace OweMe.Application.UnitTests.User;
 
 /// <summary>
-/// Validates the behavior of the UserContext class and its related components, ensuring that user context management functions correctly within the application.
+/// Validates the behavior of the UserContext class and its related components.
 /// </summary>
 public class UserContextTests
 {

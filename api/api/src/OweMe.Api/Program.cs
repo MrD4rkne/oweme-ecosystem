@@ -168,3 +168,5 @@ app.UseStatusCodePages();
 app.MapDefaultEndpoints();
 
 return await app.RunJasperFxCommands(args);
+
+public partial class Program;

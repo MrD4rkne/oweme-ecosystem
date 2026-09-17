@@ -7,6 +7,7 @@
     <PackageVersion Include="CommunityToolkit.Aspire.Hosting.Keycloak.Extensions" Version="13.5.1-beta.748" />
     <PackageVersion Include="FluentValidation" Version="12.0.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.19" />
     <PackageVersion Include="Microsoft.Bcl.TimeProvider" Version="9.0.6" />
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.8" />
