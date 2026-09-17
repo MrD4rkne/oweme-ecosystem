@@ -39,7 +39,7 @@ builder.Logging.AddOpenTelemetry(logging =>
     logging.IncludeFormattedMessage = true;
 });
 
-builder.AddServiceDefaults();
+// builder.AddServiceDefaults();
 
 var otel = builder.Services.AddOpenTelemetry();
 otel.UseOtlpExporter();
@@ -166,6 +166,6 @@ app.MapEndpoints();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-app.MapDefaultEndpoints();
+// app.MapDefaultEndpoints();
 
 return await app.RunJasperFxCommands(args);

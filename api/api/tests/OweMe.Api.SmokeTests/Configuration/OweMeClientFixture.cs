@@ -26,55 +26,37 @@ public class OweMeClientFixture
             .AddEnvironmentVariables()
             .Build();
 
-        var testSettings = configuration.GetSection(ApiSettings.SectionName).Get<ApiSettings>();
-        if (testSettings == null || string.IsNullOrEmpty(testSettings.BaseUrl))
-        {
-            throw new InvalidOperationException("TestSettings or BaseUrl is not configured properly.");
-        }
-
-        services.AddSingleton(testSettings);
+        services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName));
         services.Configure<UserSettings>(configuration.GetSection(UserSettings.SectionName));
         services.Configure<IdentityProviderSettings>(configuration.GetSection(IdentityProviderSettings.SectionName));
-
-        services.AddHttpClient();
-
-        services.AddTransient<TokenClientOptions>(sp =>
+        
+        services.AddMemoryCache();
+        services.AddSingleton<IDiscoveryCache>(r =>
         {
-            var providerSettings = sp.GetRequiredService<IOptions<IdentityProviderSettings>>().Value;
-            var httpClientFactory = sp.GetRequiredService<IHttpClientFactory>();
-
-            using var httpClient = httpClientFactory.CreateClient();
-
-            var discoveryDoc = httpClient.GetDiscoveryDocumentAsync(new DiscoveryDocumentRequest
-            {
-                Address = providerSettings.Address,
-                Policy = { RequireHttps = false, }
-            }).GetAwaiter().GetResult();
-
-            if (discoveryDoc.IsError)
-            {
-                throw new InvalidOperationException(
-                    $"Failed to discover OIDC endpoints from authority '{providerSettings.Address}': {discoveryDoc.Error}");
-            }
-
-            return new TokenClientOptions
-            {
-                Address = discoveryDoc.TokenEndpoint,
-                ClientId = providerSettings.ClientId,
-                ClientSecret = providerSettings.ClientSecret
-            };
+            var factory = r.GetRequiredService<IHttpClientFactory>();
+            var discoverySettings = r.GetRequiredService<IOptions<IdentityProviderSettings>>().Value;
+            return new DiscoveryCache(discoverySettings.Address, factory.CreateClient);
         });
 
-        services.AddHttpClient<TokenClient>()
+        services.AddHttpClient<TokenManager>()
             .AddHttpMessageHandler<LoggingDelegatingHandler>();
+        services.AddSingleton<ITokenManager>(sp => sp.GetRequiredService<TokenManager>());
 
-        services.AddHttpClient(AuthenticatedClientKey, client => client.BaseAddress = new Uri(testSettings.BaseUrl))
-            .AddHttpMessageHandler<LoggingDelegatingHandler>()
+        services.AddHttpClient(AuthenticatedClientKey, (sp, client) =>
+        {
+            var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+            client.BaseAddress = new Uri(testSettings.BaseUrl);
+        }).AddHttpMessageHandler<LoggingDelegatingHandler>()
             .AddHttpMessageHandler<AuthorizationDelegatingHandler>();
+        
         services.AddKeyedTransient(AuthenticatedClientKey, CreateOweMeClientFromKey);
 
-        services.AddHttpClient(UnauthenticatedClientKey, client => client.BaseAddress = new Uri(testSettings.BaseUrl))
-            .AddHttpMessageHandler<LoggingDelegatingHandler>();
+        services.AddHttpClient(UnauthenticatedClientKey, (sp, client) =>
+        {
+            var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+            client.BaseAddress = new Uri(testSettings.BaseUrl);
+        }).AddHttpMessageHandler<LoggingDelegatingHandler>();
+        
         services.AddKeyedTransient(UnauthenticatedClientKey, CreateOweMeClientFromKey);
 
         services.AddTransient<LoggingDelegatingHandler>();
