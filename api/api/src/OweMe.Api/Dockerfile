@@ -30,10 +30,12 @@ COPY api/api/src/OweMe.Domain/*.csproj ./api/api/src/OweMe.Domain/
 COPY api/api/src/OweMe.Infrastructure/*.csproj ./api/api/src/OweMe.Infrastructure/
 COPY api/api/src/OweMe.Persistence/*.csproj ./api/api/src/OweMe.Persistence/
 COPY api/client/OweMe.Api.Client/*.csproj ./api/client/OweMe.Api.Client/
+COPY api/aspire/OweMe.ServiceDefaults/*.csproj ./api/aspire/OweMe.ServiceDefaults/
 
 # Copy remaining source files
 COPY api/api/ ./api/api/
 COPY api/client/ ./api/client/
+COPY api/aspire/ ./api/aspire/
 
 RUN dotnet restore ./api/api/src/OweMe.Api/OweMe.Api.csproj -a $TARGETARCH
 RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TARGETARCH
