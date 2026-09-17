@@ -54,7 +54,6 @@ RUN --mount=type=bind,source=.git,target=/repo/.git \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
     -o /app/publish \
-    --no-build \
     /p:UseAppHost=false \
     /p:OpenApiGenerateDocuments=false
 
