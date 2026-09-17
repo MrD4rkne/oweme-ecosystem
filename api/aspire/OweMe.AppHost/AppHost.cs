@@ -19,7 +19,7 @@ var keycloak = builder.AddKeycloak("keycloak", port: 8080)
     .WithDataVolume()
     .WithOtlpExporter();
 
-var api = builder.AddProject<Projects.OweMe_Api>("api")
+_ = builder.AddProject<Projects.OweMe_Api>("api")
     .WithHttpEndpoint(port: 5000, name: "http")
     .WithReference(apiDb)
     .WithReference(keycloak)
