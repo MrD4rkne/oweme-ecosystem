@@ -34,4 +34,4 @@ var api = builder.AddProject<Projects.OweMe_Api>("api")
     .WithEnvironment("Database__ConnectionString", apiDb);
 
 await using var app = builder.Build();
-await app.StartAsync();
+await app.RunAsync();
