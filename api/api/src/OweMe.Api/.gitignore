@@ -1,1 +1,2 @@
 OweMe.Api.json
+**/Internal/Generated/**/*.cs
