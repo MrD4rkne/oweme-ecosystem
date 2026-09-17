@@ -39,7 +39,7 @@ public class ConfigureJwtBearerOptionsTests
         options.TokenValidationParameters.ValidIssuer.ShouldBe(identityServerOptions.ValidIssuer,
             "ValidIssuer should be set");
         options.TokenValidationParameters.ValidateIssuer.ShouldBe(true);
-        
+
         options.TokenValidationParameters.ValidateLifetime.ShouldBe(true);
 
         options.MetadataAddress.ShouldBe(identityServerOptions.MetadataAddress, "MetadataAddress should be set");

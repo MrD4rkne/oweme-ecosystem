@@ -1,12 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>c942fa62-93af-4440-bc07-4f1ffe6350da</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
@@ -29,6 +29,7 @@
     <!-- Other -->
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\aspire\OweMe.ServiceDefaults\OweMe.ServiceDefaults.csproj" />
     <ProjectReference Include="..\OweMe.Application\OweMe.Application.csproj" />
     <ProjectReference Include="..\OweMe.Domain\OweMe.Domain.csproj" />
     <ProjectReference Include="..\OweMe.Infrastructure\OweMe.Infrastructure.csproj" />

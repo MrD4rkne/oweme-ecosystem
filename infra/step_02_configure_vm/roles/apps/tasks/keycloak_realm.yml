@@ -1,0 +1,49 @@
+- name: Ensure realm exists with registration settings
+  community.general.keycloak_realm:
+    auth_keycloak_url: "https://{{ idp_hostname }}"
+    auth_realm: master
+    auth_username: "{{ vault_keycloak_admin_user }}"
+    auth_password: "{{ vault_keycloak_admin_password }}"
+    realm: "{{ keycloak_realm }}"
+    enabled: true
+    registration_allowed: true
+    registration_email_as_username: true
+    login_with_email_allowed: true
+    duplicate_emails_allowed: false
+    reset_password_allowed: true
+    verify_email: false
+    state: present
+
+- name: Ensure client scopes exist
+  community.general.keycloak_clientscope:
+    auth_keycloak_url: "https://{{ idp_hostname }}"
+    auth_realm: master
+    auth_username: "{{ vault_keycloak_admin_user }}"
+    auth_password: "{{ vault_keycloak_admin_password }}"
+    realm: "{{ keycloak_realm }}"
+    name: "{{ item.name }}"
+    description: "{{ item.description | default(omit) }}"
+    protocol: "{{ item.protocol }}"
+    attributes: "{{ item.attributes | default(omit) }}"
+    protocol_mappers: "{{ item.protocol_mappers | default(omit) }}"
+    state: present
+  loop: "{{ keycloak_client_scopes }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Ensure clients exist
+  community.general.keycloak_client:
+    auth_keycloak_url: "https://{{ idp_hostname }}"
+    auth_realm: master
+    auth_username: "{{ vault_keycloak_admin_user }}"
+    auth_password: "{{ vault_keycloak_admin_password }}"
+    realm: "{{ keycloak_realm }}"
+    client_id: "{{ item.client_id }}"
+    public_client: "{{ item.public }}"
+    direct_access_grants_enabled: "{{ item.direct_access_grants_enabled }}"
+    standard_flow_enabled: "{{ item.standard_flow_enabled }}"
+    default_client_scopes: "{{ item.default_client_scopes }}"
+    state: present
+  loop: "{{ keycloak_clients }}"
+  loop_control:
+    label: "{{ item.client_id }}"

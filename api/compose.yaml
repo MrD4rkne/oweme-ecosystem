@@ -1,20 +1,29 @@
-﻿name: oweme-system
-
-services:
-  oweme.api:
+﻿services:
+  api:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:latest
+    build:
+      context: ..
+      dockerfile: api/api/src/OweMe.Api/Dockerfile
     container_name: oweme.api
     ports:
       - "5000:8080"
       - "5001:8081"
+    networks:
+      - oweme-network
+      - default
     environment:
-      Database__ConnectionString: Server=oweme.api.database;Database=OweMe.Api;Username=sa;Password=Password123;TrustServerCertificate=True;
+      ASPNETCORE_ENVIRONMENT: Development
+      Database__ConnectionString: Server=api-database;Database=OweMe.Api;Username=sa;Password=Password123;TrustServerCertificate=True;
       Database__RunMigrations: true
-      IdentityServer__Authority: http://oweme.identity:8080
+      IdentityServer__Authority: http://localhost:8080/realms/oweme-dev
+      IdentityServer__MetadataAddress: http://keycloak:8080/realms/oweme-dev/.well-known/openid-configuration
       IdentityServer__ValidateAudience: false
       IdentityServer__RequireHttpsMetadata: false
+      # --- AUTH LOGGING OVERRIDES ---
+      Logging__LogLevel__Microsoft.AspNetCore.Authentication: Debug
+      Logging__LogLevel__Microsoft.IdentityModel: Debug
     depends_on:
-      oweme.api.database:
+      api-database:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8080/healthz" ]
@@ -22,7 +31,7 @@ services:
       timeout: 5s
       retries: 5
 
-  oweme.api.database:
+  api-database:
     image: "postgres:15.3"
     ports:
       - "5442:5432"
@@ -35,3 +44,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+networks:
+  oweme-network:
+    external: true
+    driver: bridge
+    name: oweme-network

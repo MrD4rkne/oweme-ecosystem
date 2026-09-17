@@ -17,7 +17,7 @@ public class OAuth2SecuritySchemeTransformerTests
         var options = new IdentityServerOptions { Authority = "https://identity.example.com" };
         var optionsWrapper = Options.Create(options);
         var logger = NullLogger<OAuth2SecuritySchemeTransformer>.Instance;
-        
+
         var transformer = new OAuth2SecuritySchemeTransformer(logger, optionsWrapper);
         var document = new OpenApiDocument();
         OpenApiDocumentTransformerContext context = default!;
@@ -57,7 +57,7 @@ public class OAuth2SecuritySchemeTransformerTests
         var options = new IdentityServerOptions { Authority = null };
         var optionsWrapper = Options.Create(options);
         var logger = NullLogger<OAuth2SecuritySchemeTransformer>.Instance;
-        
+
         var transformer = new OAuth2SecuritySchemeTransformer(logger, optionsWrapper);
         var document = new OpenApiDocument();
         OpenApiDocumentTransformerContext context = default!;
@@ -69,7 +69,7 @@ public class OAuth2SecuritySchemeTransformerTests
         document.Components.ShouldNotBeNull();
         document.Components.SecuritySchemes.ShouldNotContainKey("OAuth2");
         document.Components.SecuritySchemes.ShouldContainKey("Bearer");
-        
+
         document.SecurityRequirements.Count.ShouldBe(1);
         document.SecurityRequirements.First().Keys.First().Reference.Id.ShouldBe("Bearer");
     }
@@ -81,7 +81,7 @@ public class OAuth2SecuritySchemeTransformerTests
         var options = new IdentityServerOptions { Authority = "not-a-valid-uri" };
         var optionsWrapper = Options.Create(options);
         var logger = NullLogger<OAuth2SecuritySchemeTransformer>.Instance;
-        
+
         var transformer = new OAuth2SecuritySchemeTransformer(logger, optionsWrapper);
         var document = new OpenApiDocument();
         OpenApiDocumentTransformerContext context = default!;
@@ -93,7 +93,7 @@ public class OAuth2SecuritySchemeTransformerTests
         document.Components.ShouldNotBeNull();
         document.Components.SecuritySchemes.ShouldNotContainKey("OAuth2");
         document.Components.SecuritySchemes.ShouldContainKey("Bearer");
-        
+
         document.SecurityRequirements.Count.ShouldBe(1);
         document.SecurityRequirements.First().Keys.First().Reference.Id.ShouldBe("Bearer");
     }

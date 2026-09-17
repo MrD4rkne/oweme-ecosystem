@@ -30,21 +30,30 @@ COPY api/api/src/OweMe.Domain/*.csproj ./api/api/src/OweMe.Domain/
 COPY api/api/src/OweMe.Infrastructure/*.csproj ./api/api/src/OweMe.Infrastructure/
 COPY api/api/src/OweMe.Persistence/*.csproj ./api/api/src/OweMe.Persistence/
 COPY api/client/OweMe.Api.Client/*.csproj ./api/client/OweMe.Api.Client/
+COPY api/aspire/OweMe.ServiceDefaults/*.csproj ./api/aspire/OweMe.ServiceDefaults/
 
 # Copy remaining source files
 COPY api/api/ ./api/api/
 COPY api/client/ ./api/client/
+COPY api/aspire/ ./api/aspire/
 
 RUN dotnet restore ./api/api/src/OweMe.Api/OweMe.Api.csproj -a $TARGETARCH
 RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TARGETARCH
 
 WORKDIR /repo/api/api/src/OweMe.Api
+
+RUN dotnet build "OweMe.Api.csproj" \
+    -c "$BUILD_CONFIGURATION" \
+    --no-restore \
+    /p:OpenApiGenerateDocuments=false
+
+RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -- codegen
+
 RUN --mount=type=bind,source=.git,target=/repo/.git \
     dotnet publish "OweMe.Api.csproj" \
     -c "$BUILD_CONFIGURATION" \
     -a "$TARGETARCH" \
     -o /app/publish \
-    --no-restore \
     /p:UseAppHost=false \
     /p:OpenApiGenerateDocuments=false
 

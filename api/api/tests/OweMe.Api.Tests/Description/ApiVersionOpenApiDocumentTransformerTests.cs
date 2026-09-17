@@ -11,7 +11,7 @@ namespace OweMe.Api.Tests.Description;
 public class ApiVersionOpenApiDocumentTransformerTests
 {
     private readonly Mock<IApiInformationProvider> _apiInformationProviderMock = new();
-    
+
     private readonly ApiInformation _apiInformation = new()
     {
         Title = "Some title",
@@ -19,13 +19,13 @@ public class ApiVersionOpenApiDocumentTransformerTests
         Description = "Some description",
         BuildVersion = "1.0.5"
     };
-    
+
     public ApiVersionOpenApiDocumentTransformerTests()
     {
         _apiInformationProviderMock.Setup(provider => provider.GetApiInfo())
             .Returns(_apiInformation);
     }
-    
+
     [Fact]
     public async Task Transform_ShouldReturnTransformedDocument()
     {
@@ -43,7 +43,7 @@ public class ApiVersionOpenApiDocumentTransformerTests
                 }
             }
         };
-        
+
         var context = new OpenApiDocumentTransformerContext()
         {
             DocumentName = "test-document",
@@ -62,13 +62,13 @@ public class ApiVersionOpenApiDocumentTransformerTests
         document.Info.Extensions.ShouldNotBeNull();
         document.Info.Extensions.ShouldContain(
             ext => ext.Key == "x-version", "Transformer should not remove existing extensions");
-        
+
         document.Info.Extensions["x-version"].ShouldBeOfType<OpenApiString>();
         var versionExtension = document.Info.Extensions["x-version"] as OpenApiString;
         versionExtension.ShouldNotBeNull();
         versionExtension!.Value.ShouldBe("5.0.0");
-        
+
         _apiInformationProviderMock.Verify(provider => provider.GetApiInfo(), Times.AtLeastOnce,
-            "ApiInformationProvider should be called to get API information"); 
+            "ApiInformationProvider should be called to get API information");
     }
 }
