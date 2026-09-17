@@ -3,7 +3,7 @@ using Duende.IdentityModel.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace OweMe.Api.SmokeTests;
+namespace OweMe.Api.SmokeTests.Http;
 
 internal sealed class AuthorizationDelegatingHandler(
     IOptions<UserSettings> userSettings,
@@ -12,7 +12,7 @@ internal sealed class AuthorizationDelegatingHandler(
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
-        string accessToken = await GetAccessTokenAsync(cancellationToken);
+        var accessToken = await GetAccessTokenAsync(cancellationToken);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         return await base.SendAsync(request, cancellationToken);
     }

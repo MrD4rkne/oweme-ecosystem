@@ -1,7 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using Microsoft.Extensions.Logging;
 
-namespace OweMe.Api.SmokeTests;
+namespace OweMe.Api.SmokeTests.Http;
 
 public class LoggingDelegatingHandler : DelegatingHandler
 {

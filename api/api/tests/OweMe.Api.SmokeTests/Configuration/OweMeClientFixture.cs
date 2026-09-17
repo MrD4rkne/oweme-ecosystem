@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OweMe.Api.Client;
+using OweMe.Api.SmokeTests.Http;
 
 namespace OweMe.Api.SmokeTests.Configuration;
 
