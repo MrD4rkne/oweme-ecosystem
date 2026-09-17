@@ -42,14 +42,12 @@ RUN dotnet restore ./api/client/OweMe.Api.Client/OweMe.Api.Client.csproj -a $TAR
 
 WORKDIR /repo/api/api/src/OweMe.Api
 
-RUN --mount=type=bind,source=.git,target=/repo/.git \
-    dotnet build "OweMe.Api.csproj" \
+RUN dotnet build "OweMe.Api.csproj" \
     -c "$BUILD_CONFIGURATION" \
-    -a "$TARGETARCH" \
     --no-restore \
     /p:OpenApiGenerateDocuments=false
 
-RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -a "$TARGETARCH" -- codegen
+RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -- codegen
 
 RUN --mount=type=bind,source=.git,target=/repo/.git \
     dotnet publish "OweMe.Api.csproj" \
