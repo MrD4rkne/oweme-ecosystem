@@ -29,6 +29,7 @@
     <!-- Other -->
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\aspire\OweMe.ServiceDefaults\OweMe.ServiceDefaults.csproj" />
     <ProjectReference Include="..\OweMe.Application\OweMe.Application.csproj" />
     <ProjectReference Include="..\OweMe.Domain\OweMe.Domain.csproj" />
     <ProjectReference Include="..\OweMe.Infrastructure\OweMe.Infrastructure.csproj" />
