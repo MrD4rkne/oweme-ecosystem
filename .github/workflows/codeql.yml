@@ -42,6 +42,10 @@ jobs:
       with:
         dotnet-version: ${{ vars.DOTNET_VERSION }}
 
+    - name: Install Aspire CLI
+      if: matrix.language == 'csharp'
+      run: dotnet tool install -g Aspire.Cli
+
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
       with:
