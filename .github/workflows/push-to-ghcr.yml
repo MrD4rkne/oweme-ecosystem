@@ -23,6 +23,10 @@ on:
         required: false
         type: boolean
         default: false
+    outputs:
+      image_ref:
+        description: 'Fully qualified image reference with SemVer2 tag'
+        value: ${{ jobs.push-to-ghcr.outputs.image_ref }}
 
 permissions:
   contents: read
