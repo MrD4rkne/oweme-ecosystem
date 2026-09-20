@@ -32,13 +32,13 @@ jobs:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'staging'
-      force_env_render: ${{ inputs.force_env_render }}
+      force_env_render: ${{ inputs.force_env_render || false }}
     secrets: inherit
 
   configure-production:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'production'
-      force_env_render: ${{ inputs.force_env_render }}
+      force_env_render: ${{ inputs.force_env_render || false }}
     secrets: inherit
     needs: configure-staging
