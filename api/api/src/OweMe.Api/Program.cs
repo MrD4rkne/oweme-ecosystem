@@ -80,7 +80,10 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Constants.POLICY_API_SCOPE, policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", Constants.POLICY_API_SCOPE_CLAIM);
+        policy.RequireAssertion(context =>
+            context.User.FindAll("scope")
+                .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                .Contains(Constants.POLICY_API_SCOPE_CLAIM));
     });
 
 builder.AddApplication();
