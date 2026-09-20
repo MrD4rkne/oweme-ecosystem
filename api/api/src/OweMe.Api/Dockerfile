@@ -47,7 +47,7 @@ RUN dotnet build "OweMe.Api.csproj" \
     --no-restore \
     /p:OpenApiGenerateDocuments=false
 
-RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -- codegen
+RUN dotnet run --no-build -c "$BUILD_CONFIGURATION" -- codegen write
 
 RUN --mount=type=bind,source=.git,target=/repo/.git \
     dotnet publish "OweMe.Api.csproj" \
