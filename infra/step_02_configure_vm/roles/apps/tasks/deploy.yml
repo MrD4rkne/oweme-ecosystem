@@ -1,15 +1,6 @@
 ---
 # TODO: migrator and seeder
 
-- name: Set image tag for target service
-  ansible.builtin.lineinfile:
-    path: /opt/apps/.env
-    regexp: "^{{ target_app | upper }}_IMAGE_TAG="
-    line: "{{ target_app | upper }}_IMAGE_TAG={{ image_tag }}"
-    create: yes
-  when: target_app is defined
-  tags: [apps, deploy]
-
 - name: Deploy single target service (fast path)
   community.docker.docker_compose_v2:
     project_src: /opt/apps
