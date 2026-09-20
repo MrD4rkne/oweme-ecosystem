@@ -1,4 +1,5 @@
 ﻿using OweMe.Api.Client;
+using OweMe.Api.SmokeTests.Configuration;
 using OweMe.Api.SmokeTests.Helpers;
 using Shouldly;
 

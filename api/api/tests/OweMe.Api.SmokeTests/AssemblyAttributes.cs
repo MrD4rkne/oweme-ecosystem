@@ -1,3 +1,3 @@
-﻿using OweMe.Api.SmokeTests;
+﻿using OweMe.Api.SmokeTests.Configuration;
 
 [assembly: AssemblyFixture(typeof(OweMeClientFixture))]

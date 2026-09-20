@@ -1,0 +1,25 @@
+services:
+  oweme.jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: oweme.jaeger
+    profiles: ["observability"]
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+  oweme.seq:
+    image: datalust/seq:latest
+    container_name: oweme.seq
+    profiles: ["observability"]
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    volumes:
+      - seq-data:/data
+volumes:
+  seq-data:

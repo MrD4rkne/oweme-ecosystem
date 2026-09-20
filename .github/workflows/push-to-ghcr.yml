@@ -23,6 +23,10 @@ on:
         required: false
         type: boolean
         default: false
+    outputs:
+      image_ref:
+        description: 'Fully qualified image reference with SemVer2 tag'
+        value: ${{ jobs.push-to-ghcr.outputs.image_ref }}
 
 permissions:
   contents: read
@@ -66,9 +70,8 @@ jobs:
             tags="${tags},${base}:latest"
           fi
 
-          echo "image_ref=${semver_tag}" >> "$GITHUB_OUTPUT"
+          echo "image_ref=${{ steps.nbgv.outputs.SemVer2 }}" >> "$GITHUB_OUTPUT"
           echo "tags=${tags}" >> "$GITHUB_OUTPUT"
-
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4

@@ -1,9 +1,8 @@
-using Azure.Monitor.OpenTelemetry.AspNetCore;
 using JasperFx;
+using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
 using OpenTelemetry;
-using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using OweMe.Api.Configuration;
@@ -12,11 +11,16 @@ using OweMe.Api.Endpoints;
 using OweMe.Api.Identity;
 using OweMe.Api.Identity.Configuration;
 using OweMe.Api.Identity.Description;
+using OweMe.Api.User;
 using OweMe.Application;
+using OweMe.Application.Common.Middlewares;
 using OweMe.Infrastructure;
 using OweMe.Persistence;
 using OweMe.Persistence.Health;
 using Scalar.AspNetCore;
+using Wolverine;
+using Wolverine.FluentValidation;
+using DependencyInjection = OweMe.Application.User.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,8 +39,9 @@ builder.Logging.AddOpenTelemetry(logging =>
     logging.IncludeFormattedMessage = true;
 });
 
+builder.AddServiceDefaults();
+
 var otel = builder.Services.AddOpenTelemetry();
-otel.UseOtlpExporter();
 otel.WithTracing(b =>
 {
     b.AddAspNetCoreInstrumentation(options=>
@@ -49,10 +54,6 @@ otel.WithTracing(b =>
     b.AddAspNetCoreInstrumentation();
     b.AddHttpClientInstrumentation();
 });
-if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
-{
-    otel.UseAzureMonitor();
-}
 
 builder.Services.AddOpenApi(options =>
 {
@@ -71,7 +72,6 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer();
 
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddScoped<IUserContext, UserContext>();
 builder.Services.AddSingleton<IApiInformationProvider, ApiInformationProvider>();
 
 builder.Services.ConfigureOptions<ConfigureJwtBearerOptions>();
@@ -80,13 +80,40 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Constants.POLICY_API_SCOPE, policy =>
     {
         policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", Constants.POLICY_API_SCOPE_CLAIM);
+        policy.RequireAssertion(context =>
+            context.User.FindAll("scope")
+                .SelectMany(c => c.Value.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                .Contains(Constants.POLICY_API_SCOPE_CLAIM));
     });
 
 builder.AddApplication();
 builder.AddInfrastructure();
-
 builder.AddPersistence();
+
+builder.UseWolverine(opts =>
+{
+    opts.Discovery.IncludeAssembly(typeof(DependencyInjection).Assembly);
+
+    opts.Policies.AddMiddleware<PerformanceMiddleware>();
+    opts.Policies.AddMiddleware(typeof(UserContextWolverineMiddleware));
+
+    opts.UseFluentValidation(RegistrationBehavior.ExplicitRegistration);
+
+    if (builder.Environment.IsProduction())
+    {
+        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
+        opts.Services.CritterStackDefaults(cr =>
+        {
+            // I'm only going to care about this in production
+            cr.Production.AssertAllPreGeneratedTypesExist = true;
+        });
+    }
+    else
+    {
+        // Fallback to Auto for local development/debugging
+        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
+    }
+});
 
 builder.Services.AddExceptionHandler<ExceptionProblemDetailsMatcher>();
 
@@ -141,6 +168,11 @@ app.MapEndpoints();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-app.UseHealthChecks("/healthz");
+app.MapDefaultEndpoints();
 
 return await app.RunJasperFxCommands(args);
+
+public partial class Program
+{
+    protected Program(){}
+}

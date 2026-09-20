@@ -2,6 +2,12 @@ name: Configure Environments
 
 on:
   workflow_dispatch:
+    inputs:
+      force_env_render:
+        required: false
+        type: boolean
+        default: false
+        description: 'Force re-render of api.env even if it already exists on the host'
 
   push:
     branches: [main]
@@ -11,6 +17,11 @@ on:
       - "infra/**"
   pull_request:
     branches: [main]
+    paths:
+      - ".github/workflows/configure-all.yml"
+      - ".github/workflows/reusable-configure-vm.yml"
+      - "infra/**"
+  workflow_call:
 
 permissions:
   contents: read
@@ -21,11 +32,13 @@ jobs:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'staging'
+      force_env_render: ${{ inputs.force_env_render || false }}
     secrets: inherit
 
   configure-production:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'production'
+      force_env_render: ${{ inputs.force_env_render || false }}
     secrets: inherit
     needs: configure-staging

@@ -1,56 +1,48 @@
-﻿services:
-    oweme.identity.database:
-        image: "postgres:15"
-        container_name: oweme.identity.database
-        ports:
-            - "5432:5432"
-        environment:
-            POSTGRES_DB: ${POSTGRES_DB}
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-        healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+services:
+  keycloak:
+    image: keycloak/keycloak:latest
+    command: start-dev --import-realm
+    environment:
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USER}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak_db:5432/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3; grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    depends_on:
+      keycloak_db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    networks:
+      - oweme-network
+      - default
+    volumes:
+      - ./realms:/opt/keycloak/data/import
+    env_file:
+      - path: .env
+        required: true
 
-    oweme.identity.migrator:
-        image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:latest
-        container_name: oweme.identity.migrator
-        entrypoint: ["dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "migrate"]
-        environment:
-            ConnectionStrings__DefaultConnection: Host=oweme.identity.database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-        depends_on:
-            oweme.identity.database:
-                condition: service_healthy
+  keycloak_db:
+    image: bitnami/postgresql:latest
+    env_file:
+      - path: .env
+        required: true
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRESQL_USERNAME -d $$POSTGRESQL_DATABASE"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-    oweme.identity.seeder:
-        image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:latest
-        container_name: oweme.identity.seeder
-        entrypoint: [ "dotnet", "/app/migrator/OweMe.Identity.Migrator.dll", "seed" ]
-        environment:
-            ConnectionStrings__DefaultConnection: Host=oweme.identity.database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-        depends_on:
-            oweme.identity.database:
-                condition: service_healthy
-            oweme.identity.migrator:
-                condition: service_completed_successfully
-
-    oweme.identity:
-        image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-auth:latest
-        container_name: oweme.identity
-        ports:
-            - "5010:8080"
-            - "5011:8081"
-        environment:
-            ConnectionStrings__DefaultConnection: Host=oweme.identity.database;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
-        depends_on:
-            oweme.identity.migrator:
-                condition: service_completed_successfully
-            oweme.identity.database:
-                condition: service_healthy
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
-            interval: 10s
-            timeout: 5s
-            retries: 5
+networks:
+  oweme-network:
+    driver: bridge
+    name: oweme-network

@@ -3,22 +3,17 @@
 namespace OweMe.Application;
 
 /// <summary>
-///     Represents the user context.
+/// Represents the current user in the operation context.
 /// </summary>
 public interface IUserContext
 {
     /// <summary>
-    ///     User's id.  <see cref="Guid.Empty" /> if not authenticated <see cref="IsAuthenticated" />.
+    /// User's id.
     /// </summary>
     UserId Id { get; }
 
     /// <summary>
-    ///     User's email. <see langword="null" /> if not authenticated <see cref="IsAuthenticated" />.
+    /// User's email. 
     /// </summary>
-    string? Email { get; }
-
-    /// <summary>
-    ///     Indicates whether the user is authenticated.
-    /// </summary>
-    bool IsAuthenticated { get; }
+    string Email { get; }
 }

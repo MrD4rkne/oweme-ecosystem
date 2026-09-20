@@ -4,14 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OweMe.Api.Client;
+using OweMe.Api.SmokeTests.Http;
 
-namespace OweMe.Api.SmokeTests;
+namespace OweMe.Api.SmokeTests.Configuration;
 
 public class OweMeClientFixture
 {
-    public const string AuthenticatedClientKey = "authenticatedOweMeClient";
-    public const string UnauthenticatedClientKey = "unauthenticatedOweMeClient";
-    
+    public const string AuthenticatedClientKey = "Authenticated";
+    public const string UnauthenticatedClientKey = "Unauthenticated";
+
     private readonly IServiceProvider _serviceProvider;
 
     public OweMeClientFixture()
@@ -25,36 +26,37 @@ public class OweMeClientFixture
             .AddEnvironmentVariables()
             .Build();
 
-        var testSettings = configuration.GetSection(ApiSettings.SectionName).Get<ApiSettings>();
-        if (testSettings == null || string.IsNullOrEmpty(testSettings.BaseUrl))
-        {
-            throw new InvalidOperationException("TestSettings or BaseUrl is not configured properly.");
-        }
-
-        services.AddSingleton(testSettings);
+        services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName));
         services.Configure<UserSettings>(configuration.GetSection(UserSettings.SectionName));
         services.Configure<IdentityProviderSettings>(configuration.GetSection(IdentityProviderSettings.SectionName));
-
-        services.AddTransient<TokenClientOptions>(options =>
+        
+        services.AddMemoryCache();
+        services.AddSingleton<IDiscoveryCache>(r =>
         {
-            var apiSettings = options.GetRequiredService<IOptions<IdentityProviderSettings>>().Value;
-            return new TokenClientOptions
-            {
-                Address = $"{apiSettings.Address.TrimEnd('/')}/connect/token",
-                ClientId = apiSettings.ClientId,
-                ClientSecret = apiSettings.ClientSecret
-            };
+            var factory = r.GetRequiredService<IHttpClientFactory>();
+            var discoverySettings = r.GetRequiredService<IOptions<IdentityProviderSettings>>().Value;
+            return new DiscoveryCache(discoverySettings.Address, factory.CreateClient);
         });
-        services.AddHttpClient<TokenClient>()
-            .AddHttpMessageHandler<LoggingDelegatingHandler>();
 
-        services.AddHttpClient(AuthenticatedClientKey, client => client.BaseAddress = new Uri(testSettings.BaseUrl))
-            .AddHttpMessageHandler<LoggingDelegatingHandler>()
+        services.AddHttpClient<TokenManager>()
+            .AddHttpMessageHandler<LoggingDelegatingHandler>();
+        services.AddSingleton<ITokenManager>(sp => sp.GetRequiredService<TokenManager>());
+
+        services.AddHttpClient(AuthenticatedClientKey, (sp, client) =>
+        {
+            var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+            client.BaseAddress = new Uri(testSettings.BaseUrl);
+        }).AddHttpMessageHandler<LoggingDelegatingHandler>()
             .AddHttpMessageHandler<AuthorizationDelegatingHandler>();
+        
         services.AddKeyedTransient(AuthenticatedClientKey, CreateOweMeClientFromKey);
 
-        services.AddHttpClient(UnauthenticatedClientKey, client => client.BaseAddress = new Uri(testSettings.BaseUrl))
-            .AddHttpMessageHandler<LoggingDelegatingHandler>();
+        services.AddHttpClient(UnauthenticatedClientKey, (sp, client) =>
+        {
+            var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+            client.BaseAddress = new Uri(testSettings.BaseUrl);
+        }).AddHttpMessageHandler<LoggingDelegatingHandler>();
+        
         services.AddKeyedTransient(UnauthenticatedClientKey, CreateOweMeClientFromKey);
 
         services.AddTransient<LoggingDelegatingHandler>();

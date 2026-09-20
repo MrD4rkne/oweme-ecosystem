@@ -3,7 +3,7 @@
 public static class ProblemsExtensions
 {
     private static readonly string ProblemDetailsContentType = "application/problem+json";
-    
+
     /// <summary>
     /// Configures the endpoint to produce standard problem details responses
     /// </summary>
@@ -11,7 +11,7 @@ public static class ProblemsExtensions
     {
         return builder.ProducesExtendedProblem(StatusCodes.Status500InternalServerError);
     }
-    
+
     /// <summary>
     /// Configures the endpoint to produce extended problem details responses
     /// </summary>

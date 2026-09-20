@@ -28,13 +28,13 @@ public sealed class OAuth2SecuritySchemeTransformer(
             logger.LogWarning("Authority is not configured. Skipping OAuth2 security scheme addition.");
             return;
         }
-        
+
         if (!Uri.TryCreate(identityServerOptions.Value.Authority, UriKind.Absolute, out var authorityUri))
         {
             logger.LogWarning("Invalid Authority URI: {Authority}. Skipping OAuth2 security scheme addition.", identityServerOptions.Value.Authority);
             return;
         }
-        
+
         var oauth2Scheme = new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.OAuth2,
@@ -78,9 +78,9 @@ public sealed class OAuth2SecuritySchemeTransformer(
             BearerFormat = "JWT",
             Description = "Enter your JWT token"
         };
-        
+
         document.Components.SecuritySchemes.TryAdd("Bearer", bearerScheme);
-        
+
         var requirement = new OpenApiSecurityRequirement
         {
             [new OpenApiSecurityScheme
