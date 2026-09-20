@@ -172,4 +172,7 @@ app.MapDefaultEndpoints();
 
 return await app.RunJasperFxCommands(args);
 
-public static partial class Program;
+public partial class Program
+{
+    protected Program(){}
+}
