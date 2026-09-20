@@ -1,57 +1,53 @@
 keycloak_realm: oweme-staging
 
 keycloak_client_scopes:
-  - name: "basic"
-    description: "OpenID Connect scope for add all basic claims to the token"
-    protocol: "openid-connect"
+  - name: basic
+    description: "OpenID Connect scope for basic claims"
+    protocol: openid-connect
     attributes:
       include.in.token.scope: "false"
       display.on.consent.screen: "false"
     protocol_mappers:
-      - name: "sub"
-        protocol: "openid-connect"
-        protocolMapper: "oidc-sub-mapper"
-        consentRequired: false
+      - name: sub
+        protocol: openid-connect
+        protocolMapper: oidc-sub-mapper
         config:
           introspection.token.claim: "true"
           access.token.claim: "true"
-      - name: "auth_time"
-        protocol: "openid-connect"
-        protocolMapper: "oidc-usersessionmodel-note-mapper"
-        consentRequired: false
+      - name: auth_time
+        protocol: openid-connect
+        protocolMapper: oidc-usersessionmodel-note-mapper
         config:
-          user.session.note: "AUTH_TIME"
+          user.session.note: AUTH_TIME
           id.token.claim: "true"
           introspection.token.claim: "true"
           access.token.claim: "true"
-          claim.name: "auth_time"
-          jsonType.label: "long"
+          claim.name: auth_time
+          jsonType.label: long
 
-  - name: "oweme-api"
-    protocol: "openid-connect"
+  - name: oweme-api
+    protocol: openid-connect
     attributes:
       include.in.token.scope: "true"
       display.on.consent.screen: "true"
     protocol_mappers:
-      - name: "email"
-        protocol: "openid-connect"
-        protocolMapper: "oidc-usermodel-attribute-mapper"
+      - name: email
+        protocol: openid-connect
+        protocolMapper: oidc-usermodel-attribute-mapper
         config:
-          user.attribute: "email"
-          claim.name: "email"
-          jsonType.label: "String"
+          user.attribute: email
+          claim.name: email
+          jsonType.label: String
           id.token.claim: "true"
           access.token.claim: "true"
           userinfo.token.claim: "true"
-      - name: "oweme-api-audience"
-        protocol: "openid-connect"
-        protocolMapper: "oidc-audience-mapper"
-        consentRequired: false
+      - name: audience
+        protocol: openid-connect
+        protocolMapper: oidc-audience-mapper
         config:
-          included.custom.audience: "oweme-api"
-          id.token.claim: "false"
+          included.custom.audience: oweme-api
           access.token.claim: "true"
-          introspection.token.claim: "true"
+          id.token.claim: "false"
 
 keycloak_clients:
   - client_id: oweme-api-user

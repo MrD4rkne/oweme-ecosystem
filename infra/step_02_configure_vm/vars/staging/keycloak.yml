@@ -41,6 +41,13 @@ keycloak_client_scopes:
           id.token.claim: "true"
           access.token.claim: "true"
           userinfo.token.claim: "true"
+      - name: audience
+        protocol: openid-connect
+        protocolMapper: oidc-audience-mapper
+        config:
+          included.custom.audience: oweme-api
+          access.token.claim: "true"
+          id.token.claim: "false"
 
 keycloak_clients:
   - client_id: oweme-api-user
