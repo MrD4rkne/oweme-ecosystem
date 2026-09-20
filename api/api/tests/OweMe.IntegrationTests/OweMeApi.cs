@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using OweMe.Api.Identity.Configuration;
+using OweMe.IntegrationTests.Authentication;
 using OweMe.Persistence.Configuration;
 using Testcontainers.PostgreSql;
 

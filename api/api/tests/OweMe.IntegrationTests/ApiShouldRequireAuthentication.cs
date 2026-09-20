@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using OweMe.Application.Ledgers.Commands.Create;
+using OweMe.IntegrationTests.Authentication;
 using Shouldly;
 
 namespace OweMe.IntegrationTests;
@@ -11,7 +12,8 @@ public sealed class ApiShouldRequireAuthentication(OweMeApi api, ITestOutputHelp
     private async Task VerifyEndpointRequiresAuthentication(Func<HttpClient, Task<HttpResponseMessage>> requestFunc)
     {
         // Arrange
-        var client = _api.CreateClient();
+        var client = _api.CreateClient()
+            .AsAnonymous();
 
         // Act
         var response = await requestFunc(client);

@@ -1,11 +1,12 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using OweMe.Api.Description;
+using OweMe.IntegrationTests.Authentication;
 using Shouldly;
 
 namespace OweMe.IntegrationTests;
 
-public sealed class Api_ShouldNot_RequireAuthentication(OweMeApi api, ITestOutputHelper output) : IClassFixture<OweMeApi>
+public sealed class ApiShouldNotRequireAuthentication(OweMeApi api, ITestOutputHelper output) : IClassFixture<OweMeApi>
 {
     private readonly WebApplicationFactory<Program> _api = api.WithTestLogging(output);
 
@@ -13,7 +14,8 @@ public sealed class Api_ShouldNot_RequireAuthentication(OweMeApi api, ITestOutpu
     public async Task For_GetHealthEndpoint()
     {
         // Arrange
-        var client = _api.CreateClient();
+        var client = _api.CreateClient()
+            .AsAnonymous();
 
         // Act
         var response = await client.GetAsync("/healthz", TestContext.Current.CancellationToken);
@@ -26,7 +28,8 @@ public sealed class Api_ShouldNot_RequireAuthentication(OweMeApi api, ITestOutpu
     public async Task For_GetLivenessEndpoint()
     {
         // Arrange
-        var client = _api.CreateClient();
+        var client = _api.CreateClient()
+            .AsAnonymous();
 
         // Act
         var response = await client.GetAsync("/alive", TestContext.Current.CancellationToken);
@@ -39,7 +42,8 @@ public sealed class Api_ShouldNot_RequireAuthentication(OweMeApi api, ITestOutpu
     public async Task For_GetApiInformationEndpoint()
     {
         // Arrange
-        var client = _api.CreateClient();
+        var client = _api.CreateClient()
+            .AsAnonymous();
 
         // Act
         var response = await client.GetFromJsonAsync<ApiInformation>("/api/info", TestContext.Current.CancellationToken);
