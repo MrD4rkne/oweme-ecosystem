@@ -1,4 +1,4 @@
-keycloak_realm: oweme-staging
+keycloak_realm: oweme-prod
 
 keycloak_client_scopes:
   - name: basic
