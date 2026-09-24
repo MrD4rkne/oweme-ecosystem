@@ -6,14 +6,13 @@ using OweMe.Persistence.Common;
 
 namespace OweMe.Persistence.Groups;
 
-public class GroupDbContext : AuditableDbContext, IGroupContext
+public class GroupDbContext(
+    DbContextOptions<GroupDbContext> options,
+    TimeProvider timeProvider,
+    IUserContext userContext)
+    : AuditableDbContext(options, timeProvider, userContext), IGroupContext
 {
-    public GroupDbContext(DbContextOptions<GroupDbContext> options, TimeProvider timeProvider,
-        IUserContext userContext) : base(options, timeProvider, userContext)
-    {
-    }
-
-    public DbSet<Group> Groups { get; set; }
+    public DbSet<Group> Ledgers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

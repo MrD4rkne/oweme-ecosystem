@@ -53,7 +53,7 @@ namespace OweMe.Persistence.Groups.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Groups");
+                    b.ToTable("Ledgers");
                 });
 #pragma warning restore 612, 618
         }

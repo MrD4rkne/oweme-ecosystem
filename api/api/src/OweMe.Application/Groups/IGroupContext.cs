@@ -5,7 +5,7 @@ namespace OweMe.Application.Groups;
 
 public interface IGroupContext
 {
-    DbSet<Group> Groups { get; }
+    DbSet<Group> Ledgers { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

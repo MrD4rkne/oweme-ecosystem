@@ -13,7 +13,7 @@ namespace OweMe.Persistence.Groups.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Groups",
+                name: "Ledgers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -26,7 +26,7 @@ namespace OweMe.Persistence.Groups.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Groups", x => x.Id);
+                    table.PrimaryKey("PK_Ledgers", x => x.Id);
                 });
         }
 
@@ -34,7 +34,7 @@ namespace OweMe.Persistence.Groups.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Groups");
+                name: "Ledgers");
         }
     }
 }

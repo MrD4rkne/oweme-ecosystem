@@ -11,7 +11,7 @@ public static class GetGroupQueryHandler
         IUserContext userContext,
         CancellationToken cancellationToken)
     {
-        var group = await context.Groups.FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
+        var group = await context.Ledgers.FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
         if (group is null || !group.CanUserAccess(userContext.Id))
             throw new NotFoundException($"Group with id {query.Id} not found.");
 

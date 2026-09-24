@@ -32,7 +32,7 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
             TestContext.Current.CancellationToken);
 
         // Assert
-        var addedGroup = _groupContextMock.Object.Groups
+        var addedGroup = _groupContextMock.Object.Ledgers
             .FirstOrDefault(x => x.Name == groupName && x.Description == groupDescription);
         addedGroup.ShouldNotBeNull();
         result.ShouldNotBeNull();
