@@ -54,7 +54,6 @@ public class AuditableDbContext : DbContext
     private void ApplyAuditableValues()
     {
         foreach (var entry in ChangeTracker.Entries<AuditableEntity>())
-        {
             switch (entry.State)
             {
                 case EntityState.Added:
@@ -66,6 +65,5 @@ public class AuditableDbContext : DbContext
                     entry.Entity.UpdatedBy = _userContext.Id;
                     break;
             }
-        }
     }
 }

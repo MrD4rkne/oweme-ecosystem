@@ -8,7 +8,7 @@ namespace OweMe.Api.Tests.Description;
 public class ProblemsExtensionsTests
 {
     /// <summary>
-    /// Represents the content type for problem details responses.
+    ///     Represents the content type for problem details responses.
     /// </summary>
     private const string ProblemDetailsContentType = "application/problem+json";
 
@@ -44,7 +44,7 @@ public class ProblemsExtensionsTests
 
         // Assert
         endpointBuilder.Metadata.Count.ShouldBe(expectedStatusCodes.Count);
-        foreach (int statusCode in expectedStatusCodes)
+        foreach (var statusCode in expectedStatusCodes)
         {
             var metadataForCode = endpointBuilder.Metadata
                 .OfType<ProducesResponseTypeMetadata>()
@@ -52,7 +52,8 @@ public class ProblemsExtensionsTests
             metadataForCode.ShouldNotBeNull($"Should register problem details model for code {statusCode}");
             metadataForCode.ShouldBeOfType<ProducesResponseTypeMetadata>();
             metadataForCode.ShouldBeEquivalentTo(
-                new ProducesResponseTypeMetadata(statusCode, typeof(ExtendedProblemDetails), [ProblemDetailsContentType]),
+                new ProducesResponseTypeMetadata(statusCode, typeof(ExtendedProblemDetails),
+                    [ProblemDetailsContentType]),
                 $"Should register problem details model: {nameof(ExtendedProblemDetails)} for code {statusCode}");
         }
     }

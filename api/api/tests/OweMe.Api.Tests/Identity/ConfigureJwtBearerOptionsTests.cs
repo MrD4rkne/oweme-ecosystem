@@ -19,7 +19,7 @@ public class ConfigureJwtBearerOptionsTests
             Audience = "audience",
             ValidIssuer = "issuer",
             MetadataAddress = "http://metadata.com",
-            RequireHttpsMetadata = requireHttpsMetadata,
+            RequireHttpsMetadata = requireHttpsMetadata
         };
 
         var configureJwtBearerOptions =
@@ -43,7 +43,8 @@ public class ConfigureJwtBearerOptionsTests
         options.TokenValidationParameters.ValidateLifetime.ShouldBe(true);
 
         options.MetadataAddress.ShouldBe(identityServerOptions.MetadataAddress, "MetadataAddress should be set");
-        options.RequireHttpsMetadata.ShouldBe(identityServerOptions.RequireHttpsMetadata, "RequireHttpsMetadata should be set");
+        options.RequireHttpsMetadata.ShouldBe(identityServerOptions.RequireHttpsMetadata,
+            "RequireHttpsMetadata should be set");
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class ConfigureJwtBearerOptionsTests
         {
             Authority = "https://example.com",
             ValidateAudience = true,
-            Audience = "audience",
+            Audience = "audience"
         };
         var configureJwtBearerOptions =
             new ConfigureJwtBearerOptions(Options.Create(identityServerOptions));
@@ -64,6 +65,7 @@ public class ConfigureJwtBearerOptionsTests
         configureJwtBearerOptions.Configure(options);
 
         // Assert
-        options.TokenValidationParameters.ValidIssuer.ShouldBe(identityServerOptions.Authority, "ValidIssuer should default to Authority when not provided");
+        options.TokenValidationParameters.ValidIssuer.ShouldBe(identityServerOptions.Authority,
+            "ValidIssuer should default to Authority when not provided");
     }
 }

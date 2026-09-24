@@ -1,16 +1,18 @@
+using Projects;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
 var apiDbServer = builder.AddPostgres("postgres-api")
     .WithDataVolume();
 
-var apiDb = apiDbServer.AddDatabase("api-database", databaseName: "OweMe.Api");
+var apiDb = apiDbServer.AddDatabase("api-database", "OweMe.Api");
 
 var keycloakDbServer = builder.AddPostgres("postgres-keycloak")
     .WithDataVolume();
-                              
+
 var keycloakDb = keycloakDbServer.AddDatabase("keycloak-db");
 
-var keycloak = builder.AddKeycloak("keycloak", port: 8080)
+var keycloak = builder.AddKeycloak("keycloak", 8080)
     .WithPostgres(keycloakDb)
     .WithRealmImport("../../../auth/realms")
     .WithEnvironment("KC_HOSTNAME_STRICT", "false")
@@ -19,8 +21,8 @@ var keycloak = builder.AddKeycloak("keycloak", port: 8080)
     .WithDataVolume()
     .WithOtlpExporter();
 
-_ = builder.AddProject<Projects.OweMe_Api>("api")
-    .WithHttpEndpoint(port: 5000, name: "http")
+_ = builder.AddProject<OweMe_Api>("api")
+    .WithHttpEndpoint(5000, name: "http")
     .WithReference(apiDb)
     .WithReference(keycloak)
     .WaitFor(apiDb)

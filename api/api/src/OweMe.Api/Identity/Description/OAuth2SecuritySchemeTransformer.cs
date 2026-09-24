@@ -21,7 +21,8 @@ public sealed class OAuth2SecuritySchemeTransformer(
         return Task.CompletedTask;
     }
 
-    private static void TryAddOAuth2Description(OpenApiDocument document, IOptions<IdentityServerOptions> identityServerOptions, ILogger logger)
+    private static void TryAddOAuth2Description(OpenApiDocument document,
+        IOptions<IdentityServerOptions> identityServerOptions, ILogger logger)
     {
         if (identityServerOptions.Value.Authority is null)
         {
@@ -31,7 +32,8 @@ public sealed class OAuth2SecuritySchemeTransformer(
 
         if (!Uri.TryCreate(identityServerOptions.Value.Authority, UriKind.Absolute, out var authorityUri))
         {
-            logger.LogWarning("Invalid Authority URI: {Authority}. Skipping OAuth2 security scheme addition.", identityServerOptions.Value.Authority);
+            logger.LogWarning("Invalid Authority URI: {Authority}. Skipping OAuth2 security scheme addition.",
+                identityServerOptions.Value.Authority);
             return;
         }
 

@@ -35,7 +35,7 @@ public sealed class ApiShouldRequireAuthentication(OweMeApi api, ITestOutputHelp
     [Fact]
     public async Task For_CreateGroupEndpoint()
     {
-        var group = new CreateGroupCommand()
+        var group = new CreateGroupCommand
         {
             Name = "Test Group",
             Description = "Test Description"

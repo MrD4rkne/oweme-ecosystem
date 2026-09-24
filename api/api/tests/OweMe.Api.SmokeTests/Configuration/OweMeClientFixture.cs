@@ -29,7 +29,7 @@ public class OweMeClientFixture
         services.Configure<ApiSettings>(configuration.GetSection(ApiSettings.SectionName));
         services.Configure<UserSettings>(configuration.GetSection(UserSettings.SectionName));
         services.Configure<IdentityProviderSettings>(configuration.GetSection(IdentityProviderSettings.SectionName));
-        
+
         services.AddMemoryCache();
         services.AddSingleton<IDiscoveryCache>(r =>
         {
@@ -43,12 +43,12 @@ public class OweMeClientFixture
         services.AddSingleton<ITokenManager>(sp => sp.GetRequiredService<TokenManager>());
 
         services.AddHttpClient(AuthenticatedClientKey, (sp, client) =>
-        {
-            var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
-            client.BaseAddress = new Uri(testSettings.BaseUrl);
-        }).AddHttpMessageHandler<LoggingDelegatingHandler>()
+            {
+                var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
+                client.BaseAddress = new Uri(testSettings.BaseUrl);
+            }).AddHttpMessageHandler<LoggingDelegatingHandler>()
             .AddHttpMessageHandler<AuthorizationDelegatingHandler>();
-        
+
         services.AddKeyedTransient(AuthenticatedClientKey, CreateOweMeClientFromKey);
 
         services.AddHttpClient(UnauthenticatedClientKey, (sp, client) =>
@@ -56,7 +56,7 @@ public class OweMeClientFixture
             var testSettings = sp.GetRequiredService<IOptions<ApiSettings>>().Value;
             client.BaseAddress = new Uri(testSettings.BaseUrl);
         }).AddHttpMessageHandler<LoggingDelegatingHandler>();
-        
+
         services.AddKeyedTransient(UnauthenticatedClientKey, CreateOweMeClientFromKey);
 
         services.AddTransient<LoggingDelegatingHandler>();

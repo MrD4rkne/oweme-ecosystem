@@ -10,8 +10,6 @@ namespace OweMe.Api.Tests.Description;
 
 public class ApiVersionOpenApiDocumentTransformerTests
 {
-    private readonly Mock<IApiInformationProvider> _apiInformationProviderMock = new();
-
     private readonly ApiInformation _apiInformation = new()
     {
         Title = "Some title",
@@ -19,6 +17,8 @@ public class ApiVersionOpenApiDocumentTransformerTests
         Description = "Some description",
         BuildVersion = "1.0.5"
     };
+
+    private readonly Mock<IApiInformationProvider> _apiInformationProviderMock = new();
 
     public ApiVersionOpenApiDocumentTransformerTests()
     {
@@ -44,7 +44,7 @@ public class ApiVersionOpenApiDocumentTransformerTests
             }
         };
 
-        var context = new OpenApiDocumentTransformerContext()
+        var context = new OpenApiDocumentTransformerContext
         {
             DocumentName = "test-document",
             DescriptionGroups = [],
@@ -57,8 +57,10 @@ public class ApiVersionOpenApiDocumentTransformerTests
         // Assert
         document.Info.ShouldNotBeNull();
         document.Info.Title.ShouldBe(_apiInformation.Title, "Transformer should set the title from ApiInformation");
-        document.Info.Version.ShouldBe(_apiInformation.Version, "Transformer should set the version from ApiInformation");
-        document.Info.Description.ShouldBe(_apiInformation.Description, "Transformer should set the description from ApiInformation");
+        document.Info.Version.ShouldBe(_apiInformation.Version,
+            "Transformer should set the version from ApiInformation");
+        document.Info.Description.ShouldBe(_apiInformation.Description,
+            "Transformer should set the description from ApiInformation");
         document.Info.Extensions.ShouldNotBeNull();
         document.Info.Extensions.ShouldContain(
             ext => ext.Key == "x-version", "Transformer should not remove existing extensions");

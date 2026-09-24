@@ -15,7 +15,7 @@ public sealed class OweMeApi : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
         .WithDatabase("oweme_test")
-        .WithPortBinding(5432, assignRandomHostPort: true)
+        .WithPortBinding(5432, true)
         .Build();
 
     private string ConnectionString => _postgresContainer.GetConnectionString();

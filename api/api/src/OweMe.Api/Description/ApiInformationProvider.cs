@@ -11,7 +11,9 @@ public class ApiInformationProvider : IApiInformationProvider
             Title = OweMeApiInformation.Title,
             Version = OweMeApiInformation.Version,
             Description = OweMeApiInformation.Description,
-            BuildVersion = typeof(ApiInformationProvider).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "unknown",
+            BuildVersion =
+                typeof(ApiInformationProvider).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+                    ?.InformationalVersion ?? "unknown"
         };
     }
 

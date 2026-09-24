@@ -15,17 +15,12 @@ internal sealed class TokenManager(
     public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
     {
         var key = CreateKeyFor(userSettings.Value.Username, userSettings.Value.Scope);
-        if (memoryCache.TryGetValue(key, out string? accessToken))
-        {
-            return accessToken!;
-        }
+        if (memoryCache.TryGetValue(key, out string? accessToken)) return accessToken!;
 
         var discoveryDocument = await discoveryCache.GetAsync();
         if (discoveryDocument.IsError)
-        {
             throw new FailedToRetrieveDiscoveryDocumentException(identityProviderSettings.Value.Address,
                 discoveryDocument.Error);
-        }
 
         var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
         {
@@ -33,13 +28,11 @@ internal sealed class TokenManager(
             ClientId = identityProviderSettings.Value.ClientId,
             ClientSecret = identityProviderSettings.Value.ClientSecret,
             UserName = userSettings.Value.Username,
-            Password = userSettings.Value.Password,
+            Password = userSettings.Value.Password
         }, cancellationToken);
         if (tokenResponse.IsError)
-        {
             throw new FailedToObtainTokenException(userSettings.Value.Username, userSettings.Value.Scope,
                 tokenResponse.Error);
-        }
 
         accessToken = tokenResponse.AccessToken!;
 

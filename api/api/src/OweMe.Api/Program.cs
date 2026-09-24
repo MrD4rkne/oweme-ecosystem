@@ -133,13 +133,11 @@ builder.Services.AddProblemDetails(options =>
 builder.Services.AddEndpoints(typeof(OweMe.Api.Program).Assembly);
 
 if (!CodeGeneration.IsRunningGeneration())
-{
     // Some actions like validating application options must not be run during codegen activities, like OpenApi spec
     // generation or managing Entity Framework Core migrations.
     identityOptions
         .ValidateDataAnnotations()
         .ValidateOnStart();
-}
 
 builder.Services.AddHealthChecks()
     .AddPersistenceHealthCheck();
@@ -171,7 +169,7 @@ return await app.RunJasperFxCommands(args);
 
 namespace OweMe.Api
 {
-    public partial class Program
+    public class Program
     {
         protected Program()
         {

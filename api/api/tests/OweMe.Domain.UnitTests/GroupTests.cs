@@ -19,7 +19,7 @@ public class GroupTests
         };
 
         // Act
-        bool canAccess = group.CanUserAccess(userId);
+        var canAccess = group.CanUserAccess(userId);
 
         // Assert
         canAccess.ShouldBeTrue();
@@ -39,7 +39,7 @@ public class GroupTests
         };
 
         // Act
-        bool canAccess = group.CanUserAccess(otherUserId);
+        var canAccess = group.CanUserAccess(otherUserId);
 
         // Assert
         canAccess.ShouldBeFalse();

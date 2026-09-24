@@ -5,7 +5,7 @@ using OweMe.Domain.Users;
 namespace OweMe.Application.UnitTests.User;
 
 /// <summary>
-/// Validates the behavior of the UserContext class and its related components.
+///     Validates the behavior of the UserContext class and its related components.
 /// </summary>
 public class UserContextTests
 {
@@ -55,7 +55,8 @@ public class UserContextTests
         using var scope = _serviceProvider.CreateScope();
 
         // Act
-        scope.ServiceProvider.SetUserContext(_serviceProvider.GetRequiredService<IUserContext>().Id, _serviceProvider.GetRequiredService<IUserContext>().Email);
+        scope.ServiceProvider.SetUserContext(_serviceProvider.GetRequiredService<IUserContext>().Id,
+            _serviceProvider.GetRequiredService<IUserContext>().Email);
 
         // Assert
         var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();

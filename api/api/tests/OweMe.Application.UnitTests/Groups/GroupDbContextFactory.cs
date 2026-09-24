@@ -24,10 +24,8 @@ public class GroupDbContextMoq : PostgresTestBase
         get
         {
             if (_groupContextMock is null)
-            {
                 throw new InvalidOperationException(
                     $"GroupContextMock is not initialized. Call {nameof(SetupAsync)} first.");
-            }
 
             return _groupContextMock.As<IGroupContext>();
         }
@@ -35,15 +33,9 @@ public class GroupDbContextMoq : PostgresTestBase
 
     public static GroupDbContextMoq Create(GroupDbContextCreationOptions options)
     {
-        if (options.TimeProvider is null)
-        {
-            options = options.WithTimeProvider(new Mock<TimeProvider>().Object);
-        }
+        if (options.TimeProvider is null) options = options.WithTimeProvider(new Mock<TimeProvider>().Object);
 
-        if (options.UserContext is null)
-        {
-            options = options.WithUserContext(new Mock<IUserContext>().Object);
-        }
+        if (options.UserContext is null) options = options.WithUserContext(new Mock<IUserContext>().Object);
 
         return new GroupDbContextMoq(options.TimeProvider!, options.UserContext!);
     }

@@ -10,9 +10,9 @@ namespace OweMe.Api.Tests.Description;
 
 public class ExceptionProblemDetailsMatcherTests
 {
-    private readonly Mock<IProblemDetailsService> _mockProblemDetailsService;
-    private readonly ExceptionProblemDetailsMatcher _matcher;
     private readonly HttpContext _httpContext;
+    private readonly ExceptionProblemDetailsMatcher _matcher;
+    private readonly Mock<IProblemDetailsService> _mockProblemDetailsService;
 
     public ExceptionProblemDetailsMatcherTests()
     {

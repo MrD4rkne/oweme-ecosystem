@@ -37,7 +37,7 @@ public sealed class UserContextShouldBeDerivedFromTheRequest : IClassFixture<Owe
         var client = _api.CreateClient()
             .AsUser(user);
 
-        var group = new CreateGroupCommand()
+        var group = new CreateGroupCommand
         {
             Name = "Test Group",
             Description = "Test Description"

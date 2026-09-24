@@ -1,18 +1,18 @@
 <Project Sdk="Aspire.AppHost.Sdk/13.5.3">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <AspireUseCliBundle>true</AspireUseCliBundle>
-    <UserSecretsId>3d0b2fcd-af4e-4bbd-9dbd-d15cff44242c</UserSecretsId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AspireUseCliBundle>true</AspireUseCliBundle>
+        <UserSecretsId>3d0b2fcd-af4e-4bbd-9dbd-d15cff44242c</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-    <PackageReference Include="CommunityToolkit.Aspire.Hosting.Keycloak.Extensions" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
+        <PackageReference Include="CommunityToolkit.Aspire.Hosting.Keycloak.Extensions"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\api\src\OweMe.Api\OweMe.Api.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\api\src\OweMe.Api\OweMe.Api.csproj"/>
+    </ItemGroup>
 
 </Project>

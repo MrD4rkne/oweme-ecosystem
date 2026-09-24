@@ -40,13 +40,9 @@ public class CreateGroupCommandValidatorTests
     public static TheoryData<string, string?> ValidNameDescriptionCombinations()
     {
         var data = new TheoryData<string, string?>();
-        foreach (string name in ValidNames)
-        {
-            foreach (string? description in ValidDescriptions)
-            {
-                data.Add(name, description);
-            }
-        }
+        foreach (var name in ValidNames)
+        foreach (var description in ValidDescriptions)
+            data.Add(name, description);
 
         return data;
     }
@@ -73,13 +69,9 @@ public class CreateGroupCommandValidatorTests
     public static TheoryData<string?, string?> InvalidNameValidDescriptionCombinations()
     {
         var data = new TheoryData<string?, string?>();
-        foreach (string? name in InvalidNames)
-        {
-            foreach (string? description in ValidDescriptions)
-            {
-                data.Add(name, description);
-            }
-        }
+        foreach (var name in InvalidNames)
+        foreach (var description in ValidDescriptions)
+            data.Add(name, description);
 
         return data;
     }
@@ -107,13 +99,9 @@ public class CreateGroupCommandValidatorTests
     public static TheoryData<string, string> ValidNameInvalidDescriptionCombinations()
     {
         var data = new TheoryData<string, string>();
-        foreach (string name in ValidNames)
-        {
-            foreach (string description in InvalidDescriptions)
-            {
-                data.Add(name, description);
-            }
-        }
+        foreach (var name in ValidNames)
+        foreach (var description in InvalidDescriptions)
+            data.Add(name, description);
 
         return data;
     }
