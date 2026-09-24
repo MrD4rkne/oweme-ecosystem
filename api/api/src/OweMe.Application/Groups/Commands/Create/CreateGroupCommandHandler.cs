@@ -13,7 +13,7 @@ public static class CreateGroupCommandHandler
             Description = message.Description
         };
 
-        context.Ledgers.Add(group);
+        context.Groups.Add(group);
         _ = await context.SaveChangesAsync(cancellationToken);
         return new GroupCreated(
             group.Id

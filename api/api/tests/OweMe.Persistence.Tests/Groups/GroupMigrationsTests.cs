@@ -59,10 +59,10 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
         };
 
         // Act
-        context.Ledgers.Add(group);
+        context.Groups.Add(group);
         await context.SaveChangesAsync(TestContext.Current.CancellationToken);
 
-        var createdGroup = await context.Ledgers
+        var createdGroup = await context.Groups
             .FirstOrDefaultAsync(x => x.Name == "Test Group" && x.Description == "This is a test group.",
                 TestContext.Current.CancellationToken);
 

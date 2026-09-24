@@ -12,7 +12,7 @@ public class GroupDbContext(
     IUserContext userContext)
     : AuditableDbContext(options, timeProvider, userContext), IGroupContext
 {
-    public DbSet<Group> Ledgers { get; set; }
+    public DbSet<Group> Groups { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
