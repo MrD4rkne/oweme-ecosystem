@@ -22,7 +22,7 @@ public sealed record IdentityServerOptions
     public bool ValidateAudience { get; set; } = true;
 
     /// <summary>
-    ///     Valid issuer for token validation. If not set, defaults to the Authority URL.
+    /// Valid issuer for token validation. If not set, defaults to the Authority URL.
     /// </summary>
     public string ValidIssuer
     {

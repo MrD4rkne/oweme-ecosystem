@@ -8,7 +8,7 @@ namespace OweMe.Api.Tests.Description;
 public class ProblemsExtensionsTests
 {
     /// <summary>
-    ///     Represents the content type for problem details responses.
+    /// Represents the content type for problem details responses.
     /// </summary>
     private const string ProblemDetailsContentType = "application/problem+json";
 
