@@ -1,34 +1,34 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using OweMe.Api.Endpoints.Ledgers.Get;
+using OweMe.Api.Endpoints.Groups.Get;
 using OweMe.Application.Common.Exceptions;
-using OweMe.Application.Ledgers.Queries.Get;
+using OweMe.Application.Groups.Queries.Get;
 using Shouldly;
 using Wolverine;
 
-namespace OweMe.Api.Tests.Endpoints.Ledgers.Get;
+namespace OweMe.Api.Tests.Endpoints.Groups.Get;
 
-public class GetLedgerByIdTests
+public class GetGroupByIdTests
 {
     [Fact]
-    public async Task GetLedger_ReturnsOk_WhenSuccess()
+    public async Task GetGroup_ReturnsOk_WhenSuccess()
     {
         // Arrange
         var messageBusMock = new Mock<IMessageBus>();
-        var expectedValue = new GetLedgerResult(Guid.NewGuid(), "Test Ledger", "This is a test ledger.",
+        var expectedValue = new GetGroupResult(Guid.NewGuid(), "Test Group", "This is a test group.",
             DateTimeOffset.UtcNow, Guid.NewGuid(), DateTimeOffset.UtcNow, Guid.NewGuid());
 
         messageBusMock.Setup(m =>
-                m.InvokeAsync<GetLedgerResult>(It.IsAny<GetLedgerQuery>(), It.IsAny<CancellationToken>(), null))
+                m.InvokeAsync<GetGroupResult>(It.IsAny<GetGroupQuery>(), It.IsAny<CancellationToken>(), null))
             .ReturnsAsync(expectedValue);
 
         // Act
-        var result = await GetLedgerByIdEndpoint.GetLedger(expectedValue.Id, messageBusMock.Object);
+        var result = await GetGroupByIdEndpoint.GetGroup(expectedValue.Id, messageBusMock.Object);
 
         // Assert
-        result.ShouldBeOfType<Ok<GetLedgerResult>>();
+        result.ShouldBeOfType<Ok<GetGroupResult>>();
 
-        var okResult = result as Ok<GetLedgerResult>;
+        var okResult = result as Ok<GetGroupResult>;
         okResult.ShouldNotBeNull();
         okResult.Value.ShouldNotBeNull();
 
@@ -42,20 +42,20 @@ public class GetLedgerByIdTests
     }
 
     [Fact]
-    public async Task GetLedger_ReturnsNotFound_WhenLedgerNotFound()
+    public async Task GetGroup_ReturnsNotFound_WhenGroupNotFound()
     {
         // Arrange
         var messageBusMock = new Mock<IMessageBus>();
         messageBusMock.Setup(m =>
-                m.InvokeAsync<GetLedgerResult>(It.IsAny<GetLedgerQuery>(), It.IsAny<CancellationToken>(), null))
-            .Throws(new NotFoundException("Ledger not found."));
+                m.InvokeAsync<GetGroupResult>(It.IsAny<GetGroupQuery>(), It.IsAny<CancellationToken>(), null))
+            .Throws(new NotFoundException("Group not found."));
 
-        var ledgerId = Guid.NewGuid();
+        var groupId = Guid.NewGuid();
 
         // Act & Assert
         await Should.ThrowAsync<NotFoundException>(async () =>
         {
-            await GetLedgerByIdEndpoint.GetLedger(ledgerId, messageBusMock.Object);
+            await GetGroupByIdEndpoint.GetGroup(groupId, messageBusMock.Object);
         });
     }
 }

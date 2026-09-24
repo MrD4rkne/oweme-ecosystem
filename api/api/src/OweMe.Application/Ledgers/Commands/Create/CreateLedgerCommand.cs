@@ -1,6 +1,6 @@
-﻿namespace OweMe.Application.Ledgers.Commands.Create;
+﻿namespace OweMe.Application.Groups.Commands.Create;
 
-public record CreateLedgerCommand
+public record CreateGroupCommand
 {
     public required string Name { get; init; }
 

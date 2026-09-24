@@ -1,3 +1,3 @@
-﻿namespace OweMe.Application.Ledgers.Queries.Get;
+﻿namespace OweMe.Application.Groups.Queries.Get;
 
-public record GetLedgerQuery(Guid Id);
+public record GetGroupQuery(Guid Id);

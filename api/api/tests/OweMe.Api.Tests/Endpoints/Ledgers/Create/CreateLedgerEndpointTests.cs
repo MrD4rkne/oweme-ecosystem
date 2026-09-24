@@ -1,36 +1,36 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
 using OweMe.Api.Endpoints.Ledgers.Create;
-using OweMe.Application.Ledgers.Commands.Create;
+using OweMe.Application.Groups.Commands.Create;
 using Shouldly;
 using Wolverine;
 
-namespace OweMe.Api.Tests.Endpoints.Ledgers.Create;
+namespace OweMe.Api.Tests.Endpoints.Groups.Create;
 
-public class CreateLedgerEndpointTests
+public class CreateGroupEndpointTests
 {
     [Fact]
-    public async Task CreateLedger_ReturnsCreatedResult()
+    public async Task CreateGroup_ReturnsCreatedResult()
     {
         // Arrange
         var messageBusMock = new Mock<IMessageBus>();
-        var request = new CreateLedgerCommand
+        var request = new CreateGroupCommand
         {
-            Name = "Test Ledger",
-            Description = "This is a test ledger."
+            Name = "Test Group",
+            Description = "This is a test group."
         };
 
-        var ledgerId = Guid.NewGuid();
-        var ledgerCreated = new CreateLedgerCommandHandler.LedgerCreated(ledgerId);
+        var groupId = Guid.NewGuid();
+        var groupCreated = new CreateGroupCommandHandler.GroupCreated(groupId);
 
         messageBusMock.Setup(m =>
-                m.InvokeAsync<CreateLedgerCommandHandler.LedgerCreated>(It.IsAny<CreateLedgerCommand>(),
+                m.InvokeAsync<CreateGroupCommandHandler.GroupCreated>(It.IsAny<CreateGroupCommand>(),
                     It.IsAny<CancellationToken>(), null))
-            .ReturnsAsync(ledgerCreated);
+            .ReturnsAsync(groupCreated);
 
         // Act
         var result =
-            await CreateLedgerEndpoint.CreateLedger(request, messageBusMock.Object,
+            await CreateGroupEndpoint.CreateGroup(request, messageBusMock.Object,
                 TestContext.Current.CancellationToken);
 
         // Assert
@@ -38,11 +38,11 @@ public class CreateLedgerEndpointTests
 
         var createdResult = result as Created;
         createdResult.ShouldNotBeNull();
-        createdResult.Location.ShouldBe($"/api/ledgers/{ledgerId}");
+        createdResult.Location.ShouldBe($"/api/groups/{groupId}");
 
         messageBusMock.Verify(m =>
-            m.InvokeAsync<CreateLedgerCommandHandler.LedgerCreated>(
-                It.Is<CreateLedgerCommand>(command =>
+            m.InvokeAsync<CreateGroupCommandHandler.GroupCreated>(
+                It.Is<CreateGroupCommand>(command =>
                     command.Name == request.Name && command.Description == request.Description),
                 It.IsAny<CancellationToken>(), null), Times.Once);
     }

@@ -3,40 +3,40 @@ using OweMe.Api.SmokeTests.Configuration;
 using OweMe.Api.SmokeTests.Helpers;
 using Shouldly;
 
-namespace OweMe.Api.SmokeTests.Endpoints.Ledgers;
+namespace OweMe.Api.SmokeTests.Endpoints.Groups;
 
-public class CreateLedgerEndpointTests(OweMeClientFixture fixture)
+public class CreateGroupEndpointTests(OweMeClientFixture fixture)
 {
-    private readonly CreateLedgerCommand _validCreateLedgerRequest = new()
+    private readonly CreateGroupCommand _validCreateGroupRequest = new()
     {
-        Name = "Test Ledger",
-        Description = "This is a test ledger."
+        Name = "Test Group",
+        Description = "This is a test group."
     };
 
     [Fact]
-    public async Task For_ValidRequest_Should_CreateLedgerSuccessfully()
+    public async Task For_ValidRequest_Should_CreateGroupSuccessfully()
     {
         // Arrange
         var client = fixture.GetClient(OweMeClientFixture.AuthenticatedClientKey);
 
         // Act
-        var ledgerId =
-            await CreateLedgerHelper.CreateLedger(client, _validCreateLedgerRequest,
+        var groupId =
+            await CreateGroupHelper.CreateGroup(client, _validCreateGroupRequest,
                 TestContext.Current.CancellationToken);
 
         // Assert
-        ledgerId.ShouldNotBe(Guid.Empty, "Ledger ID should not be empty after successful creation.");
+        groupId.ShouldNotBe(Guid.Empty, "Group ID should not be empty after successful creation.");
 
-        var ledger = await client.GetLedgerAsync(ledgerId, TestContext.Current.CancellationToken);
-        ledger.ShouldNotBeNull("Ledger should not be null after creation.");
-        ledger.Result.ShouldNotBeNull("Ledger result should not be null.");
-        ledger.Result.Id.ShouldBe(ledgerId, "Ledger ID should match the created ledger ID.");
-        ledger.Result.Name.ShouldBe(_validCreateLedgerRequest.Name, "Ledger name should match the request.");
-        ledger.Result.Description.ShouldBe(_validCreateLedgerRequest.Description,
-            "Ledger description should match the request.");
-        ledger.Result.CreatedBy.ShouldNotBe(Guid.Empty, "Ledger created by should not be empty.");
-        ledger.Result.UpdatedAt.ShouldBeNull("Ledger updated date should be null for a newly created ledger.");
-        ledger.Result.UpdatedBy.ShouldBeNull("Ledger updated by should be null for a newly created ledger.");
+        var group = await client.GetGroupAsync(groupId, TestContext.Current.CancellationToken);
+        group.ShouldNotBeNull("Group should not be null after creation.");
+        group.Result.ShouldNotBeNull("Group result should not be null.");
+        group.Result.Id.ShouldBe(groupId, "Group ID should match the created group ID.");
+        group.Result.Name.ShouldBe(_validCreateGroupRequest.Name, "Group name should match the request.");
+        group.Result.Description.ShouldBe(_validCreateGroupRequest.Description,
+            "Group description should match the request.");
+        group.Result.CreatedBy.ShouldNotBe(Guid.Empty, "Group created by should not be empty.");
+        group.Result.UpdatedAt.ShouldBeNull("Group updated date should be null for a newly created group.");
+        group.Result.UpdatedBy.ShouldBeNull("Group updated by should be null for a newly created group.");
     }
 
     [Fact]
@@ -45,15 +45,15 @@ public class CreateLedgerEndpointTests(OweMeClientFixture fixture)
         // Arrange
         var client = fixture.GetClient(OweMeClientFixture.AuthenticatedClientKey);
 
-        var invalidCreateLedgerRequest = new CreateLedgerCommand
+        var invalidCreateGroupRequest = new CreateGroupCommand
         {
             Name = "", // Invalid: Name cannot be empty
-            Description = "This is an invalid test ledger."
+            Description = "This is an invalid test group."
         };
 
         // Act
         var apiException = await Should.ThrowAsync<ApiException>(() =>
-            client.CreateLedgerAsync(invalidCreateLedgerRequest, TestContext.Current.CancellationToken));
+            client.CreateGroupAsync(invalidCreateGroupRequest, TestContext.Current.CancellationToken));
 
         // Assert
         apiException.ShouldNotBeNull("API exception should not be null for invalid request.");
@@ -68,7 +68,7 @@ public class CreateLedgerEndpointTests(OweMeClientFixture fixture)
 
         // Act
         var apiException = await Should.ThrowAsync<ApiException>(() =>
-            client.CreateLedgerAsync(_validCreateLedgerRequest, TestContext.Current.CancellationToken));
+            client.CreateGroupAsync(_validCreateGroupRequest, TestContext.Current.CancellationToken));
 
         // Assert
         apiException.ShouldNotBeNull("API exception should not be null for unauthorized request.");

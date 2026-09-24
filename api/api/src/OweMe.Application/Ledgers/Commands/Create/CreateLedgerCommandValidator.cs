@@ -1,20 +1,20 @@
 ﻿using FluentValidation;
-using OweMe.Domain.Ledgers;
+using OweMe.Domain.Groups;
 
-namespace OweMe.Application.Ledgers.Commands.Create;
+namespace OweMe.Application.Groups.Commands.Create;
 
-public class CreateLedgerCommandValidator : AbstractValidator<CreateLedgerCommand>
+public class CreateGroupCommandValidator : AbstractValidator<CreateGroupCommand>
 {
-    public CreateLedgerCommandValidator()
+    public CreateGroupCommandValidator()
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Ledger name is required.")
-            .MaximumLength(LedgerConstants.MaxNameLength)
-            .WithMessage($"Ledger name must not exceed {LedgerConstants.MaxNameLength} characters.");
+            .WithMessage("Group name is required.")
+            .MaximumLength(GroupConstants.MaxNameLength)
+            .WithMessage($"Group name must not exceed {GroupConstants.MaxNameLength} characters.");
 
         RuleFor(x => x.Description)
-            .MaximumLength(LedgerConstants.MaxDescriptionLength)
-            .WithMessage($"Ledger description must not exceed {LedgerConstants.MaxDescriptionLength} characters.");
+            .MaximumLength(GroupConstants.MaxDescriptionLength)
+            .WithMessage($"Group description must not exceed {GroupConstants.MaxDescriptionLength} characters.");
     }
 }

@@ -1,9 +1,9 @@
-﻿using OweMe.Application.Ledgers.Commands.Create;
+﻿using OweMe.Application.Groups.Commands.Create;
 using Shouldly;
 
-namespace OweMe.Application.UnitTests.Ledgers.Commands.Create;
+namespace OweMe.Application.UnitTests.Groups.Commands.Create;
 
-public class CreateLedgerCommandValidatorTests
+public class CreateGroupCommandValidatorTests
 {
     private const int MaxNameLength = 100;
     private const int MaxDescriptionLength = 500;
@@ -53,11 +53,11 @@ public class CreateLedgerCommandValidatorTests
 
     [Theory]
     [MemberData(nameof(ValidNameDescriptionCombinations))]
-    public void Should_Validate_CreateLedgerCommand(string name, string? description)
+    public void Should_Validate_CreateGroupCommand(string name, string? description)
     {
         // Arrange
-        var validator = new CreateLedgerCommandValidator();
-        var command = new CreateLedgerCommand
+        var validator = new CreateGroupCommandValidator();
+        var command = new CreateGroupCommand
         {
             Name = name,
             Description = description
@@ -86,11 +86,11 @@ public class CreateLedgerCommandValidatorTests
 
     [Theory]
     [MemberData(nameof(InvalidNameValidDescriptionCombinations))]
-    public void Should_Invalidate_CreateLedgerCommand_When_Name_Is_Invalid(string? name, string? description)
+    public void Should_Invalidate_CreateGroupCommand_When_Name_Is_Invalid(string? name, string? description)
     {
         // Arrange
-        var validator = new CreateLedgerCommandValidator();
-        var command = new CreateLedgerCommand
+        var validator = new CreateGroupCommandValidator();
+        var command = new CreateGroupCommand
         {
             Name = name!,
             Description = description
@@ -120,12 +120,12 @@ public class CreateLedgerCommandValidatorTests
 
     [Theory]
     [MemberData(nameof(ValidNameInvalidDescriptionCombinations))]
-    public void Should_Invalidate_CreateLedgerCommand_When_Description_Exceeds_Max_Length(string name,
+    public void Should_Invalidate_CreateGroupCommand_When_Description_Exceeds_Max_Length(string name,
         string? description)
     {
         // Arrange
-        var validator = new CreateLedgerCommandValidator();
-        var command = new CreateLedgerCommand
+        var validator = new CreateGroupCommandValidator();
+        var command = new CreateGroupCommand
         {
             Name = name,
             Description = description

@@ -2,7 +2,6 @@ using JasperFx;
 using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
-using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using OweMe.Api.Configuration;
@@ -17,6 +16,7 @@ using OweMe.Application.Common.Middlewares;
 using OweMe.Infrastructure;
 using OweMe.Persistence;
 using OweMe.Persistence.Health;
+using OweMe.ServiceDefaults;
 using Scalar.AspNetCore;
 using Wolverine;
 using Wolverine.FluentValidation;
@@ -44,7 +44,7 @@ builder.AddServiceDefaults();
 var otel = builder.Services.AddOpenTelemetry();
 otel.WithTracing(b =>
 {
-    b.AddAspNetCoreInstrumentation(options=>
+    b.AddAspNetCoreInstrumentation(options =>
     {
         options.Filter = context => !context.Request.Path.StartsWithSegments("/healthz");
     });
@@ -130,7 +130,7 @@ builder.Services.AddProblemDetails(options =>
     };
 });
 
-builder.Services.AddEndpoints(typeof(Program).Assembly);
+builder.Services.AddEndpoints(typeof(OweMe.Api.Program).Assembly);
 
 if (!CodeGeneration.IsRunningGeneration())
 {
@@ -152,10 +152,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(opt =>
     {
         opt.AddPreferredSecuritySchemes("OAuth2")
-        .AddPasswordFlow("OAuth2", flow =>
-        {
-            flow.SelectedScopes = [Constants.POLICY_API_SCOPE_CLAIM];
-        });
+            .AddPasswordFlow("OAuth2", flow => { flow.SelectedScopes = [Constants.POLICY_API_SCOPE_CLAIM]; });
     });
 }
 
@@ -172,7 +169,12 @@ app.MapDefaultEndpoints();
 
 return await app.RunJasperFxCommands(args);
 
-public partial class Program
+namespace OweMe.Api
 {
-    protected Program(){}
+    public partial class Program
+    {
+        protected Program()
+        {
+        }
+    }
 }

@@ -141,25 +141,25 @@ namespace OweMe.Api.Client
         }
 
         /// <remarks>
-        /// Get a ledger by ID.
+        /// Get a group by ID.
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Response<GetLedgerResult>> GetLedgerAsync(System.Guid ledgerId)
+        public virtual System.Threading.Tasks.Task<Response<GetGroupResult>> GetGroupAsync(System.Guid groupId)
         {
-            return GetLedgerAsync(ledgerId, System.Threading.CancellationToken.None);
+            return GetGroupAsync(groupId, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <remarks>
-        /// Get a ledger by ID.
+        /// Get a group by ID.
         /// </remarks>
         /// <returns>OK</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response<GetLedgerResult>> GetLedgerAsync(System.Guid ledgerId, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<Response<GetGroupResult>> GetGroupAsync(System.Guid groupId, System.Threading.CancellationToken cancellationToken)
         {
-            if (ledgerId == null)
-                throw new System.ArgumentNullException("ledgerId");
+            if (groupId == null)
+                throw new System.ArgumentNullException("groupId");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -172,9 +172,9 @@ namespace OweMe.Api.Client
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ledgers/{ledgerId}"
-                    urlBuilder_.Append("api/ledgers/");
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(ledgerId, System.Globalization.CultureInfo.InvariantCulture)));
+                    // Operation Path: "api/groups/{groupId}"
+                    urlBuilder_.Append("api/groups/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(groupId, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -201,12 +201,12 @@ namespace OweMe.Api.Client
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<GetLedgerResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<GetGroupResult>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
-                            return new Response<GetLedgerResult>(status_, headers_, objectResponse_.Object);
+                            return new Response<GetGroupResult>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         if (status_ == 404)
@@ -249,22 +249,22 @@ namespace OweMe.Api.Client
         }
 
         /// <remarks>
-        /// Create a new ledger that groups expenses and payments between users.
+        /// Create a new group that groups expenses and payments between users.
         /// </remarks>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Response> CreateLedgerAsync(CreateLedgerCommand body)
+        public virtual System.Threading.Tasks.Task<Response> CreateGroupAsync(CreateGroupCommand body)
         {
-            return CreateLedgerAsync(body, System.Threading.CancellationToken.None);
+            return CreateGroupAsync(body, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <remarks>
-        /// Create a new ledger that groups expenses and payments between users.
+        /// Create a new group that groups expenses and payments between users.
         /// </remarks>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> CreateLedgerAsync(CreateLedgerCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<Response> CreateGroupAsync(CreateGroupCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -283,8 +283,8 @@ namespace OweMe.Api.Client
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
-                    // Operation Path: "api/ledgers"
-                    urlBuilder_.Append("api/ledgers");
+                    // Operation Path: "api/groups"
+                    urlBuilder_.Append("api/groups");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -517,7 +517,7 @@ namespace OweMe.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.5.0.0 (NJsonSchema v11.4.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class CreateLedgerCommand
+    public partial class CreateGroupCommand
     {
 
         [Newtonsoft.Json.JsonProperty("name", Required = Newtonsoft.Json.Required.Always)]
@@ -578,7 +578,7 @@ namespace OweMe.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.5.0.0 (NJsonSchema v11.4.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class GetLedgerResult
+    public partial class GetGroupResult
     {
 
         [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Always)]

@@ -1,87 +1,87 @@
 ﻿using Moq;
 using OweMe.Application.Common.Exceptions;
-using OweMe.Application.Ledgers.Queries.Get;
-using OweMe.Domain.Ledgers;
+using OweMe.Application.Groups.Queries.Get;
+using OweMe.Domain.Groups;
 using OweMe.Domain.Users;
 using Shouldly;
 
-namespace OweMe.Application.UnitTests.Ledgers.Queries.Get;
+namespace OweMe.Application.UnitTests.Groups.Queries.Get;
 
-public class GetLedgerQueryHandlerTests : BaseCommandTest
+public class GetGroupQueryHandlerTests : BaseCommandTest
 {
     [Fact]
-    public async Task Handle_ShouldReturnLedger_WhenLedgerExistsAndUserHasAccess()
+    public async Task Handle_ShouldReturnGroup_WhenGroupExistsAndUserHasAccess()
     {
         // Arrange
         var userId = UserId.New();
         _userContextMock.Setup(x => x.Id).Returns(userId);
 
-        var ledger = new Ledger { Name = "Test Ledger", CreatedBy = userId };
-        await _ledgerContextMock.Object.Ledgers.AddAsync(ledger, TestContext.Current.CancellationToken);
-        await _ledgerContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var ledgerId = ledger.Id;
+        var group = new Group { Name = "Test Group", CreatedBy = userId };
+        await _groupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
+        await _groupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var groupId = group.Id;
 
-        _ledgerContextMock.Invocations.Clear();
+        _groupContextMock.Invocations.Clear();
         _userContextMock.Invocations.Clear();
 
-        var query = new GetLedgerQuery(ledgerId);
+        var query = new GetGroupQuery(groupId);
 
         // Act
-        var result = await GetLedgerQueryHandler.HandleAsync(query,
-            _ledgerContextMock.Object, _userContextMock.Object,
+        var result = await GetGroupQueryHandler.HandleAsync(query,
+            _groupContextMock.Object, _userContextMock.Object,
             TestContext.Current.CancellationToken);
 
         // Assert
         result.ShouldNotBeNull();
-        result.Name.ShouldBe("Test Ledger");
-        result.Id.ShouldBe(ledgerId);
+        result.Name.ShouldBe("Test Group");
+        result.Id.ShouldBe(groupId);
         result.CreatedBy.ShouldBe<Guid>(userId);
-        result.CreatedAt.ShouldBe(ledger.CreatedAt);
+        result.CreatedAt.ShouldBe(group.CreatedAt);
         result.UpdatedBy.ShouldBeNull();
         result.UpdatedAt.ShouldBeNull();
     }
 
     [Fact]
-    public async Task Handle_ShouldThrow_NotFound_WhenLedgerDoesNotExist()
+    public async Task Handle_ShouldThrow_NotFound_WhenGroupDoesNotExist()
     {
         // Arrange
-        var ledgerId = Guid.NewGuid();
+        var groupId = Guid.NewGuid();
 
-        var query = new GetLedgerQuery(ledgerId);
+        var query = new GetGroupQuery(groupId);
 
         // Act
-        await Assert.ThrowsAsync<NotFoundException>(() => GetLedgerQueryHandler.HandleAsync(query,
-            _ledgerContextMock.Object, _userContextMock.Object,
+        await Assert.ThrowsAsync<NotFoundException>(() => GetGroupQueryHandler.HandleAsync(query,
+            _groupContextMock.Object, _userContextMock.Object,
             TestContext.Current.CancellationToken));
 
         _userContextMock.Verify(x => x.Id, Times.AtMostOnce);
     }
 
     [Fact]
-    public async Task HandleShouldThrow_NotFound_WhenUserDoesNotHaveAccessToLedger()
+    public async Task HandleShouldThrow_NotFound_WhenUserDoesNotHaveAccessToGroup()
     {
         // Arrange
         var otherUserId = UserId.New();
         _userContextMock.Setup(x => x.Id).Returns(otherUserId);
 
-        // Let's create a ledger with a different user
-        var ledger = new Ledger { Name = "Test Ledger", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
-        await _ledgerContextMock.Object.Ledgers.AddAsync(ledger, TestContext.Current.CancellationToken);
-        await _ledgerContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
-        var ledgerId = ledger.Id;
+        // Let's create a group with a different user
+        var group = new Group { Name = "Test Group", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
+        await _groupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
+        await _groupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var groupId = group.Id;
 
         var userId = UserId.New();
         userId.ShouldNotBe(otherUserId);
         _userContextMock.Setup(x => x.Id).Returns(userId);
 
         _userContextMock.Invocations.Clear();
-        _ledgerContextMock.Invocations.Clear();
+        _groupContextMock.Invocations.Clear();
 
-        var query = new GetLedgerQuery(ledgerId);
+        var query = new GetGroupQuery(groupId);
 
         // Act
-        await Assert.ThrowsAsync<NotFoundException>(() => GetLedgerQueryHandler.HandleAsync(query,
-            _ledgerContextMock.Object, _userContextMock.Object,
+        await Assert.ThrowsAsync<NotFoundException>(() => GetGroupQueryHandler.HandleAsync(query,
+            _groupContextMock.Object, _userContextMock.Object,
             TestContext.Current.CancellationToken));
 
         _userContextMock.Verify(x => x.Id, Times.Once);

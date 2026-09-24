@@ -1,6 +1,6 @@
-﻿namespace OweMe.Domain.Ledgers;
+﻿namespace OweMe.Domain.Groups;
 
-public static class LedgerConstants
+public static class GroupConstants
 {
     public const int MaxNameLength = 100;
     public const int MaxDescriptionLength = 500;

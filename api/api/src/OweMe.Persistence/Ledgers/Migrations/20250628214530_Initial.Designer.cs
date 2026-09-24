@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using OweMe.Persistence.Ledgers;
+using OweMe.Persistence.Groups;
+using OweMe.Persistence.Groups;
 
 #nullable disable
 
-namespace OweMe.Persistence.Ledgers.Migrations
+namespace OweMe.Persistence.Groups.Migrations
 {
-    [DbContext(typeof(LedgerDbContext))]
+    [DbContext(typeof(GroupDbContext))]
     [Migration("20250628214530_Initial")]
     partial class Initial
     {
@@ -25,7 +26,7 @@ namespace OweMe.Persistence.Ledgers.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("OweMe.Domain.Ledgers.Ledger", b =>
+            modelBuilder.Entity("OweMe.Domain.Groups.Group", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +55,7 @@ namespace OweMe.Persistence.Ledgers.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ledgers");
+                    b.ToTable("Groups");
                 });
 #pragma warning restore 612, 618
         }

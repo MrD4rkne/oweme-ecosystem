@@ -1,39 +1,39 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
-using OweMe.Application.Ledgers;
-using OweMe.Persistence.Ledgers;
+using OweMe.Application.Groups;
+using OweMe.Persistence.Groups;
 using OweMe.Tests.Common;
 
-namespace OweMe.Application.UnitTests.Ledgers;
+namespace OweMe.Application.UnitTests.Groups;
 
-public class LedgerDbContextMoq : PostgresTestBase
+public class GroupDbContextMoq : PostgresTestBase
 {
     private readonly TimeProvider _timeProvider;
     private readonly IUserContext _userContext;
-    private Mock<LedgerDbContext>? _ledgerContextMock;
+    private Mock<GroupDbContext>? _groupContextMock;
 
-    private LedgerDbContextMoq(TimeProvider timeProvider,
+    private GroupDbContextMoq(TimeProvider timeProvider,
         IUserContext userContext)
     {
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
     }
 
-    public Mock<ILedgerContext> LedgerContextMock
+    public Mock<IGroupContext> GroupContextMock
     {
         get
         {
-            if (_ledgerContextMock is null)
+            if (_groupContextMock is null)
             {
                 throw new InvalidOperationException(
-                    $"LedgerContextMock is not initialized. Call {nameof(SetupAsync)} first.");
+                    $"GroupContextMock is not initialized. Call {nameof(SetupAsync)} first.");
             }
 
-            return _ledgerContextMock.As<ILedgerContext>();
+            return _groupContextMock.As<IGroupContext>();
         }
     }
 
-    public static LedgerDbContextMoq Create(LedgerDbContextCreationOptions options)
+    public static GroupDbContextMoq Create(GroupDbContextCreationOptions options)
     {
         if (options.TimeProvider is null)
         {
@@ -45,18 +45,18 @@ public class LedgerDbContextMoq : PostgresTestBase
             options = options.WithUserContext(new Mock<IUserContext>().Object);
         }
 
-        return new LedgerDbContextMoq(options.TimeProvider!, options.UserContext!);
+        return new GroupDbContextMoq(options.TimeProvider!, options.UserContext!);
     }
 
     public override async Task SetupAsync()
     {
         await base.SetupAsync();
 
-        var dbOptions = new DbContextOptionsBuilder<LedgerDbContext>()
+        var dbOptions = new DbContextOptionsBuilder<GroupDbContext>()
             .UseNpgsql(ConnectionString)
             .Options;
 
-        _ledgerContextMock = new Mock<LedgerDbContext>(
+        _groupContextMock = new Mock<GroupDbContext>(
             dbOptions,
             _timeProvider,
             _userContext
@@ -65,52 +65,52 @@ public class LedgerDbContextMoq : PostgresTestBase
             CallBase = true
         };
 
-        await _ledgerContextMock.Object.Database.EnsureCreatedAsync();
+        await _groupContextMock.Object.Database.EnsureCreatedAsync();
     }
 
-    public ILedgerContext GetLedgerContext()
+    public IGroupContext GetGroupContext()
     {
-        return LedgerContextMock.Object;
+        return GroupContextMock.Object;
     }
 
-    public readonly struct LedgerDbContextCreationOptions()
+    public readonly struct GroupDbContextCreationOptions()
     {
         public TimeProvider? TimeProvider { get; init; } = null;
         public IUserContext? UserContext { get; init; } = null;
 
-        public LedgerDbContextCreationOptions WithOptions(DbContextOptions<LedgerDbContext> options)
+        public GroupDbContextCreationOptions WithOptions(DbContextOptions<GroupDbContext> options)
         {
-            return new LedgerDbContextCreationOptions
+            return new GroupDbContextCreationOptions
             {
                 TimeProvider = TimeProvider,
                 UserContext = UserContext
             };
         }
 
-        public LedgerDbContextCreationOptions WithTimeProvider(TimeProvider timeProvider)
+        public GroupDbContextCreationOptions WithTimeProvider(TimeProvider timeProvider)
         {
-            return new LedgerDbContextCreationOptions
+            return new GroupDbContextCreationOptions
             {
                 TimeProvider = timeProvider,
                 UserContext = UserContext
             };
         }
 
-        public LedgerDbContextCreationOptions WithUserContext(IUserContext userContext)
+        public GroupDbContextCreationOptions WithUserContext(IUserContext userContext)
         {
-            return new LedgerDbContextCreationOptions
+            return new GroupDbContextCreationOptions
             {
                 TimeProvider = TimeProvider,
                 UserContext = userContext
             };
         }
 
-        public static LedgerDbContextCreationOptions New()
+        public static GroupDbContextCreationOptions New()
         {
-            return new LedgerDbContextCreationOptions();
+            return new GroupDbContextCreationOptions();
         }
 
-        public LedgerDbContextMoq Build()
+        public GroupDbContextMoq Build()
         {
             return Create(this);
         }

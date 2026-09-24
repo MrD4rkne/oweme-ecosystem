@@ -1,9 +1,9 @@
 ﻿using OweMe.Domain.Common;
 using OweMe.Domain.Users;
 
-namespace OweMe.Domain.Ledgers;
+namespace OweMe.Domain.Groups;
 
-public class Ledger : AuditableEntity
+public class Group : AuditableEntity
 {
     public Guid Id { get; set; }
 

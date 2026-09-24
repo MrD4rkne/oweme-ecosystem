@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using OweMe.Application;
 using OweMe.Persistence.Configuration;
-using OweMe.Persistence.Ledgers;
+using OweMe.Persistence.Groups;
 using OweMe.Tests.Common;
 using Shouldly;
 
@@ -14,11 +14,11 @@ namespace OweMe.Persistence.Tests.Configuration;
 
 public class MigrationHostedServiceTests
 {
-    private readonly Mock<ILogger<LedgerDbContext>> _dbContextLoggerMock = new();
+    private readonly Mock<ILogger<GroupDbContext>> _dbContextLoggerMock = new();
     private readonly Mock<ILogger<MigrationHostedService>> _loggerMock = new();
     private readonly Mock<IOptions<DatabaseOptions>> _optionsMock = new();
     private readonly IServiceCollection _serviceProvider;
-    private readonly Mock<LedgerDbContext> _testContextMock = new();
+    private readonly Mock<GroupDbContext> _testContextMock = new();
     private readonly Mock<TimeProvider> _timeProviderMock = new();
     private readonly Mock<IUserContext> _userContextMock = new();
 
@@ -29,7 +29,7 @@ public class MigrationHostedServiceTests
             .AddSingleton(_loggerMock.Object)
             .AddTransient<TimeProvider>(_ => _timeProviderMock.Object)
             .AddTransient<IUserContext>(_ => _userContextMock.Object)
-            .AddTransient<ILogger<LedgerDbContext>>(_ => _dbContextLoggerMock.Object)
+            .AddTransient<ILogger<GroupDbContext>>(_ => _dbContextLoggerMock.Object)
             .AddSingleton(_optionsMock.Object);
     }
 
@@ -43,7 +43,7 @@ public class MigrationHostedServiceTests
         _optionsMock.Setup(o => o.Value).Returns(new DatabaseOptions { RunMigrations = true });
 
         var connectionString = postgresTestBase.ConnectionString;
-        _serviceProvider.AddDbContext<LedgerDbContext>(options => options.UseNpgsql(connectionString)
+        _serviceProvider.AddDbContext<GroupDbContext>(options => options.UseNpgsql(connectionString)
         );
 
         var serviceProvider = _serviceProvider.BuildServiceProvider();
@@ -68,7 +68,7 @@ public class MigrationHostedServiceTests
     public async Task StartAsync_ShouldNotRunMigrations_WhenDisabled()
     {
         // Arrange
-        _serviceProvider.AddTransient<LedgerDbContext>(_ => _testContextMock.Object);
+        _serviceProvider.AddTransient<GroupDbContext>(_ => _testContextMock.Object);
 
         _optionsMock.Setup(o => o.Value).Returns(new DatabaseOptions { RunMigrations = false });
         var migrationService = new MigrationHostedService(_serviceProvider.BuildServiceProvider(), _loggerMock.Object);
@@ -85,7 +85,7 @@ public class MigrationHostedServiceTests
 
     private static async Task<bool> AreTherePendingMigrations(IServiceProvider serviceProvider)
     {
-        var context = serviceProvider.GetRequiredService<LedgerDbContext>();
+        var context = serviceProvider.GetRequiredService<GroupDbContext>();
         var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
         return pendingMigrations.Any();
     }

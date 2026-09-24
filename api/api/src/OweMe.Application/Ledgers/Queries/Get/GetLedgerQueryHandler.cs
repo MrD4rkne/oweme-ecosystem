@@ -1,22 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OweMe.Application.Common.Exceptions;
 
-namespace OweMe.Application.Ledgers.Queries.Get;
+namespace OweMe.Application.Groups.Queries.Get;
 
-public static class GetLedgerQueryHandler
+public static class GetGroupQueryHandler
 {
-    public static async Task<GetLedgerResult> HandleAsync(
-        GetLedgerQuery query,
-        ILedgerContext context,
+    public static async Task<GetGroupResult> HandleAsync(
+        GetGroupQuery query,
+        IGroupContext context,
         IUserContext userContext,
         CancellationToken cancellationToken)
     {
-        var ledger = await context.Ledgers.FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
-        if (ledger is null || !ledger.CanUserAccess(userContext.Id))
+        var group = await context.Groups.FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
+        if (group is null || !group.CanUserAccess(userContext.Id))
         {
-            throw new NotFoundException($"Ledger with id {query.Id} not found.");
+            throw new NotFoundException($"Group with id {query.Id} not found.");
         }
 
-        return GetLedgerResult.FromDomain(ledger);
+        return GetGroupResult.FromDomain(group);
     }
 }

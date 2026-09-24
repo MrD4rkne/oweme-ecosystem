@@ -1,25 +1,25 @@
-﻿using OweMe.Domain.Ledgers;
+﻿using OweMe.Domain.Groups;
 using OweMe.Domain.Users;
 using OweMe.Tests.Common;
 using Shouldly;
 
 namespace OweMe.Domain.UnitTests;
 
-public class LedgerTests
+public class GroupTests
 {
     [Fact]
     public void CanUserAccess_Creator_ShouldReturnTrue()
     {
         // Arrange
         var userId = new UserId(Guid.NewGuid());
-        var ledger = new Ledger
+        var group = new Group
         {
             CreatedBy = userId,
             Id = Guid.NewGuid()
         };
 
         // Act
-        bool canAccess = ledger.CanUserAccess(userId);
+        bool canAccess = group.CanUserAccess(userId);
 
         // Assert
         canAccess.ShouldBeTrue();
@@ -32,14 +32,14 @@ public class LedgerTests
         var creatorId = new UserId(Guid.NewGuid());
         var otherUserId = new UserId(GuidHelper.CreateDifferentGuid(creatorId));
 
-        var ledger = new Ledger
+        var group = new Group
         {
             CreatedBy = creatorId,
             Id = Guid.NewGuid()
         };
 
         // Act
-        bool canAccess = ledger.CanUserAccess(otherUserId);
+        bool canAccess = group.CanUserAccess(otherUserId);
 
         // Assert
         canAccess.ShouldBeFalse();

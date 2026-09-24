@@ -1,9 +1,9 @@
 ﻿using OweMe.Application.Common;
-using OweMe.Domain.Ledgers;
+using OweMe.Domain.Groups;
 
-namespace OweMe.Application.Ledgers.Queries.Get;
+namespace OweMe.Application.Groups.Queries.Get;
 
-public sealed record GetLedgerResult(
+public sealed record GetGroupResult(
     Guid Id,
     string Name,
     string? Description,
@@ -12,9 +12,9 @@ public sealed record GetLedgerResult(
     DateTimeOffset? UpdatedAt,
     Guid? UpdatedBy) : AuditableEntityDto(CreatedAt, UpdatedAt, CreatedBy, UpdatedBy)
 {
-    public static GetLedgerResult FromDomain(Ledger ledger)
+    public static GetGroupResult FromDomain(Group group)
     {
-        return new GetLedgerResult(ledger.Id, ledger.Name, ledger.Description,
-            ledger.CreatedAt, ledger.CreatedBy.Id, ledger.UpdatedAt, ledger.UpdatedBy?.Id);
+        return new GetGroupResult(group.Id, group.Name, group.Description,
+            group.CreatedAt, group.CreatedBy.Id, group.UpdatedAt, group.UpdatedBy?.Id);
     }
 }

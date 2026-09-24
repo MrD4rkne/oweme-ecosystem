@@ -1,50 +1,50 @@
-﻿using OweMe.Application.Ledgers.Commands.Create;
+﻿using OweMe.Application.Groups.Commands.Create;
 using OweMe.Tests.Common;
 using Shouldly;
 
-namespace OweMe.Application.UnitTests.Ledgers.Commands.Create;
+namespace OweMe.Application.UnitTests.Groups.Commands.Create;
 
-public class CreateLedgerCommandHandlerTests : BaseCommandTest
+public class CreateGroupCommandHandlerTests : BaseCommandTest
 {
     private readonly DateTimeOffset _currentTime = DateTimeOffset.UtcNow;
     private readonly Guid _currentUserId = Guid.NewGuid();
 
-    public CreateLedgerCommandHandlerTests()
+    public CreateGroupCommandHandlerTests()
     {
         _userContextMock.Setup(x => x.Id).Returns(_currentUserId);
         _timeProvider.Setup(x => x.GetUtcNow()).Returns(_currentTime);
     }
 
     [Fact]
-    public async Task Handle_ShouldCreateLedger_WhenValidCommand()
+    public async Task Handle_ShouldCreateGroup_WhenValidCommand()
     {
         // Arrange
-        const string ledgerName = "Test Ledger";
-        const string ledgerDescription = "This is a test ledger.";
-        var command = new CreateLedgerCommand
+        const string groupName = "Test Group";
+        const string groupDescription = "This is a test group.";
+        var command = new CreateGroupCommand
         {
-            Name = ledgerName,
-            Description = ledgerDescription
+            Name = groupName,
+            Description = groupDescription
         };
 
         // Act
-        var result = await CreateLedgerCommandHandler.Handle(command, _ledgerContextMock.Object,
+        var result = await CreateGroupCommandHandler.Handle(command, _groupContextMock.Object,
             TestContext.Current.CancellationToken);
 
         // Assert
-        var addedLedger = _ledgerContextMock.Object.Ledgers
-            .FirstOrDefault(x => x.Name == ledgerName && x.Description == ledgerDescription);
-        addedLedger.ShouldNotBeNull();
+        var addedGroup = _groupContextMock.Object.Groups
+            .FirstOrDefault(x => x.Name == groupName && x.Description == groupDescription);
+        addedGroup.ShouldNotBeNull();
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(addedLedger.Id);
+        result.Id.ShouldBe(addedGroup.Id);
 
-        addedLedger.Name.ShouldBe(command.Name);
-        addedLedger.Description.ShouldBe(command.Description);
+        addedGroup.Name.ShouldBe(command.Name);
+        addedGroup.Description.ShouldBe(command.Description);
 
-        addedLedger.ShouldBeCreated(
+        addedGroup.ShouldBeCreated(
             _currentUserId,
             _currentTime
         );
-        addedLedger.ShouldBeNeverUpdated();
+        addedGroup.ShouldBeNeverUpdated();
     }
 }

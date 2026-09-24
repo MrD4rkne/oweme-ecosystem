@@ -2,9 +2,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-using OweMe.Application.Ledgers;
+using OweMe.Application.Groups;
 using OweMe.Persistence.Configuration;
-using OweMe.Persistence.Ledgers;
+using OweMe.Persistence.Groups;
 
 namespace OweMe.Persistence;
 
@@ -18,14 +18,14 @@ public static class DependencyInjection
             .Bind(builder.Configuration.GetSection(DatabaseOptions.SectionName))
             .ValidateOnStart();
 
-        builder.Services.AddDbContext<LedgerDbContext>((serviceProvider, options) =>
+        builder.Services.AddDbContext<GroupDbContext>((serviceProvider, options) =>
         {
             var dbOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(dbOptions.ConnectionString);
             options.EnableSensitiveDataLogging();
         });
 
-        builder.Services.AddScoped<ILedgerContext, LedgerDbContext>();
+        builder.Services.AddScoped<IGroupContext, GroupDbContext>();
         builder.Services.AddHostedService<MigrationHostedService>();
 
         return builder;

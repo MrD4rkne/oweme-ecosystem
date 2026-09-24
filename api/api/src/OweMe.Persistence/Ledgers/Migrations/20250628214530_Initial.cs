@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace OweMe.Persistence.Ledgers.Migrations
+namespace OweMe.Persistence.Groups.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -13,7 +13,7 @@ namespace OweMe.Persistence.Ledgers.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Ledgers",
+                name: "Groups",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -26,7 +26,7 @@ namespace OweMe.Persistence.Ledgers.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Ledgers", x => x.Id);
+                    table.PrimaryKey("PK_Groups", x => x.Id);
                 });
         }
 
@@ -34,7 +34,7 @@ namespace OweMe.Persistence.Ledgers.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Ledgers");
+                name: "Groups");
         }
     }
 }

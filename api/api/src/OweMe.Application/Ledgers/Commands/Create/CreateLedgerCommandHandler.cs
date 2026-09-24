@@ -1,24 +1,24 @@
-﻿using OweMe.Domain.Ledgers;
+﻿using OweMe.Domain.Groups;
 
-namespace OweMe.Application.Ledgers.Commands.Create;
+namespace OweMe.Application.Groups.Commands.Create;
 
-public static class CreateLedgerCommandHandler
+public static class CreateGroupCommandHandler
 {
-    public static async Task<LedgerCreated> Handle(CreateLedgerCommand message, ILedgerContext context,
+    public static async Task<GroupCreated> Handle(CreateGroupCommand message, IGroupContext context,
         CancellationToken cancellationToken = default)
     {
-        var ledger = new Ledger
+        var group = new Group
         {
             Name = message.Name,
             Description = message.Description
         };
 
-        context.Ledgers.Add(ledger);
+        context.Groups.Add(group);
         _ = await context.SaveChangesAsync(cancellationToken);
-        return new LedgerCreated(
-            ledger.Id
+        return new GroupCreated(
+            group.Id
         );
     }
 
-    public sealed record LedgerCreated(Guid Id);
+    public sealed record GroupCreated(Guid Id);
 }

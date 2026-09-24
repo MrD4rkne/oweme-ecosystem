@@ -1,21 +1,17 @@
 using Duende.IdentityModel.Client;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using OweMe.Api.SmokeTests.Configuration;
 
 namespace OweMe.Api.SmokeTests.Http;
 
 internal sealed class TokenManager(
     HttpClient client,
-    IMemoryCache memoryCache, 
+    IMemoryCache memoryCache,
     IDiscoveryCache discoveryCache,
     IOptions<IdentityProviderSettings> identityProviderSettings,
     IOptions<UserSettings> userSettings) : ITokenManager
 {
-    private static string CreateKeyFor(string username, string scope)
-    {
-        return $"{username}:{scope}";
-    }
-    
     public async Task<string> GetAccessTokenAsync(CancellationToken cancellationToken)
     {
         var key = CreateKeyFor(userSettings.Value.Username, userSettings.Value.Scope);
@@ -27,7 +23,8 @@ internal sealed class TokenManager(
         var discoveryDocument = await discoveryCache.GetAsync();
         if (discoveryDocument.IsError)
         {
-            throw new FailedToRetrieveDiscoveryDocumentException(identityProviderSettings.Value.Address, discoveryDocument.Error);
+            throw new FailedToRetrieveDiscoveryDocumentException(identityProviderSettings.Value.Address,
+                discoveryDocument.Error);
         }
 
         var tokenResponse = await client.RequestPasswordTokenAsync(new PasswordTokenRequest
@@ -40,7 +37,8 @@ internal sealed class TokenManager(
         }, cancellationToken);
         if (tokenResponse.IsError)
         {
-            throw new FailedToObtainTokenException(userSettings.Value.Username, userSettings.Value.Scope, tokenResponse.Error);
+            throw new FailedToObtainTokenException(userSettings.Value.Username, userSettings.Value.Scope,
+                tokenResponse.Error);
         }
 
         accessToken = tokenResponse.AccessToken!;
@@ -51,7 +49,14 @@ internal sealed class TokenManager(
         return accessToken;
     }
 
-    private sealed class FailedToRetrieveDiscoveryDocumentException(string url, string? error) : Exception($"Failed to retrieve discovery document from {url}: {error}");
+    private static string CreateKeyFor(string username, string scope)
+    {
+        return $"{username}:{scope}";
+    }
 
-    private sealed class FailedToObtainTokenException(string user, string scope, string? error) : Exception($"Failed to obtain token for user '{user}' with scope '{scope}': {error}");
+    private sealed class FailedToRetrieveDiscoveryDocumentException(string url, string? error)
+        : Exception($"Failed to retrieve discovery document from {url}: {error}");
+
+    private sealed class FailedToObtainTokenException(string user, string scope, string? error)
+        : Exception($"Failed to obtain token for user '{user}' with scope '{scope}': {error}");
 }

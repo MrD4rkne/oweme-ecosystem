@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OweMe.Domain.Ledgers;
+using OweMe.Domain.Groups;
 
-namespace OweMe.Application.Ledgers;
+namespace OweMe.Application.Groups;
 
-public interface ILedgerContext
+public interface IGroupContext
 {
-    DbSet<Ledger> Ledgers { get; }
+    DbSet<Group> Groups { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

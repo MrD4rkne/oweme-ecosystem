@@ -1,32 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OweMe.Application;
-using OweMe.Application.Ledgers;
-using OweMe.Domain.Ledgers;
+using OweMe.Application.Groups;
+using OweMe.Domain.Groups;
 using OweMe.Persistence.Common;
 
-namespace OweMe.Persistence.Ledgers;
+namespace OweMe.Persistence.Groups;
 
-public class LedgerDbContext : AuditableDbContext, ILedgerContext
+public class GroupDbContext : AuditableDbContext, IGroupContext
 {
-    public LedgerDbContext(DbContextOptions<LedgerDbContext> options, TimeProvider timeProvider,
+    public GroupDbContext(DbContextOptions<GroupDbContext> options, TimeProvider timeProvider,
         IUserContext userContext) : base(options, timeProvider, userContext)
     {
     }
 
-    public DbSet<Ledger> Ledgers { get; set; }
+    public DbSet<Group> Groups { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Ledger>()
+        modelBuilder.Entity<Group>()
             .HasKey(l => l.Id);
 
-        modelBuilder.Entity<Ledger>()
+        modelBuilder.Entity<Group>()
             .Property(l => l.Name)
             .IsRequired()
-            .HasMaxLength(LedgerConstants.MaxNameLength);
-        modelBuilder.Entity<Ledger>()
+            .HasMaxLength(GroupConstants.MaxNameLength);
+        modelBuilder.Entity<Group>()
             .Property(l => l.Description)
-            .HasMaxLength(LedgerConstants.MaxDescriptionLength);
+            .HasMaxLength(GroupConstants.MaxDescriptionLength);
 
         base.OnModelCreating(modelBuilder);
     }
