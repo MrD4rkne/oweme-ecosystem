@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Moq;
-using OweMe.Api.Endpoints.Ledgers.Create;
+using OweMe.Api.Endpoints.Groups.Create;
 using OweMe.Application.Groups.Commands.Create;
 using Shouldly;
 using Wolverine;

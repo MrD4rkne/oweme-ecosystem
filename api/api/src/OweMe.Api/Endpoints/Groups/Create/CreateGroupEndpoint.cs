@@ -5,7 +5,7 @@ using OweMe.Api.Identity;
 using OweMe.Application.Groups.Commands.Create;
 using Wolverine;
 
-namespace OweMe.Api.Endpoints.Ledgers.Create;
+namespace OweMe.Api.Endpoints.Groups.Create;
 
 public sealed class CreateGroupEndpoint : IEndpoint
 {
