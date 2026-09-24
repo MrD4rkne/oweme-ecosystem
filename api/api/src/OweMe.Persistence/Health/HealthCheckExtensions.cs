@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using OweMe.Persistence.Ledgers;
+using OweMe.Persistence.Groups;
 
 namespace OweMe.Persistence.Health;
 
@@ -7,7 +7,7 @@ public static class HealthCheckExtensions
 {
     public static IHealthChecksBuilder AddPersistenceHealthCheck(this IHealthChecksBuilder builder)
     {
-        builder.AddDbContextCheck<LedgerDbContext>();
+        builder.AddDbContextCheck<GroupDbContext>();
         return builder;
     }
 }

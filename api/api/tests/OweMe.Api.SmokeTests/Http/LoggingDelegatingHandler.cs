@@ -13,7 +13,7 @@ public class LoggingDelegatingHandler : DelegatingHandler
         _logger?.LogInformation("Request: {Method} {Uri}", request.Method, request.RequestUri);
         if (request.Content != null)
         {
-            string requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
+            var requestBody = await request.Content.ReadAsStringAsync(cancellationToken);
             _logger?.LogInformation("Request Body: {Body}", requestBody);
         }
 
@@ -23,7 +23,7 @@ public class LoggingDelegatingHandler : DelegatingHandler
 
         _logger?.LogInformation("Response: {StatusCode} {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
 
-        string responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
+        var responseBody = await response.Content.ReadAsStringAsync(cancellationToken);
         _logger?.LogInformation("Response Body: {Body}", responseBody);
         _logger?.LogInformation("Response Headers: {Headers}", FormatHeaders(response.Headers));
 

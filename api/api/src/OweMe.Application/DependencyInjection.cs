@@ -1,15 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using FluentValidation;
-using JasperFx;
-using JasperFx.CodeGeneration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OweMe.Application.Common;
-using OweMe.Application.Common.Middlewares;
 using OweMe.Application.User;
-using Wolverine;
-using Wolverine.FluentValidation;
 
 namespace OweMe.Application;
 

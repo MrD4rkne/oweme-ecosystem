@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using OweMe.Api;
 using OweMe.Api.Description;
 using OweMe.IntegrationTests.Authentication;
 using Shouldly;
@@ -23,7 +24,7 @@ public sealed class ApiShouldNotRequireAuthentication(OweMeApi api, ITestOutputH
         // Assert
         response.EnsureSuccessStatusCode();
     }
-    
+
     [Fact]
     public async Task For_GetLivenessEndpoint()
     {
@@ -37,7 +38,7 @@ public sealed class ApiShouldNotRequireAuthentication(OweMeApi api, ITestOutputH
         // Assert
         response.EnsureSuccessStatusCode();
     }
-    
+
     [Fact]
     public async Task For_GetApiInformationEndpoint()
     {
@@ -46,7 +47,8 @@ public sealed class ApiShouldNotRequireAuthentication(OweMeApi api, ITestOutputH
             .AsAnonymous();
 
         // Act
-        var response = await client.GetFromJsonAsync<ApiInformation>("/api/info", TestContext.Current.CancellationToken);
+        var response =
+            await client.GetFromJsonAsync<ApiInformation>("/api/info", TestContext.Current.CancellationToken);
 
         // Assert
         response.ShouldNotBeNull();

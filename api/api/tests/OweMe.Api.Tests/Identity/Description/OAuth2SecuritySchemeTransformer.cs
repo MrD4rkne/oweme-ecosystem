@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using OweMe.Api.Identity;
 using OweMe.Api.Identity.Configuration;
 using OweMe.Api.Identity.Description;
 using Shouldly;
 
-namespace OweMe.Api.Identity.Tests.Description;
+namespace OweMe.Api.Tests.Identity.Description;
 
 public class OAuth2SecuritySchemeTransformerTests
 {

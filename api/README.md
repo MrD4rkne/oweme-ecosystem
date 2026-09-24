@@ -2,7 +2,8 @@
 
 ## Overview
 
-OweMe API is a .NET-based web API built with Clean Architecture principles. The application manages financial tracking and ledger operations with a focus on maintainability, testability, and scalability.
+OweMe API is a .NET-based web API built with Clean Architecture principles. The application manages financial tracking
+and group operations with a focus on maintainability, testability, and scalability.
 
 ## Project Structure
 

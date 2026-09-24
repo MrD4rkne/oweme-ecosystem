@@ -3,7 +3,8 @@ using Microsoft.OpenApi.Models;
 
 namespace OweMe.Api.Description;
 
-public class ApiVersionOpenApiDocumentTransformer(IApiInformationProvider apiInformationProvider) : IOpenApiDocumentTransformer
+public class ApiVersionOpenApiDocumentTransformer(IApiInformationProvider apiInformationProvider)
+    : IOpenApiDocumentTransformer
 {
     public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context,
         CancellationToken cancellationToken)

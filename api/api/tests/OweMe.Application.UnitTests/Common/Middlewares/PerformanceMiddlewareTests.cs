@@ -7,10 +7,11 @@ using OweMe.Application.Common.Middlewares;
 using Shouldly;
 using Wolverine;
 
-namespace OweMe.Application.UnitTests.Common.Behaviours;
+namespace OweMe.Application.UnitTests.Common.Middlewares;
 
 public sealed partial class PerformanceMiddlewareTests
 {
+    private readonly TestMessageContext _context = new();
     private readonly Mock<ILogger<PerformanceMiddleware>> _logger = new();
 
     private readonly IOptions<ApplicationOptions> _options = Options.Create(new ApplicationOptions
@@ -20,8 +21,6 @@ public sealed partial class PerformanceMiddlewareTests
 
     [GeneratedRegex(@"Handled TestRequest in (\d+(\.\d+)?) ms", RegexOptions.Compiled)]
     private static partial Regex HandledRequestRegex();
-
-    private readonly TestMessageContext _context = new();
 
     [Fact]
     public void On_BeforeRunTwice_Should_ThrowInvalidOperationException()

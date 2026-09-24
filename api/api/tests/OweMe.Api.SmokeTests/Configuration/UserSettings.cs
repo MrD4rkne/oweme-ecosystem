@@ -1,4 +1,4 @@
-﻿namespace OweMe.Api.SmokeTests;
+﻿namespace OweMe.Api.SmokeTests.Configuration;
 
 internal sealed record UserSettings
 {

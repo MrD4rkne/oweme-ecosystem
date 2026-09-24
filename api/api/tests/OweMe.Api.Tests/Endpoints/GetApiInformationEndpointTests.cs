@@ -18,7 +18,7 @@ public class GetApiInformationEndpointTests
         {
             Title = "OweMe API",
             Version = "1.0.0",
-            Description = "API for managing debts and ledgers.",
+            Description = "API for managing debts and groups.",
             BuildVersion = "1.0.0+build.123"
         };
 

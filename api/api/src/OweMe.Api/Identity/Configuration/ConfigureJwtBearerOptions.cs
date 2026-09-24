@@ -15,7 +15,7 @@ internal sealed class ConfigureJwtBearerOptions(
             ValidateIssuer = true,
             ValidIssuer = identityServerOptions.Value.ValidIssuer,
             ValidateAudience = identityServerOptions.Value.ValidateAudience,
-            ValidateLifetime = true,
+            ValidateLifetime = true
         };
 
         options.Audience = identityServerOptions.Value.Audience;
@@ -24,9 +24,7 @@ internal sealed class ConfigureJwtBearerOptions(
         options.TokenValidationParameters.ValidTypes = ["at+jwt", "JWT"];
 
         if (!string.IsNullOrEmpty(identityServerOptions.Value.MetadataAddress))
-        {
             options.MetadataAddress = identityServerOptions.Value.MetadataAddress;
-        }
         options.RequireHttpsMetadata = identityServerOptions.Value.RequireHttpsMetadata;
     }
 

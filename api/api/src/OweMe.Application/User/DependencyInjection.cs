@@ -17,19 +17,19 @@ public static class DependencyInjection
     {
         private UserContext? _context;
 
+        public UserId Id => _context?.Id ?? throw new UserContextNotAvailableException();
+        public string Email => _context?.Email ?? throw new UserContextNotAvailableException();
+
         public void SetContext(UserId id, string email)
         {
             _context = new UserContext(id, email);
         }
-        
+
         public void ResetContext()
         {
             _context = null;
         }
-
-        public UserId Id => _context?.Id ?? throw new UserContextNotAvailableException();
-        public string Email => _context?.Email ?? throw new UserContextNotAvailableException();
     }
-    
+
     private sealed record UserContext(UserId Id, string Email);
 }

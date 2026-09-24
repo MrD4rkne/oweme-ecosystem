@@ -55,7 +55,8 @@ public class UserContextTests
         using var scope = _serviceProvider.CreateScope();
 
         // Act
-        scope.ServiceProvider.SetUserContext(_serviceProvider.GetRequiredService<IUserContext>().Id, _serviceProvider.GetRequiredService<IUserContext>().Email);
+        scope.ServiceProvider.SetUserContext(_serviceProvider.GetRequiredService<IUserContext>().Id,
+            _serviceProvider.GetRequiredService<IUserContext>().Email);
 
         // Assert
         var userContext = scope.ServiceProvider.GetRequiredService<IUserContext>();

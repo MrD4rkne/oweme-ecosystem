@@ -73,7 +73,7 @@ public class AuditableDbContextTests : PostgresTestBase, IAsyncLifetime
         _userContextMock.Setup(uc => uc.Id).Returns(_createdBy);
 
         // Act
-        int changed = await sut.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var changed = await sut.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
         changed.ShouldBe(1);
@@ -108,7 +108,7 @@ public class AuditableDbContextTests : PostgresTestBase, IAsyncLifetime
 
         // Act
         entity.Name = "Updated Name"; // Simulate change
-        int changes = await sut.SaveChangesAsync(TestContext.Current.CancellationToken);
+        var changes = await sut.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         // Assert
         changes.ShouldBe(1);

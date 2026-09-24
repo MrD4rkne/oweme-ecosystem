@@ -6,5 +6,5 @@ namespace OweMe.Api.Description;
 public static class Tags
 {
     public const string ApiInformation = "Api Information";
-    public const string Ledger = "Ledger";
+    public const string Group = "Group";
 }

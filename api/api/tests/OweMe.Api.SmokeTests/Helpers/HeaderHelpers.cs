@@ -8,10 +8,7 @@ public static class HeaderHelpers
         out string location)
     {
         location = string.Empty;
-        if (!headers.TryGetValue(LocationHeaderName, out var locationHeader) || !locationHeader.Any())
-        {
-            return false;
-        }
+        if (!headers.TryGetValue(LocationHeaderName, out var locationHeader) || !locationHeader.Any()) return false;
 
         location = locationHeader.First();
         return true;
@@ -21,18 +18,14 @@ public static class HeaderHelpers
         string prefix,
         Func<string, T> converter)
     {
-        if (!TryGetLocationHeaderValue(headers, out string locationHeader))
-        {
+        if (!headers.TryGetLocationHeaderValue(out var locationHeader))
             throw new ArgumentException($"Location header '{LocationHeaderName}' not found in headers.");
-        }
 
         if (!locationHeader.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-        {
             throw new ArgumentException(
                 $"Location header '{LocationHeaderName}' does not start with the expected prefix '{prefix}'.");
-        }
 
-        string value = locationHeader[prefix.Length..];
+        var value = locationHeader[prefix.Length..];
         return converter(value);
     }
 }

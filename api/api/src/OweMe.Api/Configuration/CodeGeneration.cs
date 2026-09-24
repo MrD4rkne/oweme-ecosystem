@@ -7,6 +7,7 @@ internal static class CodeGeneration
 {
     internal static bool IsRunningGeneration()
     {
-        return Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider" || Environment.GetCommandLineArgs().Contains("codegen");
+        return Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider" ||
+               Environment.GetCommandLineArgs().Contains("codegen");
     }
 }

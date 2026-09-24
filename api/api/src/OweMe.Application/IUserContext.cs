@@ -13,7 +13,7 @@ public interface IUserContext
     UserId Id { get; }
 
     /// <summary>
-    /// User's email. 
+    /// User's email.
     /// </summary>
     string Email { get; }
 }
