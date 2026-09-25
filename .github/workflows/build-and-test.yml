@@ -112,7 +112,7 @@ jobs:
           /d:sonar.scanner.skipJreProvisioning=true
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           /d:sonar.host.url="https://sonarcloud.io"
-          /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
+          /d:sonar.cs.cobertura.reportsPaths="**/TestResults/**/coverage.cobertura.xml"
           /d:sonar.scanner.scanAll=false
           /d:sonar.qualitygate.wait=${{ inputs.sonar_enforce_quality_gate }}
           /d:sonar.qualitygate.timeout=300
@@ -130,7 +130,7 @@ jobs:
           -p:SkipSmokeTests=true
           --
           --coverage
-          --coverage-output-format opencover
+          --coverage-output-format cobertura
           --report-trx
 
       - name: Sonar End
