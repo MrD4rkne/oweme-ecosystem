@@ -127,7 +127,7 @@ jobs:
           dotnet test ${{ inputs.working_dir }}
           --configuration Release
           --no-build
-          {{ env.FILTER_ARG }}
+          ${{ env.FILTER_ARG }}
           --
           --coverage
           --coverage-output-format cobertura
