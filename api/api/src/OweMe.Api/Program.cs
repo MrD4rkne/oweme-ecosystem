@@ -11,6 +11,8 @@ using OweMe.Api.Identity.Description;
 using OweMe.Api.User;
 using OweMe.Application;
 using OweMe.Application.Common.Middlewares;
+using OweMe.Application.Groups;
+using OweMe.Application.User;
 using OweMe.Infrastructure;
 using OweMe.Persistence;
 using OweMe.Persistence.Health;
@@ -77,6 +79,9 @@ builder.AddPersistence();
 builder.UseWolverine(opts =>
 {
     opts.Discovery.IncludeAssembly(typeof(DependencyInjection).Assembly);
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IGroupContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IUserContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IUserContextSetter>();
 
     opts.Policies.AddMiddleware<PerformanceMiddleware>();
     opts.Policies.AddMiddleware(typeof(UserContextWolverineMiddleware));
