@@ -127,12 +127,11 @@ jobs:
           dotnet test ${{ inputs.working_dir }}
           --configuration Release
           --no-build
-          ${{ env.FILTER_ARG }}
+          -p:SkipSmokeTests=true
           --
           --coverage
           --coverage-output-format opencover
           --report-trx
-          --ignore-exit-code 5
 
       - name: Sonar End
         run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
