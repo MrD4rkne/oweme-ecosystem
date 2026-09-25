@@ -112,7 +112,9 @@ jobs:
           /d:sonar.scanner.skipJreProvisioning=true
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           /d:sonar.host.url="https://sonarcloud.io"
-          /d:sonar.cs.cobertura.reportsPaths="**/TestResults/**/coverage.cobertura.xml"
+          /d:sonar.sources="api/api/src"
+          /d:sonar.tests="api/api/tests"
+          /d:sonar.cs.cobertura.reportsPaths="**/TestResults/**/*.cobertura.xml"
           /d:sonar.scanner.scanAll=false
           /d:sonar.qualitygate.wait=${{ inputs.sonar_enforce_quality_gate }}
           /d:sonar.qualitygate.timeout=300
@@ -139,12 +141,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Test Logs (.trx)
+      - name: Upload Test Logs and Coverage
         uses: actions/upload-artifact@v7
         if: always() # Ensures logs are uploaded even if tests fail
         with:
           name: test-results-${{ inputs.sonar_project_key }}
-          path: '**/*.trx'
+          path: |
+            **/*.trx
+            **/*.cobertura.xml
           retention-days: 14
 
       - name: Publish Test Results to Summary
