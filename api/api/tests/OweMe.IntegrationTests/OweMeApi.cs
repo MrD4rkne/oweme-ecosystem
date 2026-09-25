@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using OweMe.Api;
 using OweMe.Api.Identity.Configuration;
 using OweMe.IntegrationTests.Authentication;
 using OweMe.Persistence.Configuration;
@@ -13,7 +12,7 @@ namespace OweMe.IntegrationTests;
 
 public sealed class OweMeApi : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
+    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder("postgres:15.3")
         .WithDatabase("oweme_test")
         .WithPortBinding(5432, true)
         .Build();

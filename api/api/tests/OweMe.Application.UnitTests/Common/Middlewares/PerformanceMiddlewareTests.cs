@@ -66,20 +66,20 @@ public sealed partial class PerformanceMiddlewareTests
         _logger.Invocations.Count.ShouldBe(2);
         _logger.Invocations.All(invocation => invocation.Method.Name == "Log")
             .ShouldBeTrue("All invocations should be Log method calls.");
-        _logger.Invocations.All(invocation => invocation.Arguments[0].Equals(LogLevel.Information))
+        _logger.Invocations.All(invocation => invocation.Arguments[0]?.Equals(LogLevel.Information) == true)
             .ShouldBeTrue("All invocations should log at Information level.");
 
         var startLogMessage = _logger.Invocations
-            .FirstOrDefault(i => i.Method.Name == "Log" && i.Arguments[0].Equals(LogLevel.Information))?
+            .FirstOrDefault(i => i.Method.Name == "Log" && i.Arguments[0]?.Equals(LogLevel.Information) == true)?
             .Arguments[2]?.ToString();
         startLogMessage.ShouldNotBeNull();
         startLogMessage.ShouldBe($"Started processing {requestName}.");
 
         var endLogMessage = _logger.Invocations
             .FirstOrDefault(i => i.Method.Name == "Log"
-                                 && i.Arguments[0].Equals(LogLevel.Information)
-                                 && i.Arguments[2].ToString() is not null
-                                 && i.Arguments[2].ToString()!.Contains("Handled")
+                                 && i.Arguments[0]?.Equals(LogLevel.Information) == true
+                                 && i.Arguments[2]?.ToString() is not null
+                                 && i.Arguments[2]!.ToString()!.Contains("Handled")
             )?
             .Arguments[2]?.ToString();
         endLogMessage.ShouldNotBeNull();

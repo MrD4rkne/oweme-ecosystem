@@ -8,7 +8,7 @@ public class PostgresTestBase(
     string password = "postgres",
     int? port = null) : IAsyncDisposable
 {
-    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder()
+    private readonly PostgreSqlContainer _postgresContainer = new PostgreSqlBuilder("postgres:15.3")
         .WithDatabase(databaseName)
         .WithUsername(username)
         .WithPassword(password)

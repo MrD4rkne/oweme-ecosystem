@@ -58,13 +58,13 @@ public class OAuth2SecuritySchemeTransformerTests
     public async Task TransformAsync_WithNullAuthority_SkipsOAuth2AndOnlyAddsBearer()
     {
         // Arrange
-        var options = new IdentityServerOptions { Authority = null };
+        var options = new IdentityServerOptions { Authority = null! };
         var optionsWrapper = Options.Create(options);
         var logger = NullLogger<OAuth2SecuritySchemeTransformer>.Instance;
 
         var transformer = new OAuth2SecuritySchemeTransformer(logger, optionsWrapper);
         var document = new OpenApiDocument();
-        OpenApiDocumentTransformerContext context = default!;
+        OpenApiDocumentTransformerContext context = null!;
 
         // Act
         await transformer.TransformAsync(document, context, CancellationToken.None);
