@@ -61,7 +61,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: ${{ vars.DOTNET_VERSION }}
+          dotnet-version: 10.x
           cache: true
           cache-dependency-path: |
             ${{ inputs.working_dir }}/**/packages.lock.json
