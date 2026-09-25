@@ -112,7 +112,7 @@ jobs:
           /d:sonar.scanner.skipJreProvisioning=true
           /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
           /d:sonar.host.url="https://sonarcloud.io"
-          /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml"
+          /d:sonar.cs.cobertura.reportsPaths="**/TestResults/**/*.cobertura.xml"
           /d:sonar.scanner.scanAll=false
           /d:sonar.qualitygate.wait=${{ inputs.sonar_enforce_quality_gate }}
           /d:sonar.qualitygate.timeout=300
@@ -127,14 +127,9 @@ jobs:
           dotnet test ${{ inputs.working_dir }}
           --configuration Release
           --no-build
-          --logger trx
-          --collect:"XPlat Code Coverage" ${{ env.FILTER_ARG }}
-          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
-
-      - name: Sonar End
-        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          --report-trx
+          --coverage --coverage-output-format cobertura
+          ${{ env.FILTER_ARG }}
 
       - name: Upload Test Logs (.trx)
         uses: actions/upload-artifact@v7
