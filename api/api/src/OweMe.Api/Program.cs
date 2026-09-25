@@ -2,8 +2,6 @@ using JasperFx;
 using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using OweMe.Api.Configuration;
 using OweMe.Api.Description;
 using OweMe.Api.Endpoints;
@@ -40,20 +38,6 @@ builder.Logging.AddOpenTelemetry(logging =>
 });
 
 builder.AddServiceDefaults();
-
-var otel = builder.Services.AddOpenTelemetry();
-otel.WithTracing(b =>
-{
-    b.AddAspNetCoreInstrumentation(options =>
-    {
-        options.Filter = context => !context.Request.Path.StartsWithSegments("/healthz");
-    });
-    b.AddHttpClientInstrumentation();
-}).WithMetrics(b =>
-{
-    b.AddAspNetCoreInstrumentation();
-    b.AddHttpClientInstrumentation();
-});
 
 builder.Services.AddOpenApi(options =>
 {
