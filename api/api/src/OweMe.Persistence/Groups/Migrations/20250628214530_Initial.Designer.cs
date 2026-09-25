@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OweMe.Persistence.Groups;
-using OweMe.Persistence.Groups;
 
 #nullable disable
 
