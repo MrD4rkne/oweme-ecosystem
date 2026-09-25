@@ -1,0 +1,55 @@
+<Solution>
+    <Configurations>
+        <Platform Name="Any CPU"/>
+        <Platform Name="x64"/>
+        <Platform Name="x86"/>
+    </Configurations>
+    <Folder Name="/api/"/>
+    <Folder Name="/api/src/"/>
+    <Folder Name="/api/src/Core/">
+        <Project Path="api/src/OweMe.Application/OweMe.Application.csproj"/>
+        <Project Path="api/src/OweMe.Domain/OweMe.Domain.csproj"/>
+    </Folder>
+    <Folder Name="/api/src/Infrastructure/">
+        <Project Path="api/src/OweMe.Infrastructure/OweMe.Infrastructure.csproj"/>
+        <Project Path="api/src/OweMe.Persistence/OweMe.Persistence.csproj"/>
+    </Folder>
+    <Folder Name="/api/src/Presentation/">
+        <Project Path="api/src/OweMe.Api/OweMe.Api.csproj"/>
+    </Folder>
+    <Folder Name="/api/test/">
+        <Project Path="api/tests/OweMe.Api.Benchmarks/OweMe.Api.Benchmarks.csproj"/>
+        <Project Path="api/tests/OweMe.Api.SmokeTests/OweMe.Api.SmokeTests.csproj"/>
+        <Project Path="api/tests/OweMe.Architecture.Tests/OweMe.Architecture.Tests.csproj"/>
+        <Project Path="api/tests/OweMe.IntegrationTests/OweMe.IntegrationTests.csproj"/>
+    </Folder>
+    <Folder Name="/api/test/Common/">
+        <Project Path="api/tests/OweMe.Tests.Common.Tests/OweMe.Tests.Common.Tests.csproj"/>
+        <Project Path="api/tests/OweMe.Tests.Common/OweMe.Tests.Common.csproj"/>
+    </Folder>
+    <Folder Name="/api/test/Core/">
+        <Project Path="api/tests/OweMe.Application.UnitTests/OweMe.Application.UnitTests.csproj"/>
+        <Project Path="api/tests/OweMe.Domain.UnitTests/OweMe.Domain.UnitTests.csproj"/>
+    </Folder>
+    <Folder Name="/api/test/Infrastructure/">
+        <Project Path="api/tests/OweMe.Persistence.Tests/OweMe.Persistence.Tests.csproj"/>
+    </Folder>
+    <Folder Name="/api/test/Presentation/">
+        <Project Path="api/tests/OweMe.Api.Tests/OweMe.Api.Tests.csproj"/>
+    </Folder>
+    <Folder Name="/aspire/">
+        <Project Path="aspire/OweMe.AppHost/OweMe.AppHost.csproj"/>
+        <Project Path="aspire/OweMe.ServiceDefaults/OweMe.ServiceDefaults.csproj"/>
+    </Folder>
+    <Folder Name="/clients/">
+        <Project Path="client/OweMe.Api.Client/OweMe.Api.Client.csproj"/>
+    </Folder>
+    <Folder Name="/Solution Items/">
+        <File Path="api/src/.dockerignore"/>
+        <File Path="compose.yaml"/>
+        <File Path="Directory.Build.props"/>
+        <File Path="Directory.Packages.props"/>
+        <File Path="README.md"/>
+        <File Path="version.json"/>
+    </Folder>
+</Solution>

@@ -6,7 +6,7 @@ on:
       sln_path:
         required: true
         type: string
-        description: 'Path to the solution file (e.g. api/OweMe.Api.sln)'
+        description: 'Path to the solution file (e.g. api/OweMe.Api.slnx)'
       project_path:
         required: true
         type: string

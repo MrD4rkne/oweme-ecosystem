@@ -21,7 +21,7 @@ COPY version.json ./
 COPY api/version.json ./api/
 COPY api/Directory.Build.props ./
 COPY api/Directory.Packages.props ./
-COPY api/OweMe.Api.sln ./api/
+COPY api/OweMe.Api.slnx ./api/
 
 # Copy all .csproj files to restore dependencies
 COPY api/api/src/OweMe.Api/*.csproj ./api/api/src/OweMe.Api/
