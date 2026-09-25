@@ -2,8 +2,6 @@ using JasperFx;
 using JasperFx.CodeGeneration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Features;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
 using OweMe.Api.Configuration;
 using OweMe.Api.Description;
 using OweMe.Api.Endpoints;
@@ -13,6 +11,8 @@ using OweMe.Api.Identity.Description;
 using OweMe.Api.User;
 using OweMe.Application;
 using OweMe.Application.Common.Middlewares;
+using OweMe.Application.Groups;
+using OweMe.Application.User;
 using OweMe.Infrastructure;
 using OweMe.Persistence;
 using OweMe.Persistence.Health;
@@ -40,20 +40,6 @@ builder.Logging.AddOpenTelemetry(logging =>
 });
 
 builder.AddServiceDefaults();
-
-var otel = builder.Services.AddOpenTelemetry();
-otel.WithTracing(b =>
-{
-    b.AddAspNetCoreInstrumentation(options =>
-    {
-        options.Filter = context => !context.Request.Path.StartsWithSegments("/healthz");
-    });
-    b.AddHttpClientInstrumentation();
-}).WithMetrics(b =>
-{
-    b.AddAspNetCoreInstrumentation();
-    b.AddHttpClientInstrumentation();
-});
 
 builder.Services.AddOpenApi(options =>
 {
@@ -93,25 +79,24 @@ builder.AddPersistence();
 builder.UseWolverine(opts =>
 {
     opts.Discovery.IncludeAssembly(typeof(DependencyInjection).Assembly);
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IGroupContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IUserContext>();
+    opts.CodeGeneration.AlwaysUseServiceLocationFor<IUserContextSetter>();
 
     opts.Policies.AddMiddleware<PerformanceMiddleware>();
     opts.Policies.AddMiddleware(typeof(UserContextWolverineMiddleware));
 
     opts.UseFluentValidation(RegistrationBehavior.ExplicitRegistration);
 
-    if (builder.Environment.IsProduction())
+    if (builder.Environment.IsProduction() && !CodeGeneration.IsRunningGeneration())
     {
         opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
-        opts.Services.CritterStackDefaults(cr =>
-        {
-            // I'm only going to care about this in production
-            cr.Production.AssertAllPreGeneratedTypesExist = true;
-        });
+        opts.Services.CritterStackDefaults(cr => { cr.Production.AssertAllPreGeneratedTypesExist = true; });
     }
     else
     {
         // Fallback to Auto for local development/debugging
-        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
+        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Dynamic;
     }
 });
 

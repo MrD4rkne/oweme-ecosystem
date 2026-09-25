@@ -3,12 +3,14 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <IsTestProject>false</IsTestProject>
+
+        <!-- Override the Directory.Build.props testing configuration -->
+        <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Shouldly"/>
         <PackageReference Include="Testcontainers.PostgreSql"/>
-        <PackageReference Include="xunit.v3.extensibility.core"/>
     </ItemGroup>
 
     <ItemGroup>
