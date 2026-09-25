@@ -3,6 +3,11 @@
     <PropertyGroup>
         <IsPackable>false</IsPackable>
         <IsTestProject>false</IsTestProject>
+
+        <!-- Override the Directory.Build.props testing configuration -->
+        <UseMicrosoftTestingPlatformRunner>false</UseMicrosoftTestingPlatformRunner>
+        <GenerateTestingPlatformEntryPoint>false</GenerateTestingPlatformEntryPoint>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
