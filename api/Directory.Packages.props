@@ -33,7 +33,7 @@
         <!-- API Description -->
         <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12"/>
         <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.12"/>
-        <PackageVersion Include="Scalar.AspNetCore" Version="2.17.9"/>
+        <PackageVersion Include="Scalar.AspNetCore" Version="2.17.10"/>
         <!-- Database and ORM -->
         <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.12"/>
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.6"/>
@@ -44,7 +44,7 @@
         <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.12"/>
         <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3"/>
         <!-- Versioning -->
-        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.7.115"/>
+        <PackageVersion Include="Nerdbank.GitVersioning" Version="3.10.94"/>
         <!-- Clients -->
         <PackageVersion Include="Newtonsoft.Json" Version="13.0.4"/>
         <PackageVersion Include="NSwag.MSBuild" Version="14.7.1">
