@@ -7,6 +7,7 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
         <PackageReference Include="WolverineFx"/>
+        <PackageReference Include="WolverineFx.RuntimeCompilation"/>
         <PackageReference Include="WolverineFx.FluentValidation"/>
     </ItemGroup>
 
