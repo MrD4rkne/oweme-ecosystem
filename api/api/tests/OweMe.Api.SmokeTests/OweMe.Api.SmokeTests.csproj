@@ -1,5 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Duende.IdentityModel"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
