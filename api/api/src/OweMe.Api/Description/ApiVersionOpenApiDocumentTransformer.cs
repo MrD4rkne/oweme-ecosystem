@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace OweMe.Api.Description;
 
@@ -11,7 +11,6 @@ public class ApiVersionOpenApiDocumentTransformer(IApiInformationProvider apiInf
     {
         var apiInfo = apiInformationProvider.GetApiInfo();
 
-        document.Info ??= new OpenApiInfo();
         document.Info.Title = apiInfo.Title;
         document.Info.Version = apiInfo.Version;
         document.Info.Description = apiInfo.Description;
