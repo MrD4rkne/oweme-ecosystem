@@ -1,9 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <IsTestProject Condition="'$(SkipSmokeTests)' == 'true'">false</IsTestProject>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Duende.IdentityModel"/>
         <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
