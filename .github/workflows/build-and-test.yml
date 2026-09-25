@@ -127,12 +127,9 @@ jobs:
           dotnet test ${{ inputs.working_dir }}
           --configuration Release
           --no-build
-          --
-          --filter "FullyQualifiedName!~SmokeTests"
-          --coverage
-          --coverage-output-format opencover
-          --report-trx
-          --ignore-exit-code 8
+          --logger trx
+          --collect:"XPlat Code Coverage" ${{ env.FILTER_ARG }}
+          -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
 
       - name: Sonar End
         run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
