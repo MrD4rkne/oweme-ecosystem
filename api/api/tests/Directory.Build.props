@@ -5,6 +5,8 @@
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <OutputType>Exe</OutputType>
+        <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+        <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,11 +15,12 @@
 
     <ItemGroup>
         <PackageReference Include="Moq"/>
-        <PackageReference Include="coverlet.collector"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="Shouldly"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="xunit.v3"/>
-        <PackageReference Include="xunit.runner.visualstudio"/>
+        
+        <!-- Replace coverlet and visualstudio runner with modern MSTP extensions -->
+        <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage"/>
+        <PackageReference Include="Microsoft.Testing.Extensions.TrxReport"/>
     </ItemGroup>
-
 </Project>
