@@ -128,7 +128,7 @@ jobs:
           --configuration Release
           --no-build
           --report-trx
-          --coverage --coverage-output-format cobertura
+          --coverage --coverage-output-format opencover
           ${{ env.FILTER_ARG }}
           -- --ignore-exit-code 8
 
