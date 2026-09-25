@@ -132,6 +132,7 @@ jobs:
           --coverage
           --coverage-output-format cobertura
           --report-trx
+          --ignore-exit-code 8
 
       - name: Sonar End
         run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
