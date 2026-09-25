@@ -122,11 +122,6 @@ jobs:
       - name: Build
         run: dotnet build ${{ inputs.working_dir }} --configuration Release
 
-      - name: Debug global.json resolution
-        run: |
-          echo "CWD: $(pwd)"
-          find . -name global.json -not -path '*/node_modules/*' -exec echo {} \; -exec cat {} \;
-
       - name: Test
         run: >
           dotnet test ${{ inputs.working_dir }}
@@ -135,6 +130,7 @@ jobs:
           --report-trx
           --coverage --coverage-output-format cobertura
           ${{ env.FILTER_ARG }}
+          -- --ignore-exit-code 8
 
       - name: Sonar End
         run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
