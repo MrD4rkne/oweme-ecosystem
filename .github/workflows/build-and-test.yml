@@ -120,13 +120,14 @@ jobs:
           /d:sonar.coverage.exclusions="**/aspire/**"
 
       - name: Build
-        run: dotnet build ${{ inputs.working_dir }} --configuration Release
+        run: dotnet build ${{ inputs.working_dir }} --configuration Release -p:TestingPlatformDotnetTestSupport=true
 
       - name: Test
         run: >
-          dotnet test api
+          dotnet test ${{ inputs.working_dir }}
           --configuration Release
           --no-build
+          -p:TestingPlatformDotnetTestSupport=true
           --
           --filter "FullyQualifiedName!~SmokeTests"
           --coverage
