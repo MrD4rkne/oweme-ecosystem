@@ -83,13 +83,7 @@ builder.UseWolverine(opts =>
 
     opts.UseFluentValidation(RegistrationBehavior.ExplicitRegistration);
 
-    if (CodeGeneration.IsRunningGeneration())
-    {
-        // OpenAPI introspection (and `codegen write` itself) boot the host
-        // outside Development, so force Dynamic here regardless of environment.
-        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Dynamic;
-    }
-    else if (builder.Environment.IsProduction())
+    if (builder.Environment.IsProduction() && !CodeGeneration.IsRunningGeneration())
     {
         opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Static;
         opts.Services.CritterStackDefaults(cr => { cr.Production.AssertAllPreGeneratedTypesExist = true; });
@@ -97,7 +91,7 @@ builder.UseWolverine(opts =>
     else
     {
         // Fallback to Auto for local development/debugging
-        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Auto;
+        opts.CodeGeneration.TypeLoadMode = TypeLoadMode.Dynamic;
     }
 });
 
