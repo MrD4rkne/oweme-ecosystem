@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OweMe.Application;
 using OweMe.Domain.Common;
+using OweMe.Persistence.User;
 
 namespace OweMe.Persistence.Common;
 

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OweMe.Domain.Users;
 
-namespace OweMe.Persistence.Common;
+namespace OweMe.Persistence.User;
 
 public class UserIdConverter(ConverterMappingHints? mappingHints = null)
     : ValueConverter<UserId, Guid>(ToProvider, FromProvider, mappingHints)
