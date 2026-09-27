@@ -28,7 +28,7 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
         };
 
         // Act
-        var result = await CreateGroupCommandHandler.Handle(command, _groupContextMock.Object,
+        var result = await CreateGroupCommandHandler.Handle(command, _groupContextMock.Object, _timeProvider.Object,
             TestContext.Current.CancellationToken);
 
         // Assert

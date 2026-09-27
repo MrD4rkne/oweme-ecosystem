@@ -16,7 +16,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         var userId = UserId.New();
         _userContextMock.Setup(x => x.Id).Returns(userId);
 
-        var group = new Group { Name = "Test Group", CreatedBy = userId };
+        var group = new Group { Id = Guid.NewGuid(), Name = "Test Group", CreatedBy = userId };
         await _groupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
         await _groupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
         var groupId = group.Id;
@@ -65,7 +65,8 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         _userContextMock.Setup(x => x.Id).Returns(otherUserId);
 
         // Let's create a group with a different user
-        var group = new Group { Name = "Test Group", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
+        var group = new Group
+            { Id = Guid.NewGuid(), Name = "Test Group", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
         await _groupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
         await _groupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
         var groupId = group.Id;

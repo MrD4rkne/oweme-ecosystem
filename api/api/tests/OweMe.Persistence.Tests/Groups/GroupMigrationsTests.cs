@@ -54,6 +54,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
 
         var group = new Group
         {
+            Id = Guid.NewGuid(),
             Name = "Test Group",
             Description = "This is a test group."
         };
@@ -68,6 +69,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
 
         // Assert
         createdGroup.ShouldNotBeNull("The group should have been created successfully.");
+        createdGroup.Id.ShouldBe(group.Id, "The created group should have the same ID as the one we added.");
         createdGroup.Name.ShouldBe("Test Group");
         createdGroup.Description.ShouldBe("This is a test group.");
         createdGroup.ShouldBeCreated(

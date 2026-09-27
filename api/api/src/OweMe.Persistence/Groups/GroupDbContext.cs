@@ -20,6 +20,9 @@ public class GroupDbContext(
             .HasKey(l => l.Id);
 
         modelBuilder.Entity<Group>()
+            .Property(g => g.Id);
+
+        modelBuilder.Entity<Group>()
             .Property(l => l.Name)
             .IsRequired()
             .HasMaxLength(GroupConstants.MaxNameLength);
