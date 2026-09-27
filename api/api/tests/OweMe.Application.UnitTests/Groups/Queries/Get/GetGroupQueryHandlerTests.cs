@@ -35,7 +35,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         result.ShouldNotBeNull();
         result.Name.ShouldBe("Test Group");
         result.Id.ShouldBe(groupId);
-        result.CreatedBy.ShouldBe<Guid>(userId);
+        result.CreatedBy.ShouldBe<Guid>(userId.Value);
         result.CreatedAt.ShouldBe(group.CreatedAt);
         result.UpdatedBy.ShouldBeNull();
         result.UpdatedAt.ShouldBeNull();

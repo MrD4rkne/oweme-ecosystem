@@ -14,8 +14,8 @@ public class UserIdTests
 
         // Assert
         id1.ShouldNotBe(id2);
-        id1.Id.ShouldNotBe(Guid.Empty);
-        id2.Id.ShouldNotBe(Guid.Empty);
+        id1.Value.ShouldNotBe(Guid.Empty);
+        id2.Value.ShouldNotBe(Guid.Empty);
     }
 
     [Fact]
@@ -25,7 +25,7 @@ public class UserIdTests
         var empty = UserId.Empty;
 
         // Assert
-        empty.Id.ShouldBe(Guid.Empty);
+        empty.Value.ShouldBe(Guid.Empty);
     }
 
     [Fact]
@@ -40,32 +40,5 @@ public class UserIdTests
 
         // Assert
         result.ShouldBe(guid.ToString());
-    }
-
-    [Fact]
-    public void ImplicitConversion_ToGuid_ShouldReturnGuid()
-    {
-        // Arrange
-        var guid = Guid.NewGuid();
-        var userId = new UserId(guid);
-
-        // Act
-        Guid result = userId;
-
-        // Assert
-        result.ShouldBe(guid);
-    }
-
-    [Fact]
-    public void ImplicitConversion_FromGuid_ShouldReturnUserId()
-    {
-        // Arrange
-        var guid = Guid.NewGuid();
-
-        // Act
-        UserId userId = guid;
-
-        // Assert
-        userId.Id.ShouldBe(guid);
     }
 }

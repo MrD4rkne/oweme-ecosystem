@@ -1,20 +1,21 @@
 ﻿using OweMe.Application.Groups.Queries.Get;
 using OweMe.Domain.Groups;
+using OweMe.Domain.Users;
 using Shouldly;
 
 namespace OweMe.Application.UnitTests.Groups;
 
 public class GetGroupResultTests
 {
-    public static TheoryData<Guid?, DateTimeOffset?> ModifiedByAndAtData => new()
+    public static TheoryData<UserId?, DateTimeOffset?> ModifiedByAndAtData => new()
     {
-        { Guid.NewGuid(), DateTimeOffset.UtcNow },
+        { UserId.New(), DateTimeOffset.UtcNow },
         { null, null }
     };
 
     [Theory]
     [MemberData(nameof(ModifiedByAndAtData))]
-    public void FromDomain_MapsAllPropertiesCorrectly(Guid? modifiedBy, DateTimeOffset? modifiedAt)
+    public void FromDomain_MapsAllPropertiesCorrectly(UserId? modifiedBy, DateTimeOffset? modifiedAt)
     {
         // Arrange
         var group = new Group
@@ -24,7 +25,7 @@ public class GetGroupResultTests
             Description = "Test Description",
             CreatedAt = DateTime.UtcNow.AddDays(-1),
             UpdatedAt = modifiedAt,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = UserId.New(),
             UpdatedBy = modifiedBy
         };
 
@@ -37,7 +38,7 @@ public class GetGroupResultTests
         dto.Description.ShouldBe(group.Description);
         dto.CreatedAt.ShouldBe(group.CreatedAt);
         dto.UpdatedAt.ShouldBe(group.UpdatedAt);
-        dto.CreatedBy.ShouldBe(group.CreatedBy.Id);
-        dto.UpdatedBy.ShouldBe(group.UpdatedBy?.Id);
+        dto.CreatedBy.ShouldBe(group.CreatedBy.Value);
+        dto.UpdatedBy.ShouldBe(group.UpdatedBy?.Value);
     }
 }

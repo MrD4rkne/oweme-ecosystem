@@ -31,7 +31,7 @@ public class GroupTests
     {
         // Arrange
         var creatorId = new UserId(Guid.NewGuid());
-        var otherUserId = new UserId(GuidHelper.CreateDifferentGuid(creatorId));
+        var otherUserId = new UserId(GuidHelper.CreateDifferentGuid(creatorId.Value));
 
         var group = new Group
         {

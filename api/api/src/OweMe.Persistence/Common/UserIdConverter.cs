@@ -7,6 +7,6 @@ namespace OweMe.Persistence.Common;
 public class UserIdConverter(ConverterMappingHints? mappingHints = null)
     : ValueConverter<UserId, Guid>(ToProvider, FromProvider, mappingHints)
 {
-    private static readonly Expression<Func<UserId, Guid>> ToProvider = userId => userId.Id;
+    private static readonly Expression<Func<UserId, Guid>> ToProvider = userId => userId.Value;
     private static readonly Expression<Func<Guid, UserId>> FromProvider = id => new UserId(id);
 }

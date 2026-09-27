@@ -15,6 +15,6 @@ public sealed record GetGroupResult(
     public static GetGroupResult FromDomain(Group group)
     {
         return new GetGroupResult(group.Id, group.Name, group.Description,
-            group.CreatedAt, group.CreatedBy.Id, group.UpdatedAt, group.UpdatedBy?.Id);
+            group.CreatedAt, group.CreatedBy.Value, group.UpdatedAt, group.UpdatedBy?.Value);
     }
 }
