@@ -10,7 +10,7 @@ public static class CreateGroupCommandHandler
     {
         var group = new Group
         {
-            Id = Guid.CreateVersion7(timeProvider.GetUtcNow()),
+            Id = new(Guid.CreateVersion7(timeProvider.GetUtcNow())),
             Name = message.Name,
             Description = message.Description
         };
@@ -18,7 +18,7 @@ public static class CreateGroupCommandHandler
         context.Groups.Add(group);
         _ = await context.SaveChangesAsync(cancellationToken);
         return new GroupCreated(
-            group.Id
+            group.Id.Value
         );
     }
 

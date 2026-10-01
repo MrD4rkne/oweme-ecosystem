@@ -37,7 +37,7 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
             .FirstOrDefault(x => x.Name == groupName && x.Description == groupDescription);
         addedGroup.ShouldNotBeNull();
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(addedGroup.Id);
+        result.Id.ShouldBe(addedGroup.Id.Value);
 
         addedGroup.Name.ShouldBe(command.Name);
         addedGroup.Description.ShouldBe(command.Description);

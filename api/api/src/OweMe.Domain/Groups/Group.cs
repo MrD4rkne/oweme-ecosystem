@@ -5,7 +5,7 @@ namespace OweMe.Domain.Groups;
 
 public sealed class Group : AuditableEntity
 {
-    public required Guid Id { get; init; }
+    public required GroupId Id { get; init; }
 
     public required string Name { get; init; }
 

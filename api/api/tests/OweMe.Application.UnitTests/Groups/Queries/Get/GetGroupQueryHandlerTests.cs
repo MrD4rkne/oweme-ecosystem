@@ -16,7 +16,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         var userId = UserId.New();
         _userContextMock.Setup(x => x.Id).Returns(userId);
 
-        var group = new Group { Id = Guid.NewGuid(), Name = "Test Group", CreatedBy = userId };
+        var group = new Group { Id = GroupId.New(), Name = "Test Group", CreatedBy = userId };
         await _groupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
         await _groupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
         var groupId = group.Id;
@@ -24,7 +24,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         _groupContextMock.Invocations.Clear();
         _userContextMock.Invocations.Clear();
 
-        var query = new GetGroupQuery(groupId);
+        var query = new GetGroupQuery(groupId.Value);
 
         // Act
         var result = await GetGroupQueryHandler.HandleAsync(query,
@@ -34,7 +34,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         // Assert
         result.ShouldNotBeNull();
         result.Name.ShouldBe("Test Group");
-        result.Id.ShouldBe(groupId);
+        result.Id.ShouldBe(groupId.Value);
         result.CreatedBy.ShouldBe<Guid>(userId.Value);
         result.CreatedAt.ShouldBe(group.CreatedAt);
         result.UpdatedBy.ShouldBeNull();
@@ -66,7 +66,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
 
         // Let's create a group with a different user
         var group = new Group
-            { Id = Guid.NewGuid(), Name = "Test Group", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
+            { Id = GroupId.New(), Name = "Test Group", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
         await _groupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
         await _groupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
         var groupId = group.Id;
@@ -78,7 +78,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         _userContextMock.Invocations.Clear();
         _groupContextMock.Invocations.Clear();
 
-        var query = new GetGroupQuery(groupId);
+        var query = new GetGroupQuery(groupId.Value);
 
         // Act
         await Assert.ThrowsAsync<NotFoundException>(() => GetGroupQueryHandler.HandleAsync(query,

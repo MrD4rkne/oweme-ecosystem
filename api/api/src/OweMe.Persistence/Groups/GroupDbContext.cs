@@ -20,7 +20,8 @@ public class GroupDbContext(
             .HasKey(l => l.Id);
 
         modelBuilder.Entity<Group>()
-            .Property(g => g.Id);
+            .Property(g => g.Id)
+            .HasConversion<GroupIdConverter>();
 
         modelBuilder.Entity<Group>()
             .Property(l => l.Name)

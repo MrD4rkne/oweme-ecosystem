@@ -28,7 +28,7 @@ public class AuditableDbContext : DbContext
         {
             modelBuilder.Entity(clrType)
                 .Property(nameof(AuditableEntity.CreatedBy))
-                .HasConversion(new UserIdConverter())
+                .HasConversion<UserIdConverter>()
                 .IsRequired();
 
             modelBuilder.Entity(clrType)
@@ -37,7 +37,7 @@ public class AuditableDbContext : DbContext
 
             modelBuilder.Entity(clrType)
                 .Property(nameof(AuditableEntity.UpdatedBy))
-                .HasConversion(new UserIdConverter())
+                .HasConversion<UserIdConverter>()
                 .IsRequired(false);
 
             modelBuilder.Entity(clrType)

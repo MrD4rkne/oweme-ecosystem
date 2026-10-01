@@ -16,7 +16,7 @@ public class GroupTests
         {
             CreatedBy = userId,
             Name = "Test Group",
-            Id = Guid.NewGuid(),
+            Id = new GroupId(),
         };
 
         // Act
@@ -37,7 +37,7 @@ public class GroupTests
         {
             CreatedBy = creatorId,
             Name = "Test Group",
-            Id = Guid.NewGuid()
+            Id = new GroupId(),
         };
 
         // Act

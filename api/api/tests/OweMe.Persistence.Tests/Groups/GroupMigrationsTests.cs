@@ -54,7 +54,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
 
         var group = new Group
         {
-            Id = Guid.NewGuid(),
+            Id = GroupId.New(),
             Name = "Test Group",
             Description = "This is a test group."
         };

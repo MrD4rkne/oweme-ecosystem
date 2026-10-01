@@ -20,7 +20,7 @@ public class GetGroupResultTests
         // Arrange
         var group = new Group
         {
-            Id = Guid.NewGuid(),
+            Id = GroupId.New(),
             Name = "Test Group",
             Description = "Test Description",
             CreatedAt = DateTime.UtcNow.AddDays(-1),
@@ -33,7 +33,7 @@ public class GetGroupResultTests
         var dto = GetGroupResult.FromDomain(group);
 
         // Assert
-        dto.Id.ShouldBe(group.Id);
+        dto.Id.ShouldBe(group.Id.Value);
         dto.Name.ShouldBe(group.Name);
         dto.Description.ShouldBe(group.Description);
         dto.CreatedAt.ShouldBe(group.CreatedAt);
