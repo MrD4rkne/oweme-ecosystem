@@ -1,3 +1,5 @@
+using OweMe.Domain.Common;
+
 namespace OweMe.Domain.Users;
 
 /// <summary>
@@ -10,11 +12,11 @@ namespace OweMe.Domain.Users;
 /// <item> Add expenses for a persona that is not the user themselves (e.g., a friend, a family member, etc.).</item>
 /// </list>
 /// </remarks>
-public sealed class Persona
+public sealed class Persona : AuditableEntity
 {
     public required PersonaId Id { get; init; }
-    
+
     public required UserId? UserId { get; init; }
-    
+
     public required string Name { get; init; }
 }

@@ -1,12 +1,17 @@
 using Microsoft.EntityFrameworkCore;
+using OweMe.Application;
 using OweMe.Application.Personas;
 using OweMe.Domain.Users;
+using OweMe.Persistence.Common;
 using OweMe.Persistence.User;
 
 namespace OweMe.Persistence.Personas;
 
-public sealed class PersonaDbContext(DbContextOptions<PersonaDbContext> options)
-    : DbContext(options), IPersonaContext
+public sealed class PersonaDbContext(
+    DbContextOptions<PersonaDbContext> options,
+    TimeProvider timeProvider,
+    IUserContext userContext)
+    : AuditableDbContext(options, timeProvider, userContext), IPersonaContext
 {
     public DbSet<Persona> Personas { get; set; }
 

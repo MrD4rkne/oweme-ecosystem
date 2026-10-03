@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using OweMe.Persistence.Personas;
@@ -11,9 +12,11 @@ using OweMe.Persistence.Personas;
 namespace OweMe.Persistence.Personas.Migrations
 {
     [DbContext(typeof(PersonaDbContext))]
-    partial class PersonaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261003135219_MakePersonaAuditable")]
+    partial class MakePersonaAuditable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
