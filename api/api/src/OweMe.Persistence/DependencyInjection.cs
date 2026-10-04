@@ -4,9 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OweMe.Application.Groups;
 using OweMe.Persistence.Configuration;
-using OweMe.Persistence.Expenses;
-using OweMe.Persistence.Groups;
-using OweMe.Persistence.Personas;
+using OweMe.Persistence.Data;
 
 namespace OweMe.Persistence;
 
@@ -20,16 +18,14 @@ public static class DependencyInjection
             .Bind(builder.Configuration.GetSection(DatabaseOptions.SectionName))
             .ValidateOnStart();
 
-        builder.Services.AddOweMeDbContext<GroupDbContext>();
-        builder.Services.AddOweMeDbContext<ExpenseDbContext>();
-        builder.Services.AddOweMeDbContext<PersonaDbContext>();
+        builder.Services.AddOweMeDbContext<ApplicationDbContext>();
 
-        builder.Services.AddScoped<IGroupContext, GroupDbContext>();
+        builder.Services.AddScoped<IGroupContext, ApplicationDbContext>();
         builder.Services.AddHostedService<MigrationHostedService>();
 
         return builder;
     }
-    
+
     private static IServiceCollection AddOweMeDbContext<TContext>(this IServiceCollection services)
         where TContext : DbContext
     {

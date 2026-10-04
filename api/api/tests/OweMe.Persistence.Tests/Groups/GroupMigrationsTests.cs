@@ -2,7 +2,7 @@
 using Moq;
 using OweMe.Application;
 using OweMe.Domain.Groups;
-using OweMe.Persistence.Groups;
+using OweMe.Persistence.Data;
 using OweMe.Tests.Common;
 using Shouldly;
 
@@ -22,8 +22,8 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
     public async Task Migrations_ShouldApplySuccessfully()
     {
         // Arrange
-        await using var context = new GroupDbContext(
-            new DbContextOptionsBuilder<GroupDbContext>()
+        await using var context = new ApplicationDbContext(
+            new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(ConnectionString)
                 .Options,
             _timeProvider.Object,
@@ -42,8 +42,8 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
     public async Task Migrations_ShouldBeAbleToCreateAndQuery()
     {
         // Arrange
-        await using var context = new GroupDbContext(
-            new DbContextOptionsBuilder<GroupDbContext>()
+        await using var context = new ApplicationDbContext(
+            new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(ConnectionString)
                 .Options,
             _timeProvider.Object,
