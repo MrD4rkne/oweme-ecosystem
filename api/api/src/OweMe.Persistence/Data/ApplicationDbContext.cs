@@ -9,7 +9,7 @@ using OweMe.Persistence.Common;
 
 namespace OweMe.Persistence.Data;
 
-public class ApplicationDbContext(
+public sealed class ApplicationDbContext(
     DbContextOptions<ApplicationDbContext> options,
     TimeProvider timeProvider,
     IUserContext userContext)
