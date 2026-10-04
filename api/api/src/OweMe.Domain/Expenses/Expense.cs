@@ -9,6 +9,4 @@ public sealed class Expense : AuditableEntity
     public required string Name { get; init; }
 
     public required Guid GroupId { get; init; }
-
-    public required List<Expense> Splits { get; init; } = [];
 }
