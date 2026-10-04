@@ -2,7 +2,7 @@
 using Moq;
 using OweMe.Application;
 using OweMe.Domain.Groups;
-using OweMe.Persistence.Groups;
+using OweMe.Persistence.Data;
 using OweMe.Tests.Common;
 using Shouldly;
 
@@ -22,8 +22,8 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
     public async Task Migrations_ShouldApplySuccessfully()
     {
         // Arrange
-        await using var context = new GroupDbContext(
-            new DbContextOptionsBuilder<GroupDbContext>()
+        await using var context = new ApplicationDbContext(
+            new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(ConnectionString)
                 .Options,
             _timeProvider.Object,
@@ -42,8 +42,8 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
     public async Task Migrations_ShouldBeAbleToCreateAndQuery()
     {
         // Arrange
-        await using var context = new GroupDbContext(
-            new DbContextOptionsBuilder<GroupDbContext>()
+        await using var context = new ApplicationDbContext(
+            new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(ConnectionString)
                 .Options,
             _timeProvider.Object,
@@ -54,6 +54,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
 
         var group = new Group
         {
+            Id = GroupId.New(),
             Name = "Test Group",
             Description = "This is a test group."
         };
@@ -68,6 +69,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
 
         // Assert
         createdGroup.ShouldNotBeNull("The group should have been created successfully.");
+        createdGroup.Id.ShouldBe(group.Id, "The created group should have the same ID as the one we added.");
         createdGroup.Name.ShouldBe("Test Group");
         createdGroup.Description.ShouldBe("This is a test group.");
         createdGroup.ShouldBeCreated(

@@ -1,4 +1,5 @@
 ﻿using OweMe.Application.Groups.Commands.Create;
+using OweMe.Domain.Users;
 using OweMe.Tests.Common;
 using Shouldly;
 
@@ -7,7 +8,7 @@ namespace OweMe.Application.UnitTests.Groups.Commands.Create;
 public class CreateGroupCommandHandlerTests : BaseCommandTest
 {
     private readonly DateTimeOffset _currentTime = DateTimeOffset.UtcNow;
-    private readonly Guid _currentUserId = Guid.NewGuid();
+    private readonly UserId _currentUserId = UserId.New();
 
     public CreateGroupCommandHandlerTests()
     {
@@ -28,7 +29,7 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
         };
 
         // Act
-        var result = await CreateGroupCommandHandler.Handle(command, _groupContextMock.Object,
+        var result = await CreateGroupCommandHandler.Handle(command, _groupContextMock.Object, _timeProvider.Object,
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -36,7 +37,7 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
             .FirstOrDefault(x => x.Name == groupName && x.Description == groupDescription);
         addedGroup.ShouldNotBeNull();
         result.ShouldNotBeNull();
-        result.Id.ShouldBe(addedGroup.Id);
+        result.Id.ShouldBe(addedGroup.Id.Value);
 
         addedGroup.Name.ShouldBe(command.Name);
         addedGroup.Description.ShouldBe(command.Description);

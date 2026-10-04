@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
 using OweMe.Application.Groups;
-using OweMe.Persistence.Groups;
+using OweMe.Persistence.Data;
 using OweMe.Tests.Common;
 
 namespace OweMe.Application.UnitTests.Groups;
@@ -10,7 +10,7 @@ public class GroupDbContextMoq : PostgresTestBase
 {
     private readonly TimeProvider _timeProvider;
     private readonly IUserContext _userContext;
-    private Mock<GroupDbContext>? _groupContextMock;
+    private Mock<ApplicationDbContext>? _groupContextMock;
 
     private GroupDbContextMoq(TimeProvider timeProvider,
         IUserContext userContext)
@@ -44,11 +44,11 @@ public class GroupDbContextMoq : PostgresTestBase
     {
         await base.SetupAsync();
 
-        var dbOptions = new DbContextOptionsBuilder<GroupDbContext>()
+        var dbOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseNpgsql(ConnectionString)
             .Options;
 
-        _groupContextMock = new Mock<GroupDbContext>(
+        _groupContextMock = new Mock<ApplicationDbContext>(
             dbOptions,
             _timeProvider,
             _userContext
@@ -70,7 +70,7 @@ public class GroupDbContextMoq : PostgresTestBase
         public TimeProvider? TimeProvider { get; init; } = null;
         public IUserContext? UserContext { get; init; } = null;
 
-        public GroupDbContextCreationOptions WithOptions(DbContextOptions<GroupDbContext> options)
+        public GroupDbContextCreationOptions WithOptions(DbContextOptions<ApplicationDbContext> options)
         {
             return new GroupDbContextCreationOptions
             {

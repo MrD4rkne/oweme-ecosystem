@@ -16,7 +16,7 @@ public class GroupTests
         {
             CreatedBy = userId,
             Name = "Test Group",
-            Id = Guid.NewGuid(),
+            Id = new GroupId(),
         };
 
         // Act
@@ -31,13 +31,13 @@ public class GroupTests
     {
         // Arrange
         var creatorId = new UserId(Guid.NewGuid());
-        var otherUserId = new UserId(GuidHelper.CreateDifferentGuid(creatorId));
+        var otherUserId = new UserId(GuidHelper.CreateDifferentGuid(creatorId.Value));
 
         var group = new Group
         {
             CreatedBy = creatorId,
             Name = "Test Group",
-            Id = Guid.NewGuid()
+            Id = new GroupId(),
         };
 
         // Act
