@@ -8,7 +8,7 @@ using OweMe.Persistence.Data;
 
 #nullable disable
 
-namespace OweMe.Persistence.Groups.Migrations
+namespace OweMe.Persistence.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
     partial class ApplicationDbContextModelSnapshot : ModelSnapshot
@@ -33,9 +33,6 @@ namespace OweMe.Persistence.Groups.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ExpenseId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
 
@@ -52,7 +49,7 @@ namespace OweMe.Persistence.Groups.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExpenseId");
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Expenses");
                 });
@@ -138,9 +135,11 @@ namespace OweMe.Persistence.Groups.Migrations
 
             modelBuilder.Entity("OweMe.Domain.Expenses.Expense", b =>
                 {
-                    b.HasOne("OweMe.Domain.Expenses.Expense", null)
-                        .WithMany("Splits")
-                        .HasForeignKey("ExpenseId");
+                    b.HasOne("OweMe.Domain.Groups.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OweMe.Domain.Expenses.ExpenseSplit", b =>
@@ -156,11 +155,6 @@ namespace OweMe.Persistence.Groups.Migrations
                         .HasForeignKey("PersonaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("OweMe.Domain.Expenses.Expense", b =>
-                {
-                    b.Navigation("Splits");
                 });
 #pragma warning restore 612, 618
         }

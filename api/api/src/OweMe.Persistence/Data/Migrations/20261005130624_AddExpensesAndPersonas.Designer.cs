@@ -12,7 +12,7 @@ using OweMe.Persistence.Data;
 namespace OweMe.Persistence.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20261004150942_AddExpensesAndPersonas")]
+    [Migration("20261005130624_AddExpensesAndPersonas")]
     partial class AddExpensesAndPersonas
     {
         /// <inheritdoc />
@@ -36,9 +36,6 @@ namespace OweMe.Persistence.Data.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("ExpenseId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("GroupId")
                         .HasColumnType("uuid");
 
@@ -55,7 +52,7 @@ namespace OweMe.Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ExpenseId");
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Expenses");
                 });
@@ -141,9 +138,11 @@ namespace OweMe.Persistence.Data.Migrations
 
             modelBuilder.Entity("OweMe.Domain.Expenses.Expense", b =>
                 {
-                    b.HasOne("OweMe.Domain.Expenses.Expense", null)
-                        .WithMany("Splits")
-                        .HasForeignKey("ExpenseId");
+                    b.HasOne("OweMe.Domain.Groups.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("OweMe.Domain.Expenses.ExpenseSplit", b =>
@@ -159,11 +158,6 @@ namespace OweMe.Persistence.Data.Migrations
                         .HasForeignKey("PersonaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("OweMe.Domain.Expenses.Expense", b =>
-                {
-                    b.Navigation("Splits");
                 });
 #pragma warning restore 612, 618
         }
