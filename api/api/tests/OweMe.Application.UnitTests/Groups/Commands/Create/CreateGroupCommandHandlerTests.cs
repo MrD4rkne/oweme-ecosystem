@@ -12,8 +12,8 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
 
     public CreateGroupCommandHandlerTests()
     {
-        _userContextMock.Setup(x => x.Id).Returns(_currentUserId);
-        _timeProvider.Setup(x => x.GetUtcNow()).Returns(_currentTime);
+        UserContextMock.Setup(x => x.Id).Returns(_currentUserId);
+        TimeProvider.Setup(x => x.GetUtcNow()).Returns(_currentTime);
     }
 
     [Fact]
@@ -29,11 +29,11 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
         };
 
         // Act
-        var result = await CreateGroupCommandHandler.Handle(command, _groupContextMock.Object, _timeProvider.Object,
+        var result = await CreateGroupCommandHandler.Handle(command, GroupContextMock.Object, TimeProvider.Object,
             TestContext.Current.CancellationToken);
 
         // Assert
-        var addedGroup = _groupContextMock.Object.Groups
+        var addedGroup = GroupContextMock.Object.Groups
             .FirstOrDefault(x => x.Name == groupName && x.Description == groupDescription);
         addedGroup.ShouldNotBeNull();
         result.ShouldNotBeNull();

@@ -7,19 +7,19 @@ namespace OweMe.Application.UnitTests;
 public abstract class BaseCommandTest : IAsyncLifetime
 {
     private readonly GroupDbContextMoq _groupDbContextMoq;
-    protected readonly Mock<TimeProvider> _timeProvider = new();
+    protected readonly Mock<TimeProvider> TimeProvider = new();
 
-    protected readonly Mock<IUserContext> _userContextMock = new();
+    protected readonly Mock<IUserContext> UserContextMock = new();
 
     protected BaseCommandTest()
     {
         _groupDbContextMoq = GroupDbContextMoq.GroupDbContextCreationOptions.New()
-            .WithUserContext(_userContextMock.Object)
-            .WithTimeProvider(_timeProvider.Object)
+            .WithUserContext(UserContextMock.Object)
+            .WithTimeProvider(TimeProvider.Object)
             .Build();
     }
 
-    protected Mock<IGroupContext> _groupContextMock => _groupDbContextMoq.GroupContextMock;
+    protected Mock<IGroupContext> GroupContextMock => _groupDbContextMoq.GroupContextMock;
 
     public virtual async ValueTask InitializeAsync()
     {
