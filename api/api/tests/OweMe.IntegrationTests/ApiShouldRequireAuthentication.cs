@@ -2,14 +2,13 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
-using OweMe.Api;
 using OweMe.Application.Groups.Commands.Create;
 using OweMe.IntegrationTests.Authentication;
 using Shouldly;
 
 namespace OweMe.IntegrationTests;
 
-public sealed class ApiShouldRequireAuthentication(OweMeApi api, ITestOutputHelper output) : IClassFixture<OweMeApi>
+public sealed class ApiShouldRequireAuthentication(OweMeApi api, ITestOutputHelper output)
 {
     private readonly WebApplicationFactory<Program> _api = api.WithTestLogging(output);
 

@@ -22,6 +22,9 @@ public sealed class OweMeApi : WebApplicationFactory<Program>, IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         await _postgresContainer.StartAsync();
+
+        // Start the host once so migrations run before tests create their own derived hosts in parallel.
+        _ = Services;
     }
 
     public override async ValueTask DisposeAsync()

@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using OweMe.Application.Groups;
+using OweMe.Application.Personas;
 using OweMe.Persistence.Configuration;
 using OweMe.Persistence.Data;
 
@@ -20,7 +21,8 @@ public static class DependencyInjection
 
         builder.Services.AddOweMeDbContext<ApplicationDbContext>();
 
-        builder.Services.AddScoped<IGroupContext, ApplicationDbContext>();
+        builder.Services.AddScoped<IGroupContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
+        builder.Services.AddScoped<IPersonaContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddHostedService<MigrationHostedService>();
 
         return builder;
