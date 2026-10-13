@@ -20,20 +20,20 @@ public sealed class CreatePersonaCommandTests : BaseCommandTest
     {
         // Arrange
         const string personaName = "SomeNewPersonaName";
-        
+
         var createPersonaCommand = new CreatePersonaCommand()
         {
             Name = personaName,
         };
-        
+
         // Act
         var result = await CreatePersonaCommandHandler.Handle(
-            createPersonaCommand, PersonaContext.Object, TimeProvider.Object,
+            createPersonaCommand, PersonaContext, TimeProvider.Object,
             cancellationToken: TestContext.Current.CancellationToken
         );
-        
+
         // Assert
         result.ShouldNotBeNull();
         result.Id.Value.ShouldNotBe(Guid.Empty);
-    } 
+    }
 }

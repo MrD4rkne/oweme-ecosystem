@@ -17,18 +17,17 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         UserContextMock.Setup(x => x.Id).Returns(userId);
 
         var group = new Group { Id = GroupId.New(), Name = "Test Group", CreatedBy = userId };
-        await GroupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
-        await GroupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await GroupContext.Groups.AddAsync(group, TestContext.Current.CancellationToken);
+        await GroupContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         var groupId = group.Id;
 
-        GroupContextMock.Invocations.Clear();
         UserContextMock.Invocations.Clear();
 
         var query = new GetGroupQuery(groupId.Value);
 
         // Act
         var result = await GetGroupQueryHandler.HandleAsync(query,
-            GroupContextMock.Object, UserContextMock.Object,
+            GroupContext, UserContextMock.Object,
             TestContext.Current.CancellationToken);
 
         // Assert
@@ -51,7 +50,7 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
 
         // Act
         await Assert.ThrowsAsync<NotFoundException>(() => GetGroupQueryHandler.HandleAsync(query,
-            GroupContextMock.Object, UserContextMock.Object,
+            GroupContext, UserContextMock.Object,
             TestContext.Current.CancellationToken));
 
         UserContextMock.Verify(x => x.Id, Times.AtMostOnce);
@@ -67,8 +66,8 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         // Let's create a group with a different user
         var group = new Group
             { Id = GroupId.New(), Name = "Test Group", CreatedAt = DateTimeOffset.UtcNow, CreatedBy = otherUserId };
-        await GroupContextMock.Object.Groups.AddAsync(group, TestContext.Current.CancellationToken);
-        await GroupContextMock.Object.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await GroupContext.Groups.AddAsync(group, TestContext.Current.CancellationToken);
+        await GroupContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         var groupId = group.Id;
 
         var userId = UserId.New();
@@ -76,13 +75,12 @@ public class GetGroupQueryHandlerTests : BaseCommandTest
         UserContextMock.Setup(x => x.Id).Returns(userId);
 
         UserContextMock.Invocations.Clear();
-        GroupContextMock.Invocations.Clear();
 
         var query = new GetGroupQuery(groupId.Value);
 
         // Act
         await Assert.ThrowsAsync<NotFoundException>(() => GetGroupQueryHandler.HandleAsync(query,
-            GroupContextMock.Object, UserContextMock.Object,
+            GroupContext, UserContextMock.Object,
             TestContext.Current.CancellationToken));
 
         UserContextMock.Verify(x => x.Id, Times.Once);

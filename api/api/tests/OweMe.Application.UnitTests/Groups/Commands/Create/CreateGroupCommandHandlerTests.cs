@@ -29,11 +29,11 @@ public class CreateGroupCommandHandlerTests : BaseCommandTest
         };
 
         // Act
-        var result = await CreateGroupCommandHandler.Handle(command, GroupContextMock.Object, TimeProvider.Object,
+        var result = await CreateGroupCommandHandler.Handle(command, GroupContext, TimeProvider.Object,
             TestContext.Current.CancellationToken);
 
         // Assert
-        var addedGroup = GroupContextMock.Object.Groups
+        var addedGroup = GroupContext.Groups
             .FirstOrDefault(x => x.Name == groupName && x.Description == groupDescription);
         addedGroup.ShouldNotBeNull();
         result.ShouldNotBeNull();

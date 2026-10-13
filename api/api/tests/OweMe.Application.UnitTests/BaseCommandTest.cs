@@ -7,31 +7,31 @@ namespace OweMe.Application.UnitTests;
 
 public abstract class BaseCommandTest : IAsyncLifetime
 {
-    private readonly GroupDbContextMoq _groupDbContextMoq;
     protected readonly Mock<TimeProvider> TimeProvider = new();
 
     protected readonly Mock<IUserContext> UserContextMock = new();
+    private readonly GroupDbContextMoq _groupDbContext;
 
     protected BaseCommandTest()
     {
-        _groupDbContextMoq = GroupDbContextMoq.GroupDbContextCreationOptions.New()
+        _groupDbContext = GroupDbContextMoq.GroupDbContextCreationOptions.New()
             .WithUserContext(UserContextMock.Object)
             .WithTimeProvider(TimeProvider.Object)
             .Build();
     }
 
-    protected Mock<IGroupContext> GroupContextMock => _groupDbContextMoq.GroupContextMock;
+    protected IGroupContext GroupContext => _groupDbContext.GroupContextMock;
 
-    protected Mock<IPersonaContext> PersonaContext => _groupDbContextMoq.PersonaContextMock;
+    protected IPersonaContext PersonaContext => _groupDbContext.PersonaContextMock;
 
     public virtual async ValueTask InitializeAsync()
     {
-        await _groupDbContextMoq.SetupAsync();
+        await _groupDbContext.SetupAsync();
     }
 
     public virtual ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        return _groupDbContextMoq.DisposeAsync();
+        return _groupDbContext.DisposeAsync();
     }
 }

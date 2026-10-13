@@ -18,10 +18,10 @@ public class GroupDbContextMoq : PostgresTestBase
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
     }
-    
-    public Mock<IGroupContext> GroupContextMock { get; private set; } = null!;
 
-    public Mock<IPersonaContext> PersonaContextMock { get; private set; } = null!;
+    public IGroupContext GroupContextMock { get; private set; } = null!;
+
+    public IPersonaContext PersonaContextMock { get; private set; } = null!;
 
     private static GroupDbContextMoq Create(GroupDbContextCreationOptions options)
     {
@@ -40,18 +40,15 @@ public class GroupDbContextMoq : PostgresTestBase
             .UseNpgsql(ConnectionString)
             .Options;
 
-        var groupContextMock = new Mock<ApplicationDbContext>(
+        var dbContext = new ApplicationDbContext(
             dbOptions,
             _timeProvider,
             _userContext
-        )
-        {
-            CallBase = true
-        };
-        await groupContextMock.Object.Database.EnsureCreatedAsync();
-        
-        GroupContextMock = groupContextMock.As<IGroupContext>();
-        PersonaContextMock = groupContextMock.As<IPersonaContext>();
+        );
+        await dbContext.Database.EnsureCreatedAsync();
+
+        GroupContextMock = dbContext;
+        PersonaContextMock = dbContext;
     }
 
     public readonly struct GroupDbContextCreationOptions()
