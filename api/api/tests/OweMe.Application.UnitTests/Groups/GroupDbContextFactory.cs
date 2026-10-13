@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Moq;
 using OweMe.Application.Groups;
+using OweMe.Application.Personas;
 using OweMe.Persistence.Data;
 using OweMe.Tests.Common;
 
@@ -10,7 +11,6 @@ public class GroupDbContextMoq : PostgresTestBase
 {
     private readonly TimeProvider _timeProvider;
     private readonly IUserContext _userContext;
-    private Mock<ApplicationDbContext>? _groupContextMock;
 
     private GroupDbContextMoq(TimeProvider timeProvider,
         IUserContext userContext)
@@ -18,20 +18,12 @@ public class GroupDbContextMoq : PostgresTestBase
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _userContext = userContext ?? throw new ArgumentNullException(nameof(userContext));
     }
+    
+    public Mock<IGroupContext> GroupContextMock { get; private set; } = null!;
 
-    public Mock<IGroupContext> GroupContextMock
-    {
-        get
-        {
-            if (_groupContextMock is null)
-                throw new InvalidOperationException(
-                    $"GroupContextMock is not initialized. Call {nameof(SetupAsync)} first.");
+    public Mock<IPersonaContext> PersonaContextMock { get; private set; } = null!;
 
-            return _groupContextMock.As<IGroupContext>();
-        }
-    }
-
-    public static GroupDbContextMoq Create(GroupDbContextCreationOptions options)
+    private static GroupDbContextMoq Create(GroupDbContextCreationOptions options)
     {
         if (options.TimeProvider is null) options = options.WithTimeProvider(new Mock<TimeProvider>().Object);
 
@@ -48,7 +40,7 @@ public class GroupDbContextMoq : PostgresTestBase
             .UseNpgsql(ConnectionString)
             .Options;
 
-        _groupContextMock = new Mock<ApplicationDbContext>(
+        var groupContextMock = new Mock<ApplicationDbContext>(
             dbOptions,
             _timeProvider,
             _userContext
@@ -56,28 +48,16 @@ public class GroupDbContextMoq : PostgresTestBase
         {
             CallBase = true
         };
-
-        await _groupContextMock.Object.Database.EnsureCreatedAsync();
-    }
-
-    public IGroupContext GetGroupContext()
-    {
-        return GroupContextMock.Object;
+        await groupContextMock.Object.Database.EnsureCreatedAsync();
+        
+        GroupContextMock = groupContextMock.As<IGroupContext>();
+        PersonaContextMock = groupContextMock.As<IPersonaContext>();
     }
 
     public readonly struct GroupDbContextCreationOptions()
     {
-        public TimeProvider? TimeProvider { get; init; } = null;
-        public IUserContext? UserContext { get; init; } = null;
-
-        public GroupDbContextCreationOptions WithOptions(DbContextOptions<ApplicationDbContext> options)
-        {
-            return new GroupDbContextCreationOptions
-            {
-                TimeProvider = TimeProvider,
-                UserContext = UserContext
-            };
-        }
+        public TimeProvider? TimeProvider { get; private init; } = null;
+        public IUserContext? UserContext { get; private init; } = null;
 
         public GroupDbContextCreationOptions WithTimeProvider(TimeProvider timeProvider)
         {
