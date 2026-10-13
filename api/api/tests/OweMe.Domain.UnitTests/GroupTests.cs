@@ -1,6 +1,5 @@
 ﻿using OweMe.Domain.Groups;
 using OweMe.Domain.Users;
-using OweMe.Tests.Common;
 using Shouldly;
 
 namespace OweMe.Domain.UnitTests;
@@ -31,7 +30,7 @@ public class GroupTests
     {
         // Arrange
         var creatorId = new UserId(Guid.NewGuid());
-        var otherUserId = new UserId(GuidHelper.CreateDifferentGuid(creatorId.Value));
+        var otherUserId = UserId.New();
 
         var group = new Group
         {

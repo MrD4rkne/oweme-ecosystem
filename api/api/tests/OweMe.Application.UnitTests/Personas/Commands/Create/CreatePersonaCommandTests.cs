@@ -1,5 +1,6 @@
 using OweMe.Application.Personas.Commands.Create;
 using OweMe.Domain.Users;
+using OweMe.Tests.Common;
 using Shouldly;
 
 namespace OweMe.Application.UnitTests.Personas.Commands.Create;
@@ -35,5 +36,16 @@ public sealed class CreatePersonaCommandTests : BaseCommandTest
         // Assert
         result.ShouldNotBeNull();
         result.Id.Value.ShouldNotBe(Guid.Empty);
+        result.Id.Value.Version.ShouldBe(7);
+
+        var addedPersona = PersonaContext.Personas
+            .FirstOrDefault(x => x.Id == result.Id);
+        addedPersona.ShouldNotBeNull();
+        addedPersona.Name.ShouldBe(personaName);
+        addedPersona.ShouldBeCreated(
+            _currentUserId,
+            _currentTime
+        );
+        addedPersona.ShouldBeNeverUpdated();
     }
 }

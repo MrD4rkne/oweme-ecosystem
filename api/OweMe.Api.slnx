@@ -24,7 +24,6 @@
         <Project Path="api/tests/OweMe.IntegrationTests/OweMe.IntegrationTests.csproj"/>
     </Folder>
     <Folder Name="/api/test/Common/">
-        <Project Path="api/tests/OweMe.Tests.Common.Tests/OweMe.Tests.Common.Tests.csproj"/>
         <Project Path="api/tests/OweMe.Tests.Common/OweMe.Tests.Common.csproj"/>
     </Folder>
     <Folder Name="/api/test/Core/">
