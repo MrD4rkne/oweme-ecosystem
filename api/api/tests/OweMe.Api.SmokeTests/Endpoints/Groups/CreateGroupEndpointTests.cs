@@ -20,17 +20,15 @@ public class CreateGroupEndpointTests(OweMeClientFixture fixture)
         var client = fixture.GetClient(OweMeClientFixture.AuthenticatedClientKey);
 
         // Act
-        var groupId =
+        var groupCreated =
             await CreateGroupHelper.CreateGroup(client, _validCreateGroupRequest,
                 TestContext.Current.CancellationToken);
 
         // Assert
-        groupId.ShouldNotBe(Guid.Empty, "Group ID should not be empty after successful creation.");
-
-        var group = await client.GetGroupAsync(groupId, TestContext.Current.CancellationToken);
+        var group = await client.GetGroupAsync(groupCreated.Id, TestContext.Current.CancellationToken);
         group.ShouldNotBeNull("Group should not be null after creation.");
         group.Result.ShouldNotBeNull("Group result should not be null.");
-        group.Result.Id.ShouldBe(groupId, "Group ID should match the created group ID.");
+        group.Result.Id.ShouldBe(groupCreated.Id, "Group ID should match the created group ID.");
         group.Result.Name.ShouldBe(_validCreateGroupRequest.Name, "Group name should match the request.");
         group.Result.Description.ShouldBe(_validCreateGroupRequest.Description,
             "Group description should match the request.");

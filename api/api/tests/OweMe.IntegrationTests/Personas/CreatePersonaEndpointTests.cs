@@ -25,17 +25,20 @@ public sealed class CreatePersonaEndpointTests(OweMeApi api, ITestOutputHelper o
 
         // Act
         var response = await client.PostAsJsonAsync("/api/personas", command, TestContext.Current.CancellationToken);
+        var personaId =
+            await response.Content.ReadFromJsonAsync<CreatePersonaCommandHandler.PersonaCreated>(
+                cancellationToken: TestContext.Current.CancellationToken);
 
         // Assert
+        personaId.ShouldNotBeNull();
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         response.Headers.Location.ShouldNotBeNull();
-        var id = Guid.Parse(response.Headers.Location.OriginalString.Replace("/api/personas/", ""));
-        id.Version.ShouldBe(7);
+        response.Headers.Location.ShouldBe(new Uri($"/api/personas/{personaId.Id}", UriKind.Relative));
 
         // No GET endpoint for personas yet, so check the database directly.
         using var scope = _api.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        var persona = await db.Personas.SingleOrDefaultAsync(x => x.Id == new PersonaId(id),
+        var persona = await db.Personas.SingleOrDefaultAsync(x => x.Id == personaId.Id,
             TestContext.Current.CancellationToken);
         persona.ShouldNotBeNull();
         persona.Name.ShouldBe(command.Name);

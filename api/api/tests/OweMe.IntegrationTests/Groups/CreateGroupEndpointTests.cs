@@ -21,15 +21,20 @@ public sealed class CreateGroupEndpointTests(OweMeApi api, ITestOutputHelper out
 
         // Act
         var response = await client.PostAsJsonAsync("/api/groups", command, TestContext.Current.CancellationToken);
+        var groupId =
+            await response.Content.ReadFromJsonAsync<CreateGroupCommandHandler.GroupCreated>(
+                cancellationToken: TestContext.Current.CancellationToken);
+        groupId.ShouldNotBeNull();
 
         // Assert
         response.StatusCode.ShouldBe(HttpStatusCode.Created);
         response.Headers.Location.ShouldNotBeNull();
-        response.Headers.Location.OriginalString.ShouldMatch("^/api/groups/[0-9a-f-]{36}$");
+        response.Headers.Location.ShouldBe(new Uri($"/api/groups/{groupId.Id}", UriKind.Relative));
 
         var group = await client.GetFromJsonAsync<GetGroupResult>(response.Headers.Location,
             TestContext.Current.CancellationToken);
         group.ShouldNotBeNull();
+        group.Id.ShouldBe(groupId.Id);
         group.Name.ShouldBe(command.Name);
         group.Description.ShouldBe(command.Description);
     }
