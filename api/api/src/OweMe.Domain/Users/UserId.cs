@@ -1,26 +1,6 @@
-﻿namespace OweMe.Domain.Users;
+﻿using StronglyTypedIds;
 
-public readonly record struct UserId(Guid Id)
-{
-    public static UserId Empty => new(Guid.Empty);
+namespace OweMe.Domain.Users;
 
-    public override string ToString()
-    {
-        return Id.ToString();
-    }
-
-    public static implicit operator Guid(UserId userId)
-    {
-        return userId.Id;
-    }
-
-    public static implicit operator UserId(Guid id)
-    {
-        return new UserId(id);
-    }
-
-    public static UserId New()
-    {
-        return new UserId(Guid.NewGuid());
-    }
-}
+[StronglyTypedId(Template.Guid)]
+public partial struct UserId { }

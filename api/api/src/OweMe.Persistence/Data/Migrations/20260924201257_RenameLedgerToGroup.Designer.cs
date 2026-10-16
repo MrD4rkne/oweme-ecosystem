@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using OweMe.Persistence.Common;
 using OweMe.Persistence.Groups;
 
 #nullable disable
 
 namespace OweMe.Persistence.Data.Migrations
 {
-    [DbContext(typeof(GroupDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     [Migration("20260924201257_RenameLedgerToGroup")]
     partial class RenameLedgerToGroup
     {

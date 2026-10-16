@@ -2,7 +2,6 @@ using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
-using OweMe.Api;
 using OweMe.Application.Groups.Commands.Create;
 using OweMe.Application.Groups.Queries.Get;
 using OweMe.IntegrationTests.Authentication;
@@ -10,7 +9,7 @@ using Shouldly;
 
 namespace OweMe.IntegrationTests;
 
-public sealed class UserContextShouldBeDerivedFromTheRequest : IClassFixture<OweMeApi>
+public sealed class UserContextShouldBeDerivedFromTheRequest
 {
     private readonly WebApplicationFactory<Program> _api;
     private readonly DateTimeOffset _currentTime = DateTime.UtcNow;

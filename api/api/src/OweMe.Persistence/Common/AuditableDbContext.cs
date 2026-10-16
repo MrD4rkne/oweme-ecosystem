@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OweMe.Application;
 using OweMe.Domain.Common;
+using OweMe.Persistence.User;
 
 namespace OweMe.Persistence.Common;
 
@@ -27,7 +28,7 @@ public class AuditableDbContext : DbContext
         {
             modelBuilder.Entity(clrType)
                 .Property(nameof(AuditableEntity.CreatedBy))
-                .HasConversion(new UserIdConverter())
+                .HasConversion<UserIdConverter>()
                 .IsRequired();
 
             modelBuilder.Entity(clrType)
@@ -36,7 +37,7 @@ public class AuditableDbContext : DbContext
 
             modelBuilder.Entity(clrType)
                 .Property(nameof(AuditableEntity.UpdatedBy))
-                .HasConversion(new UserIdConverter())
+                .HasConversion<UserIdConverter>()
                 .IsRequired(false);
 
             modelBuilder.Entity(clrType)
