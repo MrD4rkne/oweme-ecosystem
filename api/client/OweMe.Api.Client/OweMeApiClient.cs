@@ -145,7 +145,7 @@ namespace OweMe.Api.Client
         /// </remarks>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Response> CreatePersonaAsync(CreatePersonaCommand body)
+        public virtual System.Threading.Tasks.Task<Response<PersonaCreated>> CreatePersonaAsync(CreatePersonaCommand body)
         {
             return CreatePersonaAsync(body, System.Threading.CancellationToken.None);
         }
@@ -156,7 +156,7 @@ namespace OweMe.Api.Client
         /// </remarks>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> CreatePersonaAsync(CreatePersonaCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<Response<PersonaCreated>> CreatePersonaAsync(CreatePersonaCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -172,6 +172,7 @@ namespace OweMe.Api.Client
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
@@ -203,7 +204,12 @@ namespace OweMe.Api.Client
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return new Response(status_, headers_);
+                            var objectResponse_ = await ReadObjectResponseAsync<PersonaCreated>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return new Response<PersonaCreated>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         if (status_ == 400)
@@ -358,7 +364,7 @@ namespace OweMe.Api.Client
         /// </remarks>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<Response> CreateGroupAsync(CreateGroupCommand body)
+        public virtual System.Threading.Tasks.Task<Response<GroupCreated>> CreateGroupAsync(CreateGroupCommand body)
         {
             return CreateGroupAsync(body, System.Threading.CancellationToken.None);
         }
@@ -369,7 +375,7 @@ namespace OweMe.Api.Client
         /// </remarks>
         /// <returns>Created</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<Response> CreateGroupAsync(CreateGroupCommand body, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<Response<GroupCreated>> CreateGroupAsync(CreateGroupCommand body, System.Threading.CancellationToken cancellationToken)
         {
             if (body == null)
                 throw new System.ArgumentNullException("body");
@@ -385,6 +391,7 @@ namespace OweMe.Api.Client
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
                     request_.Content = content_;
                     request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                 
@@ -416,7 +423,12 @@ namespace OweMe.Api.Client
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 201)
                         {
-                            return new Response(status_, headers_);
+                            var objectResponse_ = await ReadObjectResponseAsync<GroupCreated>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return new Response<GroupCreated>(status_, headers_, objectResponse_.Object);
                         }
                         else
                         if (status_ == 400)
@@ -730,6 +742,59 @@ namespace OweMe.Api.Client
 
         [Newtonsoft.Json.JsonProperty("updatedBy", Required = Newtonsoft.Json.Required.AllowNull)]
         public System.Guid? UpdatedBy { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class GroupCreated
+    {
+
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid Id { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PersonaCreated
+    {
+
+        [Newtonsoft.Json.JsonProperty("id", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public PersonaId Id { get; set; }
+
+        private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
+
+        [Newtonsoft.Json.JsonExtensionData]
+        public System.Collections.Generic.IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new System.Collections.Generic.Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class PersonaId
+    {
 
         private System.Collections.Generic.IDictionary<string, object> _additionalProperties;
 

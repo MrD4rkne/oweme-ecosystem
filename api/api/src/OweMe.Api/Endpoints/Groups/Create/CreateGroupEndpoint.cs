@@ -16,7 +16,7 @@ public sealed class CreateGroupEndpoint : IEndpoint
             .WithName("CreateGroup")
             .WithDescription("Create a new group that groups expenses and payments between users.")
             .WithTags(Tags.Group)
-            .Produces(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status201Created, typeof(CreateGroupCommandHandler.GroupCreated))
             .ProducesExtendedProblem(StatusCodes.Status400BadRequest)
             .WithStandardProblems()
             .RequireAuthorization(Constants.POLICY_API_SCOPE);
@@ -33,9 +33,9 @@ public sealed class CreateGroupEndpoint : IEndpoint
             Description = createGroupRequest.Description
         };
 
-        var group =
+        var groupCreated =
             await messageBus.InvokeAsync<CreateGroupCommandHandler.GroupCreated>(createGroupCommand,
                 cancellationToken);
-        return Results.Created($"/api/groups/{group.Id}", null);
+        return Results.Created($"/api/groups/{groupCreated.Id}", groupCreated);
     }
 }

@@ -5,7 +5,7 @@ namespace OweMe.Api.SmokeTests.Helpers;
 
 public static class CreateGroupHelper
 {
-    public static async Task<Guid> CreateGroup(OweMeApiClient client,
+    public static async Task<GroupCreated> CreateGroup(OweMeApiClient client,
         CreateGroupCommand createGroupRequest,
         CancellationToken cancellationToken = default)
     {
@@ -16,6 +16,7 @@ public static class CreateGroupHelper
         response.StatusCode.ShouldBe(201, "Expected status code 201 Created for successful group creation.");
         response.Headers.ShouldNotBeNull();
 
-        return response.Headers.GetLocationHeaderValue("/api/groups/", Guid.Parse);
+        response.Result.ShouldNotBeNull("Response result should not be null after successful group creation.");
+        return response.Result;
     }
 }
