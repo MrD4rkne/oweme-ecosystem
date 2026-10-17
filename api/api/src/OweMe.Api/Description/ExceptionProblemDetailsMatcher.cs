@@ -16,7 +16,6 @@ public sealed class ExceptionProblemDetailsMatcher(IProblemDetailsService proble
         {
             ValidationException validationException => EnrichWithException(validationException),
             NotFoundException notFoundException => EnrichWithException(notFoundException),
-            ForbiddenException forbiddenException => EnrichWithException(forbiddenException),
             BadHttpRequestException badHttpRequestException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
@@ -62,17 +61,6 @@ public sealed class ExceptionProblemDetailsMatcher(IProblemDetailsService proble
         {
             Status = StatusCodes.Status404NotFound,
             Title = "Resource not found",
-            Detail = exception.Message
-        };
-        return problemDetails;
-    }
-
-    private static ProblemDetails EnrichWithException(ForbiddenException exception)
-    {
-        var problemDetails = new ProblemDetails
-        {
-            Status = StatusCodes.Status403Forbidden,
-            Title = "Access forbidden",
             Detail = exception.Message
         };
         return problemDetails;

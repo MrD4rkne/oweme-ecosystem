@@ -97,33 +97,6 @@ public class ExceptionProblemDetailsMatcherTests
     }
 
     [Fact]
-    public async Task TryHandleAsync_WithForbiddenException_ShouldReturnCorrectProblemDetails()
-    {
-        // Arrange
-        var exception = new ForbiddenException("Access denied");
-        ProblemDetailsContext? capturedContext = null;
-
-        _mockProblemDetailsService
-            .Setup(x => x.TryWriteAsync(It.IsAny<ProblemDetailsContext>()))
-            .Callback<ProblemDetailsContext>(context => capturedContext = context)
-            .ReturnsAsync(true);
-
-        // Act
-        var result = await _matcher.TryHandleAsync(_httpContext, exception, CancellationToken.None);
-
-        // Assert
-        result.ShouldBeTrue();
-        capturedContext.ShouldNotBeNull();
-
-        var problemDetails = capturedContext.ProblemDetails;
-        problemDetails.ShouldNotBeNull();
-        problemDetails.Status.ShouldBe(StatusCodes.Status403Forbidden);
-        problemDetails.Title.ShouldBe("Access forbidden");
-        problemDetails.Detail.ShouldBe("Access denied");
-        _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status403Forbidden);
-    }
-
-    [Fact]
     public async Task TryHandleAsync_WithBadHttpRequestException_ShouldReturnCorrectProblemDetails()
     {
         // Arrange
