@@ -1,4 +1,4 @@
-﻿using OweMe.Domain.Groups;
+using OweMe.Domain.Groups;
 
 namespace OweMe.Application.Groups.Commands.Create;
 
@@ -17,10 +17,8 @@ public static class CreateGroupCommandHandler
 
         context.Groups.Add(group);
         _ = await context.SaveChangesAsync(cancellationToken);
-        return new GroupCreated(
-            group.Id.Value
-        );
+        return new GroupCreated(group.Id);
     }
 
-    public sealed record GroupCreated(Guid Id);
+    public sealed record GroupCreated(GroupId Id);
 }

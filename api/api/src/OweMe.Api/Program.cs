@@ -46,6 +46,7 @@ builder.Services.AddOpenApi(options =>
 {
     options.AddDocumentTransformer<OAuth2SecuritySchemeTransformer>();
     options.AddDocumentTransformer<ApiVersionOpenApiDocumentTransformer>();
+    options.AddSchemaTransformer<StronglyTypedIdSchemaTransformer>();
 });
 
 var identityOptions = builder.Services.AddOptions<IdentityServerOptions>()

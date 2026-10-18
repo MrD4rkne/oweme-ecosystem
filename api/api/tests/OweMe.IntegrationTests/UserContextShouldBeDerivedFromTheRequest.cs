@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Time.Testing;
 using OweMe.Application.Groups.Commands.Create;
 using OweMe.Application.Groups.Queries.Get;
+using OweMe.Domain.Users;
 using OweMe.IntegrationTests.Authentication;
 using Shouldly;
 
@@ -53,7 +54,7 @@ public sealed class UserContextShouldBeDerivedFromTheRequest
             await client.GetFromJsonAsync<GetGroupResult>(groupLocation, TestContext.Current.CancellationToken);
 
         createdGroup.ShouldNotBeNull();
-        createdGroup.CreatedBy.ShouldBe(user.Id);
+        createdGroup.CreatedBy.ShouldBe(new UserId(user.Id));
 
         // CreatedBy might lose precision when stored in the database, so we allow a small tolerance for the CreatedAt comparison.
         var tolerance = TimeSpan.FromSeconds(1);

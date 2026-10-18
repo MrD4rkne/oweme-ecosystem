@@ -1,4 +1,4 @@
-﻿using OweMe.Application.Groups.Queries.Get;
+using OweMe.Application.Groups.Queries.Get;
 using OweMe.Domain.Groups;
 using OweMe.Domain.Users;
 using Shouldly;
@@ -33,12 +33,12 @@ public class GetGroupResultTests
         var dto = GetGroupResult.FromDomain(group);
 
         // Assert
-        dto.Id.ShouldBe(group.Id.Value);
+        dto.Id.ShouldBe(group.Id);
         dto.Name.ShouldBe(group.Name);
         dto.Description.ShouldBe(group.Description);
         dto.CreatedAt.ShouldBe(group.CreatedAt);
         dto.UpdatedAt.ShouldBe(group.UpdatedAt);
-        dto.CreatedBy.ShouldBe(group.CreatedBy.Value);
-        dto.UpdatedBy.ShouldBe(group.UpdatedBy?.Value);
+        dto.CreatedBy.ShouldBe(group.CreatedBy);
+        dto.UpdatedBy.ShouldBe(group.UpdatedBy);
     }
 }
