@@ -15,4 +15,9 @@ public sealed class Group : AuditableEntity
     {
         return CreatedBy == userId;
     }
+
+    public bool CanUserEdit(UserId userId)
+    {
+        return CreatedBy == userId;
+    }
 }

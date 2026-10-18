@@ -7,5 +7,7 @@ public interface IGroupContext
 {
     DbSet<Group> Groups { get; }
 
+    DbSet<GroupMember> GroupMembers { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }
