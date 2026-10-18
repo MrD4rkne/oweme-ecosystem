@@ -21,6 +21,8 @@ public class ApplicationDbContext(
 
     public DbSet<Group> Groups { get; set; }
 
+    public DbSet<GroupMember> GroupMembers { get; set; }
+
     public DbSet<Persona> Personas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

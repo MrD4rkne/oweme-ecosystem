@@ -103,6 +103,19 @@ namespace OweMe.Persistence.Groups.Migrations
                     b.ToTable("Groups");
                 });
 
+            modelBuilder.Entity("OweMe.Domain.Groups.GroupMember", b =>
+                {
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PersonaId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("GroupId", "PersonaId");
+
+                    b.ToTable("GroupMembers");
+                });
+
             modelBuilder.Entity("OweMe.Domain.Users.Persona", b =>
                 {
                     b.Property<Guid>("Id")
