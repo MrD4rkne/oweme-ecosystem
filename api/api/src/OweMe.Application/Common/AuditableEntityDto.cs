@@ -1,3 +1,9 @@
-﻿namespace OweMe.Application.Common;
+using OweMe.Domain.Users;
 
-public record AuditableEntityDto(DateTimeOffset CreatedAt, DateTimeOffset? UpdatedAt, Guid CreatedBy, Guid? UpdatedBy);
+namespace OweMe.Application.Common;
+
+public record AuditableEntityDto(
+    DateTimeOffset CreatedAt,
+    DateTimeOffset? UpdatedAt,
+    UserId CreatedBy,
+    UserId? UpdatedBy);

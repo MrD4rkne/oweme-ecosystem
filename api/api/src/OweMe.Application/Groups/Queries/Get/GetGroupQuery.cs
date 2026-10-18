@@ -1,3 +1,5 @@
-﻿namespace OweMe.Application.Groups.Queries.Get;
+﻿using OweMe.Domain.Groups;
 
-public record GetGroupQuery(Guid Id);
+namespace OweMe.Application.Groups.Queries.Get;
+
+public record GetGroupQuery(GroupId Id);

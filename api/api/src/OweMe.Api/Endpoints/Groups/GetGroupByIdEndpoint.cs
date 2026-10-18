@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using OweMe.Api.Description;
 using OweMe.Api.Identity;
 using OweMe.Application.Groups.Queries.Get;
+using OweMe.Domain.Groups;
 using Wolverine;
 
 namespace OweMe.Api.Endpoints.Groups;
@@ -23,7 +24,7 @@ public sealed class GetGroupByIdEndpoint : IEndpoint
     }
 
     public static async Task<IResult> GetGroup(
-        [FromRoute] Guid groupId,
+        [FromRoute] GroupId groupId,
         IMessageBus messageBus)
     {
         var query = new GetGroupQuery(groupId);
