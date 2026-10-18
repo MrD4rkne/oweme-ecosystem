@@ -5,7 +5,7 @@ using OweMe.Api.Identity;
 using OweMe.Application.Groups.Queries.Get;
 using Wolverine;
 
-namespace OweMe.Api.Endpoints.Groups.Get;
+namespace OweMe.Api.Endpoints.Groups;
 
 public sealed class GetGroupByIdEndpoint : IEndpoint
 {
