@@ -48,5 +48,6 @@
     </ItemGroup>
     <ItemGroup>
         <InternalsVisibleTo Include="OweMe.Api.Tests"/>
+        <InternalsVisibleTo Include="OweMe.IntegrationTests"/>
     </ItemGroup>
 </Project>

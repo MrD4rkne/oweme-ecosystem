@@ -44,5 +44,5 @@ internal sealed class AddMemberEndpoint : IEndpoint
         };
     }
 
-    private sealed record AddGroupMemberRequest(PersonaId PersonaId);
+    internal sealed record AddGroupMemberRequest(PersonaId PersonaId);
 }
