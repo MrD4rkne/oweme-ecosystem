@@ -1,3 +1,4 @@
+using EntityFramework.Exceptions.Common;
 using Microsoft.EntityFrameworkCore;
 using OweMe.Application.Personas;
 using OweMe.Domain.Groups;
@@ -11,7 +12,7 @@ public static class AddGroupMemberCommandHandler
         GroupNotFound,
         UserNotAuthorized,
         PersonaNotFound,
-        MemberAdded
+        MemberAdded,
     }
 
     public static async Task<AddGroupMemberResult> Handle(AddGroupMemberCommand message,
@@ -48,9 +49,9 @@ public static class AddGroupMemberCommandHandler
         {
             _ = await context.SaveChangesAsync(cancellationToken);
         }
-        catch (DbUpdateException)
+        catch (UniqueConstraintException)
         {
-            // Handle the case where the member already exists in the group
+            // The member is already in the group; adding is idempotent.
             return AddGroupMemberResult.MemberAdded;
         }
 

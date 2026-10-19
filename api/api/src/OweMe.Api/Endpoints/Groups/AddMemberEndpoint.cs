@@ -21,6 +21,7 @@ internal sealed class AddMemberEndpoint : IEndpoint
             .Produces(StatusCodes.Status200OK)
             .ProducesExtendedProblem(StatusCodes.Status400BadRequest)
             .ProducesExtendedProblem(StatusCodes.Status404NotFound)
+            .ProducesExtendedProblem(StatusCodes.Status403Forbidden)
             .WithStandardProblems()
             .RequireAuthorization(Constants.POLICY_API_SCOPE);
     }
