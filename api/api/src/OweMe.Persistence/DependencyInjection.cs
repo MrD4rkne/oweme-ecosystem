@@ -36,7 +36,10 @@ public static class DependencyInjection
         {
             var dbOptions = serviceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(dbOptions.ConnectionString).UseExceptionProcessor();
-            options.EnableSensitiveDataLogging();
+            if (serviceProvider.GetRequiredService<IHostEnvironment>().IsDevelopment())
+            {
+                options.EnableSensitiveDataLogging();
+            }
         });
         return services;
     }
