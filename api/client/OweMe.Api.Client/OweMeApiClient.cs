@@ -254,7 +254,7 @@ namespace OweMe.Api.Client
         /// <remarks>
         /// Add a member to a group.
         /// </remarks>
-        /// <returns>OK</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<Response> AddMemberAsync(System.Guid groupId, AddGroupMemberRequest body)
         {
@@ -265,7 +265,7 @@ namespace OweMe.Api.Client
         /// <remarks>
         /// Add a member to a group.
         /// </remarks>
-        /// <returns>OK</returns>
+        /// <returns>No Content</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         public virtual async System.Threading.Tasks.Task<Response> AddMemberAsync(System.Guid groupId, AddGroupMemberRequest body, System.Threading.CancellationToken cancellationToken)
         {
@@ -317,7 +317,7 @@ namespace OweMe.Api.Client
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 200)
+                        if (status_ == 204)
                         {
                             return new Response(status_, headers_);
                         }

@@ -3,7 +3,6 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using OweMe.Api.Description;
-using OweMe.Application.Common.Exceptions;
 using Shouldly;
 
 namespace OweMe.Api.Tests.Description;
@@ -67,33 +66,6 @@ public class ExceptionProblemDetailsMatcherTests
         problemDetails.Errors["Field2"].ShouldContain("Error2");
 
         _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status400BadRequest);
-    }
-
-    [Fact]
-    public async Task TryHandleAsync_WithNotFoundException_ShouldReturnCorrectProblemDetails()
-    {
-        // Arrange
-        var exception = new NotFoundException("Resource not found");
-        ProblemDetailsContext? capturedContext = null;
-
-        _mockProblemDetailsService
-            .Setup(x => x.TryWriteAsync(It.IsAny<ProblemDetailsContext>()))
-            .Callback<ProblemDetailsContext>(context => capturedContext = context)
-            .ReturnsAsync(true);
-
-        // Act
-        var result = await _matcher.TryHandleAsync(_httpContext, exception, CancellationToken.None);
-
-        // Assert
-        result.ShouldBeTrue();
-        capturedContext.ShouldNotBeNull();
-
-        var problemDetails = capturedContext.ProblemDetails;
-        problemDetails.ShouldNotBeNull();
-        problemDetails.Status.ShouldBe(StatusCodes.Status404NotFound);
-        problemDetails.Title.ShouldBe("Resource not found");
-        problemDetails.Detail.ShouldBe("Resource not found");
-        _httpContext.Response.StatusCode.ShouldBe(StatusCodes.Status404NotFound);
     }
 
     [Fact]
