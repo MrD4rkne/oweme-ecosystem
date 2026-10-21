@@ -2,9 +2,9 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'auth'
+  - job_name: 'keycloak'
     static_configs:
-      - targets: ['auth:8080']
+      - targets: ['keycloak:9000']
 
   - job_name: 'api'
     static_configs:
