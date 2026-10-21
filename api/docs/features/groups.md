@@ -17,7 +17,7 @@
 |---|---|---|---|
 | POST | /api/groups | 201 | 400 |
 | GET | /api/groups/{id} | 200 | 404 (also when not the creator) |
-| POST | /api/groups/{id}/members | 204 | 404 group or persona |
+| POST | /api/groups/{id}/members | 204 | 403 not allowed to edit, 404 group or persona |
 
 ## Open questions
 - Should members be able to see the group?

@@ -18,7 +18,7 @@ internal sealed class AddMemberEndpoint : IEndpoint
             .WithName("AddMember")
             .WithDescription("Add a member to a group.")
             .WithTags(Tags.Group)
-            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent)
             .ProducesExtendedProblem(StatusCodes.Status400BadRequest)
             .ProducesExtendedProblem(StatusCodes.Status404NotFound)
             .ProducesExtendedProblem(StatusCodes.Status403Forbidden)
@@ -34,11 +34,18 @@ internal sealed class AddMemberEndpoint : IEndpoint
         var addMemberCommand = new AddGroupMemberCommand(groupId, addMemberRequest.PersonaId);
         return await messageBus.InvokeAsync<AddGroupMemberCommandHandler.AddGroupMemberResult>(addMemberCommand) switch
         {
-            AddGroupMemberCommandHandler.AddGroupMemberResult.GroupNotFound => Results.NotFound(new
-                { Message = "Group not found or non accessible." }),
-            AddGroupMemberCommandHandler.AddGroupMemberResult.UserNotAuthorized => Results.Forbid(),
-            AddGroupMemberCommandHandler.AddGroupMemberResult.PersonaNotFound => Results.NotFound(new
-                { Message = "Persona not found." }),
+            AddGroupMemberCommandHandler.AddGroupMemberResult.GroupNotFound => Results.Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Resource not found",
+                detail: "Group not found or non accessible."),
+            AddGroupMemberCommandHandler.AddGroupMemberResult.UserNotAuthorized => Results.Problem(
+                statusCode: StatusCodes.Status403Forbidden,
+                title: "Forbidden",
+                detail: "Only the group owner can add members."),
+            AddGroupMemberCommandHandler.AddGroupMemberResult.PersonaNotFound => Results.Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Resource not found",
+                detail: "Persona not found."),
             AddGroupMemberCommandHandler.AddGroupMemberResult.MemberAdded => Results.NoContent(),
             _ => throw new ArgumentOutOfRangeException(nameof(addMemberCommand),
                 "Unexpected result for adding member to group.")

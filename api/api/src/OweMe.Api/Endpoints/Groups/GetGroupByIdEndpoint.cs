@@ -28,7 +28,12 @@ public sealed class GetGroupByIdEndpoint : IEndpoint
         IMessageBus messageBus)
     {
         var query = new GetGroupQuery(groupId);
-        var group = await messageBus.InvokeAsync<GetGroupResult>(query);
-        return Results.Ok(group);
+        var group = await messageBus.InvokeAsync<GetGroupResult?>(query);
+        return group is null
+            ? Results.Problem(
+                statusCode: StatusCodes.Status404NotFound,
+                title: "Resource not found",
+                detail: "Group not found or non accessible.")
+            : Results.Ok(group);
     }
 }

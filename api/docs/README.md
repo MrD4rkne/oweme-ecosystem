@@ -15,5 +15,8 @@ The API does not own users. It reads `sub` as `UserId` and `email` from the JWT.
 ### Strongly typed ids (2026-10)
 Every entity id is a `[StronglyTypedId]` Guid struct, bound directly from route and body. Known cost: the generated NSwag client sees plain `Guid`.
 
-### How handlers report outcomes (2026-10, commit b031eb9)
-Commands return a result enum and the endpoint maps it to a status code.
+### How handlers report outcomes (2026-10)
+Rule: expected outcomes (not found, not allowed) are results; broken invariants and infrastructure failures throw.
+
+- Commands return a result enum and the endpoint maps it to a status code. Failures are written with `Results.Problem` so every error body is problem+json. 
+- Known cost: an enum carries no payload and `null` carries no reason. When an operation needs both a payload and several distinct failures, switch to a union-style result (OneOf, ErrorOr).

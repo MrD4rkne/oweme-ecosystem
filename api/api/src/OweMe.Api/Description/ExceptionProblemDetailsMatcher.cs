@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using OweMe.Application.Common.Exceptions;
 
 namespace OweMe.Api.Description;
 
@@ -15,7 +14,6 @@ public sealed class ExceptionProblemDetailsMatcher(IProblemDetailsService proble
         var problemDetails = exception switch
         {
             ValidationException validationException => EnrichWithException(validationException),
-            NotFoundException notFoundException => EnrichWithException(notFoundException),
             BadHttpRequestException badHttpRequestException => new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
@@ -53,16 +51,5 @@ public sealed class ExceptionProblemDetailsMatcher(IProblemDetailsService proble
                     group => group.Key,
                     group => group.Select(error => error.ErrorMessage).ToArray())
         };
-    }
-
-    private static ProblemDetails EnrichWithException(NotFoundException exception)
-    {
-        var problemDetails = new ProblemDetails
-        {
-            Status = StatusCodes.Status404NotFound,
-            Title = "Resource not found",
-            Detail = exception.Message
-        };
-        return problemDetails;
     }
 }

@@ -9,7 +9,8 @@ public static class AddGroupMemberCommandHandler
 {
     public enum AddGroupMemberResult
     {
-        GroupNotFound,
+        // Start at 1 so default(AddGroupMemberResult) is not a valid outcome.
+        GroupNotFound = 1,
         UserNotAuthorized,
         PersonaNotFound,
         MemberAdded,
