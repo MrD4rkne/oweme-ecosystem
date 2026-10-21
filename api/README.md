@@ -21,10 +21,4 @@ client/                    # NSwag-generated API client
 
 ## Run locally
 
-Needs the .NET 10 SDK and Docker.
-
-```bash
-git clone https://github.com/MrD4rkne/oweme-ecosystem/
-cd oweme-ecosystem/api
-docker compose -f compose.yaml -f compose.override.yaml up --build
-```
+See [the root README](../README.md): Aspire AppHost or Docker compose.

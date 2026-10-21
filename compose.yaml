@@ -1,6 +1,82 @@
 name: oweme-system
-include:
-  - path: ./auth/compose.yaml
-    project_directory: .
-  - path: ./api/compose.yaml
-    project_directory: .
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/api/src/OweMe.Api/Dockerfile
+    container_name: oweme.api
+    ports:
+      - "5000:8080"
+      - "5001:8081"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      Database__ConnectionString: Server=api-database;Database=OweMe.Api;Username=sa;Password=Password123;TrustServerCertificate=True;
+      Database__RunMigrations: true
+      IdentityServer__Authority: http://localhost:8080/realms/oweme-dev
+      IdentityServer__MetadataAddress: http://keycloak:8080/realms/oweme-dev/.well-known/openid-configuration
+      IdentityServer__ValidateAudience: false
+      IdentityServer__RequireHttpsMetadata: false
+      Logging__LogLevel__Microsoft.AspNetCore.Authentication: Debug
+      Logging__LogLevel__Microsoft.IdentityModel: Debug
+    depends_on:
+      api-database:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/healthz" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-database:
+    image: postgres:15.3
+    ports:
+      - "5442:5432"
+    environment:
+      POSTGRES_DB: OweMe.Api
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: Password123
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  keycloak:
+    image: keycloak/keycloak:26.4
+    command: start-dev --import-realm
+    environment:
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-database:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    volumes:
+      - ./auth/realms:/opt/keycloak/data/import
+    depends_on:
+      keycloak-database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3; grep -q '200 OK' <&3"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  keycloak-database:
+    image: postgres:15.3
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5

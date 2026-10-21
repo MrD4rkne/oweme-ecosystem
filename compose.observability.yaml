@@ -1,0 +1,24 @@
+# Opt-in: docker compose -f compose.yaml -f compose.observability.yaml up
+services:
+  api:
+    environment:
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://seq:5341/ingest/otlp
+      OTEL_EXPORTER_OTLP_PROTOCOL: http/protobuf
+      OTEL_SERVICE_NAME: oweme.api
+    depends_on:
+      seq:
+        condition: service_started
+
+  seq:
+    image: datalust/seq:2025.2
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "true"
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    volumes:
+      - seq-data:/data
+
+volumes:
+  seq-data:

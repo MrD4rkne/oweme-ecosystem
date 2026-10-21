@@ -6,13 +6,23 @@ Manage your debts and credits with ease. OweMe is a simple and intuitive applica
 
 ## How to run it
 
-### Docker compose
+Both options need Docker.
+
+### Aspire (dev loop: dashboard, logs, traces)
 
 ```bash
-git clone https://github.com/MrD4rkne/oweme-ecosystem.git
-cd oweme-ecosystem
-docker compose up
+dotnet run --project api/aspire/OweMe.AppHost
 ```
+
+### Docker compose (builds the API from source)
+
+```bash
+docker compose up --build
+# with logs and traces in Seq (http://localhost:8081):
+docker compose -f compose.yaml -f compose.observability.yaml up --build
+```
+
+API: http://localhost:5000, Keycloak: http://localhost:8080 (realm `oweme-dev`, user `apiuser` / `Password123!`).
 
 ## API
 
@@ -20,7 +30,7 @@ API part of the system, you can find more information in the [API readme](./api/
 
 ## Identity
 
-Keycloak, see [auth/compose.yaml](./auth/compose.yaml). The dev realm is imported from `auth/realms/dev.json`.
+Keycloak, configured in `compose.yaml`. The dev realm is imported from `auth/realms/dev.json`.
 
 ## License
 
