@@ -1,0 +1,2 @@
+M:Microsoft.AspNetCore.Http.Results.Forbid(Microsoft.AspNetCore.Authentication.AuthenticationProperties,System.Collections.Generic.IList{System.String});Use Results.Problem(statusCode: 403, ...) so the 403 body is problem+json.
+M:Microsoft.AspNetCore.Http.TypedResults.Forbid(Microsoft.AspNetCore.Authentication.AuthenticationProperties,System.Collections.Generic.IList{System.String});Use TypedResults.Problem(statusCode: 403, ...) so the 403 body is problem+json.
