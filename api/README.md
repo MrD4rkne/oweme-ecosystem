@@ -1,52 +1,24 @@
-# OweMe API Documentation
+# OweMe API
 
-## Overview
+.NET web API. Specs and decisions live in [docs/](./docs/README.md).
 
-OweMe API is a .NET-based web API built with Clean Architecture principles. The application manages financial tracking
-and group operations with a focus on maintainability, testability, and scalability.
-
-## Project Structure
-
-The solution follows Clean Architecture patterns with clear separation of concerns:
+## Projects
 
 ```text
-OweMe.Api/
-├── api/src/                    # Main application source code
-│   ├── OweMe.Api/             # 🎯 Presentation Layer - Web API endpoints
-│   ├── OweMe.Application/     # 📋 Application Layer - Business logic & use cases
-│   ├── OweMe.Domain/          # 🏛️ Domain Layer - Core business entities
-│   ├── OweMe.Infrastructure/  # 🔧 Infrastructure Layer - External concerns
-│   └── OweMe.Persistence/     # 💾 Data Access Layer - Database operations
-├── api/tests/                 # Test projects
-├── client/                    # Client-side code generation
-└── docs/                      # Documentation
+api/src/
+├── OweMe.Api/             # endpoints
+├── OweMe.Application/     # commands, queries, handlers, validation
+├── OweMe.Domain/          # entities
+├── OweMe.Infrastructure/  # external services (empty so far)
+└── OweMe.Persistence/     # EF Core, PostgreSQL, migrations
+api/tests/                 # unit, integration (Testcontainers), smoke
+client/                    # NSwag-generated API client
 ```
 
-## Technologies
+## Stack
 
-- **.NET 9.0**: Core framework for building the API.
-- **PostgreSQL**: Database for data persistence.
-- **Docker**: Containerization for development and deployment.
-- **GitHub Actions**: CI/CD pipeline for automated builds and tests.
-- **OpenApi 3.0, Scalar, NSWag**: API documentation and client code generation.
-- **Wolverine**: as mediator (and in the future as messaging framework).
+.NET 10, PostgreSQL, Wolverine (mediator), FluentValidation, OpenAPI + Scalar + NSwag, Docker, GitHub Actions.
 
-## Development
+## Run locally
 
-### Prerequisites
-
-- .NET 9.0 SDK
-- Docker (for local development)
-- PostgreSQL (via Docker Compose)
-- Images of relevant services (f.e. owe-me-identityserver)
-
-### Local Setup
-
-```bash
-# Clone and navigate the ecosystem
-git clone https://github.com/MrD4rkne/oweme-ecosystem/
-cd api
-
-# Start
-docker compose -f compose.yaml -f compose.override.yaml up --build
-```
+See [the root README](../README.md): Aspire AppHost or Docker compose.

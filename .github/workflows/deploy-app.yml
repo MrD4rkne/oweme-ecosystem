@@ -9,7 +9,7 @@ on:
       app_name:
         required: true
         type: string
-        description: 'Must match a name in ansible/vars.yml apps: list'
+        description: 'Compose service to redeploy, e.g. api (passed to Ansible as target_app)'
       image_tag:
         required: true
         type: string

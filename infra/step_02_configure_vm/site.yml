@@ -3,10 +3,10 @@
 #
 # USAGE:
 #   Full provision (first run, or after changing base packages/firewall):
-#     ansible-playbook site.yml -i inventory/hosts.ini --vault-password-file .vault_pass
+#     ansible-playbook site.yml -i inventory/staging/hosts.ini --vault-password-file .vault_pass
 #
 #   Fast path — redeploy app(s) only, e.g. after a GHCR push (used by CI):
-#     ansible-playbook site.yml -i inventory/hosts.ini --tags deploy \
+#     ansible-playbook site.yml -i inventory/staging/hosts.ini --tags deploy \
 #       --vault-password-file .vault_pass \
 #       -e "image_tag=1.2.3" -e "target_app=api"
 #
