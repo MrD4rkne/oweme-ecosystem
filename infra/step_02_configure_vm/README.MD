@@ -1,7 +1,9 @@
-# Step 2
+# Step 2: configure VM
+
+Inventories live in `inventory/staging` and `inventory/production`; secrets in each `vars/<env>/vault.yml`.
 
 ```bash
-ansible-playbook -i "<VM IP>," setup-vm.yml -u ubuntu --private-key <PATH TO PRIVATE KEY> -e "letsencrypt_email=your-real-email@example.com"
+ansible-playbook site.yml -i inventory/staging/hosts.ini --vault-password-file .vault_pass
 ```
 
-ansible-playbook -i "144.24.172.101," setup-vm.yml -u ubuntu --private-key ~/.ssh/oweme-api-vm -e "letsencrypt_email=marcinsz.pv@gmail.com"
+Deploy only (what CI runs): add `--tags deploy -e image_tag=<tag> -e target_app=api`.

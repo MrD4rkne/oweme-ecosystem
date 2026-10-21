@@ -18,9 +18,9 @@ docker compose up
 
 API part of the system, you can find more information in the [API readme](./api/README.md).
 
-## Identity server
+## Identity
 
-Authentication service for the system, you can find more information in the [Identity server readme](./auth/README.md).
+Keycloak, see [auth/compose.yaml](./auth/compose.yaml). The dev realm is imported from `auth/realms/dev.json`.
 
 ## License
 

@@ -1,41 +1,35 @@
 ```mermaid
 erDiagram
-    USER ||--o{ PERSONA: "owns"
     PERSONA ||--o{ GROUP_MEMBER: "joins"
     GROUP ||--o{ GROUP_MEMBER: "has member"
     GROUP ||--o{ EXPENSE: "contains"
-    PERSONA ||--o{ EXPENSE: "pays"
     EXPENSE ||--o{ EXPENSE_SPLIT: "splits into"
     PERSONA ||--o{ EXPENSE_SPLIT: "owes on"
 
-    USER {
-        uuid id PK
-        string email UK
-    }
     PERSONA {
         uuid id PK
-        uuid user_id FK "nullable, unclaimed if null"
-        string display_name
+        uuid user_id "nullable Keycloak subject, unclaimed if null"
+        string name
     }
     GROUP {
         uuid id PK
         string name
-        uuid created_by FK
+        string description "nullable"
     }
     GROUP_MEMBER {
-        uuid group_id FK
-        uuid persona_id FK
-        datetime joined_at
+        uuid group_id PK
+        uuid persona_id PK
     }
     EXPENSE {
         uuid id PK
-        uuid group_id FK "nullable"
-        string description
+        uuid group_id FK
+        string name
     }
     EXPENSE_SPLIT {
-        uuid id PK
-        uuid expense_id FK
-        uuid persona_id FK
-        decimal amount_owed
+        uuid expense_id PK,FK
+        uuid persona_id PK,FK
+        double amount
     }
 ```
+
+There is no users table; `user_id` is the Keycloak `sub`. GROUP, PERSONA and EXPENSE also carry `created_by`, `created_at`, `updated_by`, `updated_at`.
