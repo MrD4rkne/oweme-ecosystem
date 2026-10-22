@@ -20,6 +20,7 @@ WORKDIR /repo
 COPY version.json ./
 COPY api/version.json ./api/
 COPY api/Directory.Build.props ./
+COPY api/BannedSymbols.txt ./
 COPY api/Directory.Packages.props ./
 COPY api/OweMe.Api.slnx ./api/
 
