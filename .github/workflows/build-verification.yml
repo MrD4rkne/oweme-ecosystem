@@ -15,3 +15,33 @@ jobs:
     name: Verify API
     uses: ./.github/workflows/build-api.yml
     secrets: inherit
+
+  verify-api-image:
+    name: Verify API image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # nbgv needs history; Dockerfile bind-mounts .git
+
+      # Job-level filter (not workflow-level paths:) so the required check still reports on unrelated PRs.
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            api:
+              - 'api/**'
+              - 'version.json'
+              - '.dockerignore'
+
+      - uses: docker/setup-buildx-action@v4
+        if: steps.changes.outputs.api == 'true'
+
+      - name: Build image (no push)
+        if: steps.changes.outputs.api == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: api/api/src/OweMe.Api/Dockerfile
+          push: false
+          cache-from: type=gha
