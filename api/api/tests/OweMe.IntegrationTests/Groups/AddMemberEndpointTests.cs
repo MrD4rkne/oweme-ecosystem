@@ -108,6 +108,22 @@ public sealed class AddMemberEndpointTests(OweMeApi api, ITestOutputHelper outpu
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
+    [Fact]
+    public async Task For_EmptyPersonaId_Should_ReturnBadRequest()
+    {
+        // Arrange
+        var client = _api.CreateClient().AsUser(new TestUser());
+        var groupId = await CreateGroup(client);
+
+        // Act
+        var response = await client.PostAsJsonAsync($"/api/groups/{groupId}/members",
+            new AddMemberEndpoint.AddGroupMemberRequest(PersonaId.Empty),
+            TestContext.Current.CancellationToken);
+
+        // Assert
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+    }
+
     private static async Task<GroupId> CreateGroup(HttpClient client)
     {
         var response = await client.PostAsJsonAsync("/api/groups", new CreateGroupCommand { Name = "Test Group" },
