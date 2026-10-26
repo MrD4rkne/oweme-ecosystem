@@ -32,6 +32,13 @@ API part of the system, you can find more information in the [API readme](./api/
 
 Keycloak, configured in `compose.yaml`. The dev realm is imported from `auth/realms/dev.json`.
 
+## Dependency updates
+
+Dependabot (`.github/dependabot.yml`) opens weekly NuGet PRs in two groups, `nuget-patch` and `nuget-minor`, with a 3-day cooldown on new releases.
+`.github/workflows/dependabot-auto-merge.yml` enables auto-merge for any group named `nuget-*`; it merges once the required checks on `main` pass.
+Major NuGet bumps and GitHub Actions PRs are not grouped and need a manual merge.
+Smoke tests are not part of CI, so Keycloak/JWT regressions are not caught before an auto-merge.
+
 ## License
 
 See [License file](./LICENSE)
