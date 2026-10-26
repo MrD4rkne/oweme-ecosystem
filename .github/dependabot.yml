@@ -11,12 +11,18 @@ updates:
     commit-message:
       prefix: "nuget"
     groups:
-      nuget-patch:
+      nuget-efcore:
+        patterns: ["Microsoft.EntityFrameworkCore*", "Npgsql.EntityFrameworkCore*"]
+        update-types: ["minor", "patch"]
+      nuget-aspire:
+        patterns: ["Aspire.*", "CommunityToolkit.Aspire.*"]
+        update-types: ["minor", "patch"]
+      nuget-microsoft:
+        patterns: ["Microsoft.*", "System.*"]
+        update-types: ["minor", "patch"]
+      nuget-other:
         patterns: ["*"]
-        update-types: ["patch"]
-      nuget-minor:
-        patterns: ["*"]
-        update-types: ["minor"]
+        update-types: ["minor", "patch"]
 
   # GitHub Actions Updates
   - package-ecosystem: "github-actions"
