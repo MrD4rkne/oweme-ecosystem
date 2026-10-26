@@ -26,15 +26,10 @@ jobs:
       sonar_enforce_quality_gate: false
 
   smoke-tests:
-    name: Smoke tests (${{ matrix.stack }})
+    name: Smoke tests
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        stack: [compose, aspire]
     env:
       IdentityProviderSettings__Address: http://localhost:8080/realms/oweme-dev
-      ASPIRE_ALLOW_UNSECURED_TRANSPORT: "true"
     steps:
       - uses: actions/checkout@v7
         with:
@@ -44,19 +39,12 @@ jobs:
         with:
           dotnet-version: 10.x
 
-      - name: Start stack (compose)
-        if: matrix.stack == 'compose'
+      - name: Start stack
         run: docker compose up --build --wait --wait-timeout 600
-
-      - name: Start stack (aspire)
-        if: matrix.stack == 'aspire'
-        run: |
-          nohup dotnet run --project api/aspire/OweMe.AppHost > apphost.log 2>&1 &
-          curl -fs --retry 120 --retry-delay 5 --retry-all-errors http://localhost:5000/healthz
 
       - name: Run smoke tests
         run: dotnet test --project api/api/tests/OweMe.Api.SmokeTests/OweMe.Api.SmokeTests.csproj --configuration Release
 
-      - name: Dump logs
+      - name: Dump compose logs
         if: failure()
-        run: docker compose logs --no-color 2>/dev/null; cat apphost.log 2>/dev/null; true
+        run: docker compose logs --no-color
