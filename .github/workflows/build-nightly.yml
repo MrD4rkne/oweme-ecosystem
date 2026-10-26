@@ -54,11 +54,11 @@ jobs:
           nohup dotnet run --project api/aspire/OweMe.AppHost --launch-profile http > apphost.log 2>&1 &
           pid=$!
           for _ in $(seq 120); do
-            curl -fs http://localhost:5000/healthz && exit 0
+            curl -fsS -o /dev/null http://localhost:5000/healthz && curl -fsS -o /dev/null "$IdentityProviderSettings__Address/.well-known/openid-configuration" && exit 0
             kill -0 $pid 2>/dev/null || { echo "AppHost exited"; exit 1; }
             sleep 5
           done
-          echo "API not healthy after 10 minutes"; exit 1
+          echo "API or Keycloak not ready after 10 minutes"; exit 1
 
       - name: Run smoke tests
         run: dotnet test --project api/api/tests/OweMe.Api.SmokeTests/OweMe.Api.SmokeTests.csproj --configuration Release
