@@ -37,7 +37,7 @@ Keycloak, configured in `compose.yaml`. The dev realm is imported from `auth/rea
 Dependabot (`.github/dependabot.yml`) opens weekly NuGet PRs in two groups, `nuget-patch` and `nuget-minor`, with a 3-day cooldown on new releases.
 `.github/workflows/dependabot-auto-merge.yml` enables auto-merge for any group named `nuget-*`; it merges once the required checks on `main` pass.
 Major NuGet bumps and GitHub Actions PRs are not grouped and need a manual merge.
-Smoke tests are not part of CI, so Keycloak/JWT regressions are not caught before an auto-merge.
+Smoke tests are not part of PR CI; the nightly workflow runs them against both `docker compose` and the Aspire AppHost, so Keycloak/JWT regressions from an auto-merge show up the next day.
 
 ## License
 
