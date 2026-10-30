@@ -15,12 +15,6 @@ on:
       - ".github/workflows/configure-all.yml"
       - ".github/workflows/reusable-configure-vm.yml"
       - "infra/step_02_configure_vm/**"
-  pull_request:
-    branches: [main]
-    paths:
-      - ".github/workflows/configure-all.yml"
-      - ".github/workflows/reusable-configure-vm.yml"
-      - "infra/step_02_configure_vm/**"
   workflow_call:
 
 permissions:

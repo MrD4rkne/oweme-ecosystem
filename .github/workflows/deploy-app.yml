@@ -17,12 +17,14 @@ on:
 permissions:
   contents: read
   deployments: write
-  packages: write
 jobs:
   deploy:
     name: Deploy ${{ inputs.app_name }} — ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment_name }}
+    concurrency:
+      group: deploy-${{ inputs.environment_name }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v7
 

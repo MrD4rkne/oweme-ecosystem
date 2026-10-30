@@ -22,7 +22,7 @@ jobs:
     name: Run Ansible (full provision) — ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
     concurrency:
-      group: deploy-${{ inputs.environment_name }}-${{ github.ref }}
+      group: deploy-${{ inputs.environment_name }}
       cancel-in-progress: false
     environment: ${{ inputs.environment_name }}
     steps:

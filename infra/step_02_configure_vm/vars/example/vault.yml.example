@@ -7,5 +7,11 @@
 vault_ghcr_username: "ghcr_username"
 vault_ghcr_token: "ghcr_token_for_dowloading_image"   # PAT with read:packages scope
 
-vault_auth_db_password: "your_auth_db_password"
 vault_api_db_password: "your_api_db_password"
+
+vault_keycloak_admin_user: "keycloak_admin_user"
+vault_keycloak_admin_password: "keycloak_admin_password"
+vault_keycloak_db_password: "your_keycloak_db_password"
+
+vault_grafana_admin_password: "grafana_admin_password"
+vault_crowdsec_bouncer_key: "crowdsec_bouncer_key"
