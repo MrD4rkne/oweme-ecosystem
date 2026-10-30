@@ -17,7 +17,6 @@ public class MigrationHostedService(
         logger.LogDebug("Starting database migration service");
         using var scope = serviceProvider.CreateScope();
         var dbOptions = scope.ServiceProvider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-        logger.LogDebug("Database options: {@DbOptions}", dbOptions);
         if (!dbOptions.RunMigrations)
         {
             logger.LogInformation("Database migrations are disabled");
