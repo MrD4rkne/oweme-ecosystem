@@ -17,8 +17,8 @@ erDiagram
         string description "nullable"
     }
     GROUP_MEMBER {
-        uuid group_id PK
-        uuid persona_id PK
+        uuid group_id PK,FK "cascade on group delete"
+        uuid persona_id PK,FK "restrict on persona delete"
     }
     EXPENSE {
         uuid id PK

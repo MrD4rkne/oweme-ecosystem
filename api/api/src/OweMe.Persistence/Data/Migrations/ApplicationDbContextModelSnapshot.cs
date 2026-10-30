@@ -17,7 +17,7 @@ namespace OweMe.Persistence.Groups.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.12")
+                .HasAnnotation("ProductVersion", "10.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -113,6 +113,8 @@ namespace OweMe.Persistence.Groups.Migrations
 
                     b.HasKey("GroupId", "PersonaId");
 
+                    b.HasIndex("PersonaId");
+
                     b.ToTable("GroupMembers");
                 });
 
@@ -167,6 +169,21 @@ namespace OweMe.Persistence.Groups.Migrations
                         .WithMany()
                         .HasForeignKey("PersonaId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("OweMe.Domain.Groups.GroupMember", b =>
+                {
+                    b.HasOne("OweMe.Domain.Groups.Group", null)
+                        .WithMany()
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("OweMe.Domain.Users.Persona", null)
+                        .WithMany()
+                        .HasForeignKey("PersonaId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

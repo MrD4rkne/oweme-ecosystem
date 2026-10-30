@@ -30,12 +30,11 @@ public class ProjectsReferencesTests
     }
 
     [Theory]
-    [InlineData(ApplicationNamespace)]
-    [InlineData(DomainNamespace)]
-    [InlineData(InfrastructureNamespace)]
-    [InlineData(PersistenceNamespace)]
-    [InlineData(PresentationNamespace)]
-    public void Project_ShouldNot_HaveDependencyOnNonDomainProjects(string projectName)
+    [InlineData(DomainNamespace, new[] { ApplicationNamespace, InfrastructureNamespace, PersistenceNamespace, PresentationNamespace })]
+    [InlineData(ApplicationNamespace, new[] { InfrastructureNamespace, PersistenceNamespace, PresentationNamespace })]
+    [InlineData(InfrastructureNamespace, new[] { PersistenceNamespace, PresentationNamespace })]
+    [InlineData(PersistenceNamespace, new[] { InfrastructureNamespace, PresentationNamespace })]
+    public void Project_ShouldNot_HaveDependencyOnOuterProjects(string projectName, string[] forbidden)
     {
         // Arrange
         var assembly = Assembly.Load(projectName);
@@ -43,12 +42,13 @@ public class ProjectsReferencesTests
         // Act
         var result = Types.InAssembly(assembly)
             .That()
-            .ResideInNamespace(InfrastructureNamespace)
+            .ResideInNamespace(projectName)
             .ShouldNot()
-            .HaveDependencyOnAny(PersistenceNamespace, PresentationNamespace)
+            .HaveDependencyOnAny(forbidden)
             .GetResult();
 
         // Assert
-        Assert.True(result.IsSuccessful, $"{projectName} project has dependencies on non domain projects.");
+        Assert.True(result.IsSuccessful,
+            $"{projectName} depends on outer projects: {string.Join(", ", result.FailingTypeNames ?? [])}");
     }
 }
