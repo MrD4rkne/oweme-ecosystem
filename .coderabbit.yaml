@@ -1,19 +1,138 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: en-US
-  tone_instructions: "Brutally honest senior .NET reviewer. Roast bad code with sarcasm, but always say why it's bad and how to fix it. No praise for mediocre code, no
-  pleasantries."
-  reviews:
-    profile: assertive
-    request_changes_workflow: true   # blocks the PR until its comments are resolved
-    high_level_summary: true
-    poem: false
-    auto_review:
-      enabled: true
-      drafts: false
-    path_instructions:
-      - path: "api/**/*.cs"
-        instructions: "Check async/await misuse, EF Core N+1 queries, missing cancellation tokens, DI lifetime bugs, and leaky Clean Architecture layers (Api ->
-  Application -> Infrastructure/Persistence)."
-      - path: "**/compose*.yaml"
-        instructions: "Flag hardcoded secrets, :latest tags and exposed ports."
-  chat:
-    auto_reply: true
+tone_instructions: "Brutally honest senior .NET reviewer. Roast bad code with dry sarcasm, but every roast must say why it's wrong and how to fix it. No praise for mediocre code, no pleasantries, no filler."
+
+reviews:
+  profile: assertive
+  poem: false
+  in_progress_fortune: false
+  path_filters:
+    - "!**/Migrations/*.Designer.cs"
+    - "!**/Migrations/*ModelSnapshot.cs"
+    - "!api/client/OweMe.Api.Client/OweMeApiClient.cs" # NSwag-generated
+    - "!infra/step_02_configure_vm/vars/*/vault.yml"   # ciphertext
+    - "!**/*.DotSettings*"
+    - "!**/.idea/**"
+    - "!**/bin/**"
+    - "!**/obj/**"
+    - "!**/*.run/**"
+  auto_review:
+    enabled: true
+    drafts: false
+    ignore_usernames: ["dependabot[bot]"] # auto-merged by dependabot-auto-merge.yml
+    ignore_title_keywords: ["wip"]
+
+  path_instructions:
+    - path: "api/**/*.cs"
+      instructions: |
+        Architecture (enforced by OweMe.Architecture.Tests, but its namespace filter is buggy so check by hand):
+        - Domain references nothing. Application references Domain only and talks to EF via I*Context interfaces exposing DbSet<T>.
+          Persistence implements those interfaces. Api is the composition root. Flag Application -> Persistence/Api references.
+        - Each layer registers services in its own DependencyInjection.cs (Add<Layer>(IHostApplicationBuilder)).
+        General:
+        - CancellationToken must flow from endpoint -> IMessageBus.InvokeAsync -> handler -> EF calls. Flag every drop.
+        - Use injected TimeProvider, never DateTime.Now/UtcNow. Ids via Guid.CreateVersion7(timeProvider.GetUtcNow()).
+        - Nullable is on and warnings are errors: flag `!` null-forgiving used to silence real nullability problems.
+        - Never log secrets, connection strings or whole options objects (`{@Options}` destructuring).
+        - Debug-only toggles (EnableSensitiveDataLogging, detailed errors, RequireHttpsMetadata=false) must be gated on IsDevelopment().
+        - Central package management: versions belong in Directory.Packages.props only; flag mixed major versions of a package family (e.g. EF Core 10 with EF Relational 9).
+    - path: "api/api/src/OweMe.Application/**"
+      instructions: |
+        Wolverine (not MediatR). Layout: <Feature>/{Commands|Queries}/<Action>/{X}Command.cs, {X}CommandHandler.cs, {X}CommandValidator.cs; namespace must match folder.
+        - Handlers are static classes with a static `Handle` method (not HandleAsync) and method-injected dependencies.
+        - Every *Command needs a *CommandValidator (FluentValidation). Validation lives in validators, never in handlers.
+        - Expected outcomes (not found, not allowed, conflict) are RETURNED, never thrown. Command result enums start at 1 so default is invalid.
+          Queries return null for "not found or no access".
+        - Authorization goes through domain methods (Group.CanUserAccess / CanUserEdit) using IUserContext.UserId. Rules:
+          group members can read, only the creator edits; stranger -> NotFound (don't leak existence), member editing -> Forbidden.
+          Adding a persona requires the persona's CreatedBy or UserId to be the current user, otherwise NotFound.
+        - No catch-all `catch (DbUpdateException)` interpreted as a business outcome; catch the specific constraint exception.
+        - Watch for N+1 queries, missing AsNoTracking on read paths, and check-then-insert races that need a unique index or FK instead.
+    - path: "api/api/src/OweMe.Domain/**"
+      instructions: |
+        - Entity ids are [StronglyTypedId] structs; UserId is the Keycloak `sub` (there is no Users table).
+        - Money is `decimal`, never double/float. Splits must sum exactly to the total; check rounding of equal splits (remainder cents).
+        - Push invariants into entities instead of leaving them anemic with public setters; flag new public setters on audit fields.
+    - path: "api/api/src/OweMe.Persistence/**"
+      instructions: |
+        - One internal sealed IEntityTypeConfiguration per entity plus a ValueConverter per strongly typed id, under Persistence/<Feature>/.
+        - Relationships need real foreign keys and unique indexes; don't rely on handler existence checks.
+        - A new migration must come with an updated api/docs/domain.MD in the same PR. Review migrations for data loss (dropped/renamed columns, non-null without default).
+        - Every new I*Context needs AddScoped forwarding registration AND an AlwaysUseServiceLocationFor<> line in Program.cs.
+    - path: "api/api/src/OweMe.Api/**"
+      instructions: |
+        - Minimal APIs: one IEndpoint class per endpoint under Endpoints/<Feature>/, with .WithName/.WithDescription/.WithTags(Tags.X),
+          accurate .Produces(...) (must match the real status code, e.g. 204 vs 200), .ProducesExtendedProblem, .WithStandardProblems,
+          .RequireAuthorization(Constants.POLICY_API_SCOPE).
+        - Map result enums with an exhaustive switch to Results.Problem(...). Results.Forbid/TypedResults.Forbid are banned; use Problem(statusCode: 403).
+        - Missing `sub`/`email` claims must yield 401, not a 500.
+        - Middleware order matters: exception handler before auth.
+    - path: "api/api/tests/**"
+      instructions: |
+        xUnit v3 + Shouldly + Moq + Testcontainers Postgres + WebApplicationFactory + FakeTimeProvider.
+        - Naming: integration `For_<Case>_Should_<Outcome>`, unit `Method_Case_ShouldX`, with // Arrange // Act // Assert. Pass TestContext.Current.CancellationToken.
+        - Every new endpoint must be added to IntegrationTests/ApiShouldRequireAuthentication.cs.
+        - Authorization changes need tests for owner, member and stranger. Money logic needs edge-case tests (rounding, sum mismatch -> 400).
+        - Flag tests that assert nothing meaningful, use real time, or share mutable state.
+    - path: "api/api/src/OweMe.Api/Dockerfile"
+      instructions: "The build context is the repo root and .git is bind-mounted for nbgv. Every new project needs its csproj COPY line. BannedSymbols.txt and Directory.*.props must be copied."
+    - path: "api/client/**"
+      instructions: "NSwag client must be regenerated whenever endpoints change; flag endpoints missing from the client."
+    - path: ".github/workflows/**"
+      instructions: |
+        - Minimal top-level permissions; flag new write scopes without reason (e.g. packages: write where nothing is pushed).
+        - Never interpolate ${{ inputs.* }} / ${{ github.event.* }} directly in `run:`; pass through env.
+        - pull_request_target must never check out PR code. Flag workflows that touch staging/production on pull_request.
+        - Prefer SHA-pinned actions; flag @master/@main refs. Deploy jobs need `concurrency`.
+        - Outputs must reference jobs/matrix values that actually exist; inputs that are declared must be used.
+    - path: ".github/dependabot.yml"
+      instructions: "Every `directory` must exist in the repo. Check docker/compose images and infra/step_01_create_vm are covered."
+    - path: "{compose*.yaml,infra/**/templates/**,infra/**/*.j2}"
+      instructions: |
+        - No :latest or default-to-latest image tags (${X:-latest}); pin versions and keep dev/prod versions aligned (Keycloak, Postgres).
+        - Every service needs a healthcheck and must join the monitoring network if Prometheus scrapes it.
+        - Only 22/80/443 are open (UFW + OCI security list); flag new published ports. Traefik routers need explicit entrypoints and middlewares.
+        - Dev passwords are fine in compose.yaml only; never in templates or vars.
+        - Use KC_BOOTSTRAP_ADMIN_* (KEYCLOAK_ADMIN is deprecated in Keycloak 26).
+    - path: "infra/step_02_configure_vm/**"
+      instructions: |
+        Cross-file consistency is where this repo breaks most:
+        - Prometheus scrape targets must match existing service names and real metrics ports/endpoints.
+        - Every vault_* var used in a template must exist in vars/example/vault.yml.example; variable names must match between examples and roles.
+        - Any new module's collection must be installed in .github/actions/setup-ansible/action.yml.
+        - vault.yml files must be encrypted ($ANSIBLE_VAULT; header). Tasks handling secrets need no_log: true.
+        - staging/production vars must not drift silently from each other or from auth/realms/dev.json.
+    - path: "infra/step_01_create_vm/**"
+      instructions: "Pulumi (C#) for OCI. Flag hardcoded OCIDs/compartment ids, overly open security list rules, and resources without tags."
+    - path: "auth/realms/**"
+      instructions: "Keycloak realm export for dev. Flag real-looking secrets, wildcard redirect URIs, and drift from infra keycloak vars."
+    - path: "api/docs/**"
+      instructions: "The decision log in docs/README.md is append-only; flag edits that rewrite past decisions."
+
+  pre_merge_checks:
+    title:
+      mode: warning
+      requirements: "Conventional commit format: `<type>: <imperative lower-case summary>` with type one of feat, fix, ci, chore, refactor, infra, test, docs."
+    description:
+      mode: warning
+    issue_assessment:
+      mode: warning
+    custom_checks:
+      - name: Feature docs updated
+        mode: warning
+        instructions: "If the PR adds or changes endpoints or domain behavior, it must update api/docs/features/<feature>.md. If it adds a migration, it must update api/docs/domain.MD."
+      - name: Issue linked
+        mode: warning
+        instructions: "feat and fix PRs must reference an issue with 'Closes #N' (or Fixes/Resolves) in the description."
+      - name: Endpoint wiring complete
+        mode: warning
+        instructions: "If the PR adds an endpoint, it must also add it to IntegrationTests/ApiShouldRequireAuthentication.cs, have integration tests for happy path and 404, and regenerate the NSwag client in api/client."
+      - name: Renames leave no dangling references
+        mode: warning
+        instructions: "If the PR renames or removes a service, project, directory or variable, verify no references remain in workflows, dependabot.yml, compose files, Ansible templates/vars, Prometheus config or the Dockerfile."
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - "api/docs/README.md"
+      - "api/docs/features/*.md"
