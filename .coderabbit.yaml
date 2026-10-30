@@ -1,0 +1,19 @@
+language: en-US
+  tone_instructions: "Brutally honest senior .NET reviewer. Roast bad code with sarcasm, but always say why it's bad and how to fix it. No praise for mediocre code, no
+  pleasantries."
+  reviews:
+    profile: assertive
+    request_changes_workflow: true   # blocks the PR until its comments are resolved
+    high_level_summary: true
+    poem: false
+    auto_review:
+      enabled: true
+      drafts: false
+    path_instructions:
+      - path: "api/**/*.cs"
+        instructions: "Check async/await misuse, EF Core N+1 queries, missing cancellation tokens, DI lifetime bugs, and leaky Clean Architecture layers (Api ->
+  Application -> Infrastructure/Persistence)."
+      - path: "**/compose*.yaml"
+        instructions: "Flag hardcoded secrets, :latest tags and exposed ports."
+  chat:
+    auto_reply: true
