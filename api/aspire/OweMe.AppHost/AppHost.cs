@@ -21,18 +21,24 @@ var keycloak = builder.AddKeycloak("keycloak", 8080)
     .WithDataVolume()
     .WithOtlpExporter();
 
+// No launch profile: the migrator is a one-shot `migrate` command and must not bind the api's ports.
+var apiMigrator = builder.AddProject<OweMe_Api>("api-migrator", launchProfileName: null)
+    .WithArgs("migrate")
+    .WithReference(apiDb)
+    .WaitFor(apiDb)
+    .WithEnvironment("Database__ConnectionString", apiDb);
+
 _ = builder.AddProject<OweMe_Api>("api")
     .WithHttpEndpoint(5000, name: "http")
     .WithReference(apiDb)
     .WithReference(keycloak)
-    .WaitFor(apiDb)
+    .WaitForCompletion(apiMigrator)
     .WaitFor(keycloak)
     .WithEnvironment("IdentityServer__Authority", $"{keycloak.GetEndpoint("http")}/realms/oweme-dev")
     .WithEnvironment("IdentityServer__MetadataAddress",
         $"{keycloak.GetEndpoint("http")}/realms/oweme-dev/.well-known/openid-configuration")
     .WithEnvironment("IdentityServer__ValidateAudience", "false")
     .WithEnvironment("IdentityServer__RequireHttpsMetadata", "false")
-    .WithEnvironment("Database__RunMigrations", "true")
     .WithEnvironment("Database__ConnectionString", apiDb);
 
 await using var app = builder.Build();

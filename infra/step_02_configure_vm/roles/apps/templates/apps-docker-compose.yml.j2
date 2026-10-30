@@ -7,10 +7,22 @@ services:
       - api-db-data:/var/lib/postgresql/data
     networks: [app-backend]
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U api"]
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U api"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  # One-shot: run by the "Migrate API database" task before api is recreated; the profile keeps `up` from starting it.
+  api-migrator:
+    image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:${API_IMAGE_TAG:-latest}
+    pull_policy: always
+    command: ["migrate"]
+    env_file: api.env
+    profiles: [migrate]
+    depends_on:
+      api-db:
+        condition: service_healthy
+    networks: [app-backend]
 
   api:
     image: ghcr.io/mrd4rkne/oweme-ecosystem/oweme-api:${API_IMAGE_TAG:-latest}

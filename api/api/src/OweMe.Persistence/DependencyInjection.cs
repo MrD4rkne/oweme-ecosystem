@@ -24,7 +24,6 @@ public static class DependencyInjection
 
         builder.Services.AddScoped<IGroupContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
         builder.Services.AddScoped<IPersonaContext>(sp => sp.GetRequiredService<ApplicationDbContext>());
-        builder.Services.AddHostedService<MigrationHostedService>();
 
         return builder;
     }
