@@ -9,8 +9,6 @@ reviews:
   path_filters:
     - "!**/Migrations/*.Designer.cs"
     - "!**/Migrations/*ModelSnapshot.cs"
-    - "!api/client/OweMe.Api.Client/OweMeApiClient.cs" # NSwag-generated
-    - "!infra/step_02_configure_vm/vars/*/vault.yml"   # ciphertext
     - "!**/*.DotSettings*"
     - "!**/.idea/**"
     - "!**/bin/**"
@@ -19,7 +17,6 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-    ignore_usernames: ["dependabot[bot]"] # auto-merged by dependabot-auto-merge.yml
     ignore_title_keywords: ["wip"]
 
   path_instructions:
@@ -77,7 +74,7 @@ reviews:
     - path: "api/api/src/OweMe.Api/Dockerfile"
       instructions: "The build context is the repo root and .git is bind-mounted for nbgv. Every new project needs its csproj COPY line. BannedSymbols.txt and Directory.*.props must be copied."
     - path: "api/client/**"
-      instructions: "NSwag client must be regenerated whenever endpoints change; flag endpoints missing from the client."
+      instructions: "OweMeApiClient.cs is NSwag-generated: don't review its style, only check it matches the endpoints (regenerated when endpoints change, no missing operations)."
     - path: ".github/workflows/**"
       instructions: |
         - Minimal top-level permissions; flag new write scopes without reason (e.g. packages: write where nothing is pushed).
@@ -100,7 +97,7 @@ reviews:
         - Prometheus scrape targets must match existing service names and real metrics ports/endpoints.
         - Every vault_* var used in a template must exist in vars/example/vault.yml.example; variable names must match between examples and roles.
         - Any new module's collection must be installed in .github/actions/setup-ansible/action.yml.
-        - vault.yml files must be encrypted ($ANSIBLE_VAULT; header). Tasks handling secrets need no_log: true.
+        - vars/*/vault.yml must start with the $ANSIBLE_VAULT; header (plaintext there is a leaked secret); otherwise ignore the ciphertext. Tasks handling secrets need no_log: true.
         - staging/production vars must not drift silently from each other or from auth/realms/dev.json.
     - path: "infra/step_01_create_vm/**"
       instructions: "Pulumi (C#) for OCI. Flag hardcoded OCIDs/compartment ids, overly open security list rules, and resources without tags."
