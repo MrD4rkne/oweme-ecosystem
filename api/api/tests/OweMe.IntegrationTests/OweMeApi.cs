@@ -27,7 +27,7 @@ public sealed class OweMeApi : WebApplicationFactory<Program>, IAsyncLifetime
 
         // Migrate once before tests create their own derived hosts in parallel.
         await using var scope = Services.CreateAsyncScope();
-        await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync();
+        await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync(TestContext.Current.CancellationToken);
     }
 
     public override async ValueTask DisposeAsync()
