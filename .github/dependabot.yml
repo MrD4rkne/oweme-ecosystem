@@ -30,5 +30,12 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 3
     commit-message:
       prefix: "actions"
+    groups:
+      # Actions are SHA-pinned, so every patch release is a PR; batch them.
+      actions-minor-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
