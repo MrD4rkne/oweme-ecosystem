@@ -32,13 +32,13 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v7
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
         fetch-depth: 0  # Full history for Nbgv versioning and CodeQL analysis
 
     - name: Setup .NET
       if: matrix.language == 'csharp'
-      uses: actions/setup-dotnet@v6
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
         dotnet-version: 10.x
 
@@ -47,13 +47,13 @@ jobs:
       run: dotnet tool install -g Aspire.Cli
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
 
     - name: Set up Nbgv
-      uses: dotnet/nbgv@master
+      uses: dotnet/nbgv@705dad19ab067f12f4e9eeaa60812e01edef5d25 # v0.5.2
       if: matrix.build-mode == 'manual' && matrix.language == 'csharp'
       id: nbgv
 
@@ -63,6 +63,6 @@ jobs:
       run: dotnet build ${{ matrix.target }} --configuration Release
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
       with:
         category: ${{ matrix.category || format('/language:{0}{1}', matrix.language, matrix.project-dir && format(':{0}', matrix.project-dir) || '') }}
