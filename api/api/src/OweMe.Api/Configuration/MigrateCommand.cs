@@ -1,6 +1,10 @@
+using JasperFx;
 using JasperFx.CommandLine;
 using Microsoft.EntityFrameworkCore;
 using OweMe.Persistence.Data;
+
+// Lets JasperFx find this command when the entry assembly is not OweMe.Api (e.g. integration tests).
+[assembly: JasperFxAssembly]
 
 namespace OweMe.Api.Configuration;
 
