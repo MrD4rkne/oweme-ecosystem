@@ -17,7 +17,7 @@ public sealed class MigrateCommandCollection;
 public sealed class MigrateCommandShouldApplyMigrations(OweMeApi api)
 {
     [Fact]
-    public async Task To_AnEmptyDatabase()
+    public async Task For_AnEmptyDatabase()
     {
         // Arrange
         var connectionString = new NpgsqlConnectionStringBuilder(
@@ -32,20 +32,39 @@ public sealed class MigrateCommandShouldApplyMigrations(OweMeApi api)
         (await database.GetPendingMigrationsAsync(TestContext.Current.CancellationToken)).ShouldNotBeEmpty();
 
         // Act: the same `dotnet OweMe.Api.dll migrate` the deploy runs.
-        object? exitCode;
-        Environment.SetEnvironmentVariable("Database__ConnectionString", connectionString);
-        try
-        {
-            var main = typeof(OweMe.Api.Program).Assembly.EntryPoint!;
-            exitCode = main.Invoke(null, [new[] { "migrate" }]);
-        }
-        finally
-        {
-            Environment.SetEnvironmentVariable("Database__ConnectionString", null);
-        }
+        var exitCode = RunMigrate(connectionString);
 
         // Assert
         exitCode.ShouldBe(0);
         (await database.GetPendingMigrationsAsync(TestContext.Current.CancellationToken)).ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void For_AnUnreachableDatabase_Should_ExitWithNonZeroCode()
+    {
+        // Arrange: nothing listens on port 1, so the connection is refused at once.
+        const string connectionString = "Host=127.0.0.1;Port=1;Database=none;Username=none;Password=none";
+
+        // Act
+        var exitCode = RunMigrate(connectionString);
+
+        // Assert: the deploy relies on this to stop before starting the new api.
+        exitCode.ShouldNotBe(0);
+    }
+
+    private static object? RunMigrate(string connectionString)
+    {
+        const string variable = "Database__ConnectionString";
+        var original = Environment.GetEnvironmentVariable(variable);
+        Environment.SetEnvironmentVariable(variable, connectionString);
+        try
+        {
+            var main = typeof(OweMe.Api.Program).Assembly.EntryPoint!;
+            return main.Invoke(null, [new[] { "migrate" }]);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(variable, original);
+        }
     }
 }
