@@ -17,7 +17,7 @@ runs:
 
     - name: Install collections
       shell: bash
-      run: ansible-galaxy collection install community.docker community.general
+      run: ansible-galaxy collection install "community.docker:>=3.13.0" community.general
 
     - name: Write credential files
       shell: bash

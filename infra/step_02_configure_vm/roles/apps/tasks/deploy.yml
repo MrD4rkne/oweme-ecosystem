@@ -1,11 +1,27 @@
 ---
-# TODO: migrator and seeder
+# Runs before api is recreated, so a failed migration stops the deploy while the old api keeps serving.
+- name: Migrate API database
+  community.docker.docker_compose_v2_run:
+    project_src: /opt/apps
+    service: api-migrator
+    cleanup: true
+    tty: false
+    quiet_pull: true
+  register: api_migration
+  # The module only returns rc in synchronous mode; it never fails on its own.
+  failed_when: api_migration.rc != 0
+  # Bounds a migration stuck on a lock so it cannot hold the deploy queue.
+  timeout: 900
+  when: target_app is not defined or target_app == 'api'
+  tags: [apps, deploy]
 
 - name: Deploy single target service (fast path)
   community.docker.docker_compose_v2:
     project_src: /opt/apps
     state: present
     pull: always
+    wait: true
+    wait_timeout: 300
     services:
       - "{{ target_app }}"
   when: target_app is defined
@@ -16,5 +32,7 @@
     project_src: /opt/apps
     state: present
     pull: always
+    wait: true
+    wait_timeout: 300
   when: target_app is not defined
   tags: [apps]

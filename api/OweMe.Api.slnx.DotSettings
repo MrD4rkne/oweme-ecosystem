@@ -1,0 +1,4 @@
+<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<!-- Route ids are StronglyTypedId structs (e.g. GroupId) that parse as Guid; Rider hardcodes ':guid' to System.Guid and cannot be taught otherwise. -->
+	<s:String x:Key="/Default/CodeInspection/Highlighting/InspectionSeverities/=RouteTemplates_002EParameterTypeAndConstraintsMismatch/@EntryIndexedValue">DO_NOT_SHOW</s:String>
+</wpf:ResourceDictionary>

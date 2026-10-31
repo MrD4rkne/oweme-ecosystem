@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using OweMe.Api.Identity.Configuration;
 using OweMe.IntegrationTests.Authentication;
+using Microsoft.EntityFrameworkCore;
 using OweMe.Persistence.Configuration;
+using OweMe.Persistence.Data;
 using Testcontainers.PostgreSql;
 
 namespace OweMe.IntegrationTests;
@@ -23,8 +25,9 @@ public sealed class OweMeApi : WebApplicationFactory<Program>, IAsyncLifetime
     {
         await _postgresContainer.StartAsync();
 
-        // Start the host once so migrations run before tests create their own derived hosts in parallel.
-        _ = Services;
+        // Migrate once before tests create their own derived hosts in parallel.
+        await using var scope = Services.CreateAsyncScope();
+        await scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.MigrateAsync(TestContext.Current.CancellationToken);
     }
 
     public override async ValueTask DisposeAsync()
@@ -41,11 +44,7 @@ public sealed class OweMeApi : WebApplicationFactory<Program>, IAsyncLifetime
     {
         builder.ConfigureServices(services =>
         {
-            services.Configure<DatabaseOptions>(options =>
-            {
-                options.ConnectionString = ConnectionString;
-                options.RunMigrations = true;
-            });
+            services.Configure<DatabaseOptions>(options => options.ConnectionString = ConnectionString);
 
             services.AddAuthentication(options =>
                 {
