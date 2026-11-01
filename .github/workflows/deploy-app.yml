@@ -35,11 +35,13 @@ jobs:
     environment:
       name: ${{ inputs.environment_name }}
       url: ${{ vars.API_URL }}
-    # Default queue: one running + newest pending; an older pending deploy is cancelled, so deploys never stack.
-    # Smoke tests run inside this job, so they hold the same slot and test the version this job deployed.
+    # Keep every queued deploy/provision: builds finish out of order, so "newest pending wins" could let an older image
+    # cancel a newer one. Stale images become a fast no-op via the Ansible version guard. Nothing waits for approval,
+    # so the queue drains instead of stacking. Smoke tests run inside this job: same slot, same version.
     concurrency:
       group: deploy-${{ inputs.environment_name }}
       cancel-in-progress: false
+      queue: max
     env:
       IMAGE_TAG: ${{ inputs.image_tag }}
       TARGET_APP: ${{ inputs.app_name }}
@@ -74,7 +76,7 @@ jobs:
         if: inputs.app_name == 'api'
         run: |
           for _ in $(seq 12); do
-            running=$(curl -fsS "${API_URL}/api/info" | jq -r '.buildVersion // empty' | cut -d+ -f1) || running=""
+            running=$(curl -fsS --connect-timeout 5 --max-time 10 "${API_URL}/api/info" | jq -r '.buildVersion // empty' | cut -d+ -f1) || running=""
             if [[ "$running" == "$IMAGE_TAG" ]]; then
               echo "deployed=true" >> "$GITHUB_OUTPUT"
               echo "Deployed \`${TARGET_APP}\` **${IMAGE_TAG}** to **${TARGET_ENV}**" >> "$GITHUB_STEP_SUMMARY"

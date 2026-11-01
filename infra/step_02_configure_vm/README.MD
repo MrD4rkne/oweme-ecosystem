@@ -20,7 +20,7 @@ The deploy runs `api-migrator` (the api image with the `migrate` command) before
 
 ## Backups and restore
 
-Every API deploy dumps the API database to `/opt/backups/api-<tag>-<utc time>.dump` (root-only, last 10 kept) before migrating, and refuses to deploy when free disk is under 2x the database size. Backups stay on the VM: losing the VM loses them too.
+Every API deploy and full provision dumps the API database to `/opt/backups/api-<tag>-<utc time>.dump` (root-only, last 10 kept) before migrating, and refuses to deploy when free disk is under 2x the database size. Backups stay on the VM: losing the VM loses them too.
 
 Restore (on the VM, as root):
 
