@@ -2,6 +2,7 @@
 
 - `domain.MD` – ER diagram. Update it in the same PR as a migration.
 - `features/<name>.md` – one file per feature: goal, rules, endpoints, open questions. Open an issue first; write or update the spec in the same PR as the code. Copy `groups.md` for the shape.
+- Every new or changed endpoint regenerates `client/OweMe.Api.Client` (`nswag.json`) in the same PR.
 - Decisions below. Append only; mark replaced ones "superseded by".
 
 ## Decisions
