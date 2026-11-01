@@ -31,6 +31,7 @@ jobs:
       environment_name: staging
       app_name: api
       image_tag: ${{ needs.build.outputs.image_ref }}
+      smoke_tests: true # production runs only if these pass
     secrets: inherit
 
   deploy-production:
