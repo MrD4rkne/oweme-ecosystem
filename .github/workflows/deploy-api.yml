@@ -31,14 +31,17 @@ jobs:
       environment_name: staging
       app_name: api
       image_tag: ${{ needs.build.outputs.image_ref }}
+      smoke_tests: true
     secrets: inherit
 
+  # Automatic: only an image that this run deployed and smoke-tested on staging reaches production.
   deploy-production:
     needs: [build, deploy-staging]
     if: |
       !cancelled() &&
       needs.build.result == 'success' &&
-      needs.deploy-staging.result == 'success'
+      needs.deploy-staging.result == 'success' &&
+      needs.deploy-staging.outputs.deployed == 'true'
     uses: ./.github/workflows/deploy-app.yml
     with:
       environment_name: production

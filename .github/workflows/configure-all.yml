@@ -29,7 +29,9 @@ jobs:
       force_env_render: ${{ inputs.force_env_render || false }}
     secrets: inherit
 
+  # Full provision of production is never automatic: infra changes are rarer and riskier than app deploys.
   configure-production:
+    if: github.event_name == 'workflow_dispatch'
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
       environment_name: 'production'

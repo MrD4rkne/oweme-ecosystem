@@ -23,8 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: deploy-${{ inputs.environment_name }}
-      cancel-in-progress: false
-      queue: max # keep every pending provision/deploy instead of replacing it
+      cancel-in-progress: false # default queue: a provision superseded while pending is re-run manually
     environment: ${{ inputs.environment_name }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

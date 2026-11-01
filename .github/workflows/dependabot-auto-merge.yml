@@ -17,7 +17,11 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - if: startsWith(steps.metadata.outputs.dependency-group, 'nuget-')
+      # EF Core and Aspire bumps can change migrations/runtime behaviour and merges deploy to production: review those by hand.
+      - if: |
+          startsWith(steps.metadata.outputs.dependency-group, 'nuget-') &&
+          steps.metadata.outputs.dependency-group != 'nuget-efcore' &&
+          steps.metadata.outputs.dependency-group != 'nuget-aspire'
         run: gh pr merge --auto --squash "$PR_URL"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
