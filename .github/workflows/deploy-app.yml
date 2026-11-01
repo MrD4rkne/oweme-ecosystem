@@ -19,10 +19,6 @@ on:
         type: boolean
         default: false
         description: 'Run OweMe.Api.SmokeTests against the environment after deploying'
-    outputs:
-      deployed:
-        description: "'true' when this run's image is the one now running (not skipped as older)"
-        value: ${{ jobs.deploy.outputs.deployed }}
 permissions:
   contents: read
   deployments: write
@@ -30,23 +26,11 @@ jobs:
   deploy:
     name: Deploy ${{ inputs.app_name }} — ${{ inputs.environment_name }}
     runs-on: ubuntu-latest
-    outputs:
-      deployed: ${{ steps.verify.outputs.deployed }}
-    environment:
-      name: ${{ inputs.environment_name }}
-      url: ${{ vars.API_URL }}
-    # Keep every queued deploy/provision: builds finish out of order, so "newest pending wins" could let an older image
-    # cancel a newer one. Stale images become a fast no-op via the Ansible version guard. Nothing waits for approval,
-    # so the queue drains instead of stacking. Smoke tests run inside this job: same slot, same version.
+    environment: ${{ inputs.environment_name }}
     concurrency:
       group: deploy-${{ inputs.environment_name }}
       cancel-in-progress: false
-      queue: max
-    env:
-      IMAGE_TAG: ${{ inputs.image_tag }}
-      TARGET_APP: ${{ inputs.app_name }}
-      TARGET_ENV: ${{ inputs.environment_name }}
-      API_URL: ${{ vars.API_URL }}
+      queue: max # keep every pending provision/deploy instead of replacing it
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -62,44 +46,22 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: "False"
         run: |
-          ansible-playbook -i "inventory/${TARGET_ENV}/hosts.ini" site.yml \
+          ansible-playbook -i inventory/${{ inputs.environment_name }}/hosts.ini site.yml \
             --tags deploy \
             --private-key deploy_key \
             --vault-password-file .vault_pass \
-            -e "image_tag=${IMAGE_TAG}" \
-            -e "target_app=${TARGET_APP}" \
-            -e "target_environment=${TARGET_ENV}"
+            -e "image_tag=${{ inputs.image_tag }}" \
+            -e "target_app=${{ inputs.app_name }}" \
+            -e "target_environment=${{ inputs.environment_name }}"
 
-      # The Ansible version guard skips an image older than the one running and exits green; tell the two apart here.
-      - name: Verify running version
-        id: verify
-        if: inputs.app_name == 'api'
-        run: |
-          for _ in $(seq 12); do
-            running=$(curl -fsS --connect-timeout 5 --max-time 10 "${API_URL}/api/info" | jq -r '.buildVersion // empty' | cut -d+ -f1) || running=""
-            if [[ "$running" == "$IMAGE_TAG" ]]; then
-              echo "deployed=true" >> "$GITHUB_OUTPUT"
-              echo "Deployed \`${TARGET_APP}\` **${IMAGE_TAG}** to **${TARGET_ENV}**" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            if [[ -n "$running" ]] && [[ "$(printf '%s\n%s\n' "$IMAGE_TAG" "$running" | sort -V | tail -n1)" == "$running" ]]; then
-              echo "deployed=false" >> "$GITHUB_OUTPUT"
-              echo "::notice::Skipped: ${running} is already running on ${TARGET_ENV} (newer than ${IMAGE_TAG})"
-              echo "Skipped \`${TARGET_APP}\` ${IMAGE_TAG} on **${TARGET_ENV}**: newer ${running} already running" >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
-            sleep 5
-          done
-          echo "::error::Expected ${IMAGE_TAG} on ${TARGET_ENV}, got '${running}'"
-          exit 1
-
+      # Same job as the deploy, so it holds the same concurrency slot and tests the version just deployed.
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        if: inputs.smoke_tests && steps.verify.outputs.deployed == 'true'
+        if: inputs.smoke_tests
         with:
           dotnet-version: 10.x
 
       - name: Smoke tests
-        if: inputs.smoke_tests && steps.verify.outputs.deployed == 'true'
+        if: inputs.smoke_tests
         env:
           ApiSettings__BaseUrl: ${{ vars.API_URL }}
           IdentityProviderSettings__Address: ${{ vars.IDP_REALM_URL }}
