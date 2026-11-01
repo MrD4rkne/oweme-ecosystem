@@ -1,4 +1,13 @@
 ---
+# A runner killed mid-migration skips the rescue below and leaves the named container behind,
+# possibly still holding locks; remove it before the backup and the migration.
+- name: Remove leftover api-migrator container
+  ansible.builtin.command: docker rm -f api-migrator
+  changed_when: false
+  failed_when: false # absent container is the normal case; a real Docker problem fails the next task
+  when: target_app is not defined or target_app == 'api'
+  tags: [apps, deploy]
+
 # Same gate as the migration. Same disk as the database, so refuse to dump when free space is short;
 # dumps hold user data, so root-only. On a fresh VM this starts api-db and dumps an empty database.
 - name: Back up API database before migration
@@ -16,13 +25,14 @@
     fi
     f="/opt/backups/api-${IMAGE_TAG}-$(date -u +%Y%m%dT%H%M%SZ).dump"
     trap 'rm -f "$f.tmp"' EXIT
-    docker compose exec -T api-db sh -c 'pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB"' > "$f.tmp"
+    docker compose exec -T api-db sh -c 'pg_dump -U "$POSTGRES_USER" --lock-wait-timeout=60s -Fc "$POSTGRES_DB"' > "$f.tmp"
     mv "$f.tmp" "$f"
     ls -1t /opt/backups/api-*.dump | tail -n +11 | xargs -r rm --
   args:
     executable: /bin/bash
   environment:
-    IMAGE_TAG: "{{ image_tag | default('provision') }}"
+    # Label with the image the dump belongs to (pre-migration), so a restore starts the matching api.
+    IMAGE_TAG: "{{ deployed_api_tag if deployed_api_tag is match('^[0-9A-Za-z][0-9A-Za-z._-]*$') else 'none' }}"
   changed_when: true
   when: target_app is not defined or target_app == 'api'
   tags: [apps, deploy]
@@ -32,12 +42,6 @@
   when: target_app is not defined or target_app == 'api'
   tags: [apps, deploy]
   block:
-    # A runner killed mid-migration skips the rescue below and leaves the named container behind.
-    - name: Remove leftover api-migrator container
-      ansible.builtin.command: docker rm -f api-migrator
-      changed_when: false
-      failed_when: false # absent container is the normal case; a real Docker problem fails the next task
-
     - name: Run api-migrator
       community.docker.docker_compose_v2_run:
         project_src: /opt/apps
