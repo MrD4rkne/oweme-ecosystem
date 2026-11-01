@@ -45,14 +45,17 @@ jobs:
         working-directory: infra/step_02_configure_vm
         env:
           ANSIBLE_HOST_KEY_CHECKING: "False"
+          IMAGE_TAG: ${{ inputs.image_tag }}
+          TARGET_APP: ${{ inputs.app_name }}
+          TARGET_ENV: ${{ inputs.environment_name }}
         run: |
-          ansible-playbook -i inventory/${{ inputs.environment_name }}/hosts.ini site.yml \
+          ansible-playbook -i "inventory/${TARGET_ENV}/hosts.ini" site.yml \
             --tags deploy \
             --private-key deploy_key \
             --vault-password-file .vault_pass \
-            -e "image_tag=${{ inputs.image_tag }}" \
-            -e "target_app=${{ inputs.app_name }}" \
-            -e "target_environment=${{ inputs.environment_name }}"
+            -e "image_tag=${IMAGE_TAG}" \
+            -e "target_app=${TARGET_APP}" \
+            -e "target_environment=${TARGET_ENV}"
 
       # Same job as the deploy, so it holds the same concurrency slot and tests the version just deployed.
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
