@@ -124,6 +124,11 @@ jobs:
       - name: Build
         run: dotnet build ${{ inputs.working_dir }} --configuration Release
 
+      # The build regenerates the NSwag client; a diff means an API change was committed without it.
+      # -I ignores the generator version line in the header so NSwag bumps alone don't fail here.
+      - name: Verify generated API client is committed
+        run: git diff --exit-code -I 'NSwag toolchain' -- '${{ inputs.working_dir }}/client/*.cs'
+
       - name: Test
         run: >
           dotnet test ${{ inputs.working_dir }}
