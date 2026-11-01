@@ -31,7 +31,7 @@
   args:
     executable: /bin/bash
   environment:
-    # Label with the image the dump belongs to (pre-migration), so a restore starts the matching api.
+    # Label with the deployed (pre-migration) version, so a restore starts the matching api.
     IMAGE_TAG: "{{ deployed_api_tag if deployed_api_tag is match('^[0-9A-Za-z][0-9A-Za-z._-]*$') else 'none' }}"
   changed_when: true
   when: target_app is not defined or target_app == 'api'
@@ -55,6 +55,13 @@
       failed_when: api_migration.rc != 0
       # Bounds a migration stuck on a lock so it cannot hold the deploy queue.
       timeout: 900
+
+    - name: Record migrated API tag
+      ansible.builtin.copy:
+        content: "{{ image_tag }}\n"
+        dest: /opt/apps/.migrated_api_tag
+        mode: '0644'
+      when: target_app is defined
   rescue:
     # The timeout only stops Ansible; without this the container keeps migrating on the VM.
     - name: Stop a still-running api-migrator
