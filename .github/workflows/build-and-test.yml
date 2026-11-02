@@ -117,13 +117,14 @@ jobs:
 
       # The build regenerates the NSwag client; a diff means an API change was committed without it.
       # -I ignores the generator version (header + GeneratedCode attributes) so NSwag bumps alone don't fail here.
+      # The GeneratedCode pattern is anchored so anything else on that line is still caught.
       # git diff skips untracked files, so a newly generated file is checked separately.
       - name: Verify generated API client is committed
         env:
           CLIENT_PATHSPEC: ${{ inputs.working_dir }}/client/*.cs
         run: |
           rc=0
-          git diff --exit-code -I 'NSwag toolchain|GeneratedCode\(' -- "$CLIENT_PATHSPEC" || rc=1
+          git diff --exit-code -I '^//     Generated using the NSwag toolchain v|^ *\[System\.CodeDom\.Compiler\.GeneratedCode\("(NSwag|NJsonSchema)", "[^"]*"\)\]$' -- "$CLIENT_PATHSPEC" || rc=1
           untracked=$(git ls-files --others --exclude-standard -- "$CLIENT_PATHSPEC")
           if [ -n "$untracked" ]; then echo "::error::Untracked generated files:"; echo "$untracked"; rc=1; fi
           exit $rc
