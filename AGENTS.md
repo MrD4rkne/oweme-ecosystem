@@ -2,7 +2,7 @@
 
 Layout, stack and run instructions: [README.md](README.md), [api/README.md](api/README.md). Specs and decisions: [api/docs/README.md](api/docs/README.md).
 
-Every feature PR: spec → code → integration tests → regenerate the client.
+Every feature PR: spec → code → integration tests. Regenerate the client when the OpenAPI contract changes (route, request/response DTO, status code).
 
 ## Feature specs
 
@@ -11,7 +11,7 @@ One file per feature in `api/docs/features/<name>.md`; `groups.md` is the refere
 1. Read the issue and the code it touches (`OweMe.Api/Endpoints/`, `OweMe.Application/`, `OweMe.Domain/`) so the spec matches reality or names the delta.
 2. Rules must not contradict the Decisions in `api/docs/README.md`; if they must, append a new decision there and mark the old one "superseded by".
 3. Shape: `**Goal:**` one sentence; `## Rules` one testable rule per bullet; `## Endpoints` table (Method, Route, Success, Failures); `## Open questions` only if something is undecided. When a question is decided, move it into Rules.
-4. Tables changed → update `api/docs/domain.MD` in the same PR.
+4. New EF migration (database schema changed) → update `api/docs/domain.MD` in the same PR.
 
 Status codes:
 - 404 when the caller must not learn the entity exists (missing, stranger, foreign persona). 403 only when the caller can see it but may not change it.
@@ -30,7 +30,7 @@ Project `api/api/tests/OweMe.IntegrationTests/`, one file per endpoint in a fold
 - Arrange through the public API with private helpers (`CreateGroup`, `CreatePersona`); use the real request/response types, not hand-written DTOs. Check the DB only when the response cannot show the effect.
 - Strongly typed ids: `new XId(Guid.NewGuid())` for "does not exist", `XId.Empty` for validation failures.
 
-Every endpoint gets: happy path (status and effect), 400 per validation rule, 404 missing, 404 stranger (second `TestUser`, assert nothing changed), 403 only where the spec says so, no-op/idempotency rules, and an entry in `ApiShouldRequireAuthentication.cs`. Each spec Rule maps to a test. Pure logic (splits, rounding, balances) also gets unit tests in `OweMe.Domain.UnitTests` / `OweMe.Application.UnitTests`.
+Every endpoint gets: happy path (status and effect), 400 per validation rule, 403 only where the spec says so, no-op/idempotency rules, and an entry in `ApiShouldRequireAuthentication.cs`. Endpoints that target an existing entity also get 404 missing and 404 stranger (second `TestUser`, assert nothing changed). Each spec Rule maps to a test. Pure logic (splits, rounding, balances) also gets unit tests in `OweMe.Domain.UnitTests` / `OweMe.Application.UnitTests`.
 
 Run (Docker required):
 
