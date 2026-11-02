@@ -13,7 +13,16 @@ permissions:
   packages: write
 
 jobs:
+  test:
+    uses: ./.github/workflows/build-api.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      checks: write
+      pull-requests: write
+
   build:
+    needs: test
     uses: ./.github/workflows/push-to-ghcr.yml
     with:
       image_name: 'oweme-api'

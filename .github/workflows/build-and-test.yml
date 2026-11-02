@@ -38,8 +38,6 @@ on:
     outputs:
       semver:
         value: ${{ jobs.build.outputs.semver }}
-      image_ref:
-        value: ${{ jobs.push-to-ghcr.outputs.image_ref }}
 
 permissions:
   contents: read
