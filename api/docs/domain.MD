@@ -33,3 +33,5 @@ erDiagram
 ```
 
 There is no users table; `user_id` is the Keycloak `sub`. GROUP, PERSONA and EXPENSE also carry `created_by`, `created_at`, `updated_by`, `updated_at`.
+
+An expense has no total column: its total is the sum of its splits' `amount`.
