@@ -1,9 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using OweMe.Application.Expenses;
 using OweMe.Domain.Expenses;
 using OweMe.Domain.Groups;
-using OweMe.Persistence.Groups;
 
 namespace OweMe.Persistence.Expenses;
 

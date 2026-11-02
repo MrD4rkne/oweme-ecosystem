@@ -4,7 +4,7 @@ namespace OweMe.Domain.Expenses;
 
 public sealed class ExpenseSplit
 {
-    public required double Amount { get; init; }
+    public required decimal Amount { get; init; }
 
     public required ExpenseId ExpenseId { get; init; }
 

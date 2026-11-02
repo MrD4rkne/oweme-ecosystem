@@ -17,7 +17,7 @@ namespace OweMe.Persistence.Groups.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -62,8 +62,9 @@ namespace OweMe.Persistence.Groups.Migrations
                     b.Property<Guid>("PersonaId")
                         .HasColumnType("uuid");
 
-                    b.Property<double>("Amount")
-                        .HasColumnType("double precision");
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(19, 4)
+                        .HasColumnType("numeric(19,4)");
 
                     b.HasKey("ExpenseId", "PersonaId");
 
