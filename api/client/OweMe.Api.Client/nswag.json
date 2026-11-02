@@ -93,7 +93,8 @@
       "serviceHost": null,
       "serviceSchemes": null,
       "output": "OweMeApiClient.cs",
-      "className": "OweMeApiClient"
+      "className": "OweMeApiClient",
+      "newLineBehavior": "LF"
     }
   }
 }
