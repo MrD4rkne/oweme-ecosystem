@@ -29,5 +29,9 @@ internal sealed class ExpenseSplitConfiguration : IEntityTypeConfiguration<Expen
             .WithMany()
             .HasForeignKey(expenseSplit => expenseSplit.PersonaId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Property(expenseSplit => expenseSplit.Amount)
+            .IsRequired()
+            .HasPrecision(ExpenseConstants.Precision, ExpenseConstants.Scale);
     }
 }

@@ -28,7 +28,7 @@ erDiagram
     EXPENSE_SPLIT {
         uuid expense_id PK,FK
         uuid persona_id PK,FK
-        double amount
+        decimal amount "numeric(19,4), single implicit currency"
     }
 ```
 
