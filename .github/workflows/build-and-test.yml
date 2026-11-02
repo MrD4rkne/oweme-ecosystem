@@ -131,9 +131,11 @@ jobs:
         env:
           CLIENT_PATHSPEC: ${{ inputs.working_dir }}/client/*.cs
         run: |
-          git diff --exit-code -I 'NSwag toolchain|GeneratedCode\(' -- "$CLIENT_PATHSPEC"
+          rc=0
+          git diff --exit-code -I 'NSwag toolchain|GeneratedCode\(' -- "$CLIENT_PATHSPEC" || rc=1
           untracked=$(git ls-files --others --exclude-standard -- "$CLIENT_PATHSPEC")
-          if [ -n "$untracked" ]; then echo "Untracked generated files:"; echo "$untracked"; exit 1; fi
+          if [ -n "$untracked" ]; then echo "::error::Untracked generated files:"; echo "$untracked"; rc=1; fi
+          exit $rc
 
       - name: Test
         run: >
