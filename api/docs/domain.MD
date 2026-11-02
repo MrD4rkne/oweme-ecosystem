@@ -26,8 +26,8 @@ erDiagram
         string name
     }
     EXPENSE_SPLIT {
-        uuid expense_id PK,FK
-        uuid persona_id PK,FK
+        uuid expense_id PK, FK "cascade on expense delete"
+        uuid persona_id PK, FK "restrict on persona delete"
         decimal amount "numeric(19,4), single implicit currency"
     }
 ```
