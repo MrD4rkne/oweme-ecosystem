@@ -92,17 +92,6 @@ jobs:
         with:
           path: ${{ inputs.working_dir }}
 
-      - name: Evaluate test filter
-        run: |
-          echo "Test filter provided: ${{ inputs.test_filter }}"
-
-          if [ -n "${{ inputs.test_filter }}" ]; then
-            # Do NOT escape quotes here
-            echo "FILTER_ARG=--filter \"${{ inputs.test_filter }}\"" >> $GITHUB_ENV
-          else
-            echo "FILTER_ARG=" >> $GITHUB_ENV
-          fi
-
       - name: Sonar Begin
         run: >
           dotnet-sonarscanner begin
@@ -142,11 +131,13 @@ jobs:
       - name: Test
         env:
           WORKING_DIR: ${{ inputs.working_dir }}
+          TEST_FILTER: ${{ inputs.test_filter }}
+        # ${VAR:+...} adds --filter only when a filter is set; the quotes keep it one argument.
         run: >
           dotnet test "$WORKING_DIR"
           --configuration Release
           --no-build
-          ${{ env.FILTER_ARG }}
+          ${TEST_FILTER:+--filter "$TEST_FILTER"}
           --
           --coverage
           --coverage-output-format cobertura
