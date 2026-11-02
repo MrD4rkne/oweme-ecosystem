@@ -122,7 +122,9 @@ jobs:
           /d:sonar.coverage.exclusions="**/aspire/**"
 
       - name: Build
-        run: dotnet build ${{ inputs.working_dir }} --configuration Release
+        env:
+          WORKING_DIR: ${{ inputs.working_dir }}
+        run: dotnet build "$WORKING_DIR" --configuration Release
 
       # The build regenerates the NSwag client; a diff means an API change was committed without it.
       # -I ignores the generator version (header + GeneratedCode attributes) so NSwag bumps alone don't fail here.
@@ -138,8 +140,10 @@ jobs:
           exit $rc
 
       - name: Test
+        env:
+          WORKING_DIR: ${{ inputs.working_dir }}
         run: >
-          dotnet test ${{ inputs.working_dir }}
+          dotnet test "$WORKING_DIR"
           --configuration Release
           --no-build
           ${{ env.FILTER_ARG }}
