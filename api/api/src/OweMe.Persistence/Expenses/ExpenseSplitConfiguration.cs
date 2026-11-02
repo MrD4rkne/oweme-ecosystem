@@ -25,10 +25,11 @@ internal sealed class ExpenseSplitConfiguration : IEntityTypeConfiguration<Expen
             .HasForeignKey(expenseSplit => expenseSplit.ExpenseId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // Restrict: deleting a persona must not silently drop what they owe and rewrite the group's balances.
         modelBuilder.HasOne<Persona>()
             .WithMany()
             .HasForeignKey(expenseSplit => expenseSplit.PersonaId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Property(expenseSplit => expenseSplit.Amount)
             .IsRequired()

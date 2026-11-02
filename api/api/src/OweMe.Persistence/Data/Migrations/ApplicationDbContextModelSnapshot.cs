@@ -169,7 +169,7 @@ namespace OweMe.Persistence.Groups.Migrations
                     b.HasOne("OweMe.Domain.Users.Persona", null)
                         .WithMany()
                         .HasForeignKey("PersonaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 
