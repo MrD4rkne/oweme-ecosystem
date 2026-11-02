@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using OweMe.Application;
 using OweMe.Domain.Common;
@@ -55,6 +56,7 @@ public class AuditableDbContextTests : PostgresTestBase, IAsyncLifetime
 
         _options = new DbContextOptionsBuilder<TestDbContext>()
             .UseNpgsql(ConnectionString)
+            .UseExceptionProcessor()
             .Options;
 
         await using var ctx = new TestDbContext(_options, _timeProviderMock.Object, _userContextMock.Object);

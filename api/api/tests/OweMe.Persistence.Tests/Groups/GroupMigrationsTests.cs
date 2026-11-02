@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EntityFramework.Exceptions.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using OweMe.Application;
 using OweMe.Domain.Groups;
@@ -25,6 +26,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
         await using var context = new ApplicationDbContext(
             new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(ConnectionString)
+                .UseExceptionProcessor()
                 .Options,
             _timeProvider.Object,
             _userContextMock.Object
@@ -45,6 +47,7 @@ public class GroupMigrationsTests() : PostgresTestBase("oweme_migrations_test"),
         await using var context = new ApplicationDbContext(
             new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseNpgsql(ConnectionString)
+                .UseExceptionProcessor()
                 .Options,
             _timeProvider.Object,
             _userContextMock.Object
