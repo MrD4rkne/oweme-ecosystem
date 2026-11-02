@@ -30,7 +30,7 @@ Project `api/api/tests/OweMe.IntegrationTests/`, one file per endpoint in a fold
 - Arrange through the public API with private helpers (`CreateGroup`, `CreatePersona`); use the real request/response types, not hand-written DTOs. Check the DB only when the response cannot show the effect.
 - Strongly typed ids: `new XId(Guid.NewGuid())` for "does not exist", `XId.Empty` for validation failures.
 
-Every endpoint gets: happy path (status and effect), 400 per validation rule, 403 only where the spec says so, no-op/idempotency rules, and an entry in `ApiShouldRequireAuthentication.cs`. Endpoints that target an existing entity also get 404 missing and 404 stranger (second `TestUser`, assert nothing changed). Each spec Rule maps to a test. Pure logic (splits, rounding, balances) also gets unit tests in `OweMe.Domain.UnitTests` / `OweMe.Application.UnitTests`.
+Every endpoint gets: happy path (status and effect), 400 per validation rule, 403 only where the spec says so, and an entry in `ApiShouldRequireAuthentication.cs`. Endpoints that target an existing entity also get 404 missing and 404 stranger (second `TestUser`, assert nothing changed). Each spec Rule maps to a test. Pure logic (splits, rounding, balances) also gets unit tests in `OweMe.Domain.UnitTests` / `OweMe.Application.UnitTests`.
 
 Run (Docker required):
 
