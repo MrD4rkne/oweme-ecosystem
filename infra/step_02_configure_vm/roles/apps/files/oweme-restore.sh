@@ -13,6 +13,7 @@ source /etc/oweme-backup.env # BACKUP_PAR_URL, the read-write PAR (ends in /o/)
 cd /opt/apps
 
 # Work on a private copy: the safety backup below prunes old local runs, possibly this one.
+install -d -m 700 /opt/backups # absent on a replacement VM
 dir=$(mktemp -d /opt/backups/.restore.XXXXXX)
 trap 'rm -rf "$dir"' EXIT
 if [[ -d /opt/backups/$run ]]; then

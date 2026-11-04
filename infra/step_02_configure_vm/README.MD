@@ -37,6 +37,6 @@ The script fully reads both dumps, asks for confirmation, stops `api` and `keycl
 
 - Don't deploy during a restore: disable the workflow first (`gh workflow disable "Deploy — api"`, `enable` after).
 - Restore staging only from staging dumps: production dumps carry real users and client secrets.
-- Keycloak data comes back as it was: the admin password and client secrets too. If either was rotated since the dump (vault, `api.env`), set it again in Keycloak. A dump from a newer Keycloak won't start on an older image.
+- Keycloak comes back exactly as it was in the dump, admin password included (`keycloak.env` only sets the initial admin). If `vault_keycloak_admin_password` changed since, set it again in Keycloak, or the next full provision's realm step can't log in. The api uses no client secret. A dump from a newer Keycloak won't start on an older image.
 - The safety dump needs disk space and the bucket. If it can't run (disk full, bucket unreachable), fix that first.
-- If a restore stops after `dropdb` and before `createdb` (the database is gone), create it by hand, then rerun: `docker compose exec -T api-db sh -c 'createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'` (or `keycloak-db`).
+- If a restore stops after `dropdb` and before `createdb` (the database is gone), create it by hand, then rerun: `cd /opt/apps && docker compose exec -T api-db sh -c 'createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'` (or `keycloak-db`).
