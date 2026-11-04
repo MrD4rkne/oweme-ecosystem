@@ -14,7 +14,7 @@ flock -w 1800 9
 # The migrator starts a stopped api-db itself, so never skip: start both DBs and dump them.
 # On a fresh VM this creates and dumps empty databases, which is harmless.
 # --no-recreate: back up the current container as it is, before a deploy applies a new image or config to it.
-docker compose up -d --wait --no-recreate api-db keycloak-db
+docker compose up -d --wait --wait-timeout 300 --no-recreate api-db keycloak-db # bounded: a restart loop never turns healthy
 
 db_bytes() { docker compose exec -T "$1" sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select pg_database_size(current_database())"'; }
 # timeout runs inside the container so it kills pg_dump itself; --lock-wait-timeout only bounds getting the locks.
