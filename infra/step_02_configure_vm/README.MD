@@ -2,6 +2,8 @@
 
 Inventories live in `inventory/staging` and `inventory/production`; secrets in each `vars/<env>/vault.yml`.
 
+The VMs are changed only through GitHub Actions (deploys, Configure Environments, Restore databases), which run one at a time per environment. SSH is for reading and for break-glass when Actions is down.
+
 ```bash
 ansible-playbook site.yml -i inventory/staging/hosts.ini --vault-password-file .vault_pass
 ```
@@ -16,20 +18,27 @@ The deploy runs `api-migrator` (the api image with the `migrate` command) before
 - The old api serves on the new schema until the new one is up, and rollback never reverts migrations: keep each migration compatible with the previous release.
 - Images older than the `migrate` command cannot be redeployed through this playbook; the migrator exits 1.
 
-## CD and backups
+## CD
 
 Push to `main` (api/**) deploys staging, runs `OweMe.Api.SmokeTests` against it, then deploys production. Staging needs env variables `API_URL`, `IDP_REALM_URL` and secrets `SMOKE_USER` / `SMOKE_PASSWORD` (user in realm `oweme-staging`: first/last name, verified email, no admin roles).
 
-Each API deploy first dumps the API database to `/opt/backups/api-<utc time>.dump` (root-only, last 10, on the VM only; the deploy fails if free disk is under 2x the database size). Restore, setting `API_IMAGE_TAG` in `.env` to the image deployed at that time (see the environment's deployment history):
+## Backups and restore
+
+`/usr/local/sbin/oweme-backup.sh` dumps `api-db` and `keycloak-db` into `/opt/backups/<run>/` (root-only, last 3 runs) and uploads both to the environment's bucket (`<stack>-backups`, kept 14 days). It runs nightly at 03:00 UTC (cron, `journalctl -t oweme-backup`) and before every migration; the deploy fails if it fails. `.github/workflows/backup-check.yml` fails daily when a bucket has no fresh pair.
+
+Restore a run (both databases, as a pair: api rows are keyed by the Keycloak `sub`) with the **Restore databases** workflow (`restore-db.yml`): pick the environment and the run id. It shares the `deploy-<env>` concurrency group with deploys and provisioning, so it waits for them and they wait for it. Production needs the environment's approval. Staging ends with the smoke tests, so `SMOKE_USER` must exist in the restored data.
 
 ```bash
-sudo bash -euo pipefail <<'EOF'
-cd /opt/apps
-docker compose stop api
-# Recreate the DB: pg_restore --clean leaves tables added by later migrations behind.
-docker compose exec -T api-db sh -c 'dropdb -U "$POSTGRES_USER" --force "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
-docker compose exec -T api-db sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --exit-on-error' < /opt/backups/<file>.dump
-docker compose up -d api # reached only if the restore succeeded
-EOF
+# Run ids in the bucket (from infra/step_01_create_vm; -s oweme-p for production)
+curl -fsS -K - <<< "url = \"$(pulumi stack output BackupCheckParUrl -s oweme-s --show-secrets)\"" | jq -r '.objects[].name' | grep -oE '^[0-9]{8}T[0-9]{6}Z' | sort -u
+gh workflow run restore-db.yml -f environment=staging -f run=<run>
 ```
 
+Only when GitHub Actions itself is unavailable, restore over SSH: `sudo /usr/local/sbin/oweme-restore.sh <run>` (it asks for confirmation). With Actions down, no new deploy or provision can start, but one may still be running from before the outage: first check on the VM that `pgrep -af ansible` prints nothing, and don't start the restore until it does. While Actions works, always use the workflow, which GitHub serializes with deploys and provisioning.
+
+Before replacing anything the script takes a safety dump, and it migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`). It prints the safety run id (in the workflow log too); restoring that run undoes the restore. Before the confirmation no data is touched, though `api-db` and `keycloak-db` are started if they were stopped. If the safety dump fails, the apps that were running are started again. A failure after that leaves both apps stopped and prints the safety run to restore.
+
+- Restore staging only from staging dumps: production dumps carry real users and client secrets.
+- Keycloak comes back exactly as it was in the dump, admin password included (`keycloak.env` only sets the initial admin). If `vault_keycloak_admin_password` changed since, set it again in Keycloak, or the next full provision's realm step can't log in. The api uses no client secret. A dump from a newer Keycloak won't start on an older image.
+- The safety dump needs disk space and the bucket. If it can't run (disk full, bucket unreachable), fix that first.
+- If a restore stops after `dropdb` and before `createdb` (the database is gone), create it by hand, then rerun: `cd /opt/apps && docker compose exec -T api-db sh -c 'createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'` (or `keycloak-db`).

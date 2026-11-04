@@ -1,0 +1,69 @@
+name: Restore databases
+
+# Restores api-db and keycloak-db from a nightly backup run (issue #101), via oweme-restore.sh on the VM.
+# Shares the deploy-<env> concurrency group with deploys and provisioning, so it never runs at the same time as either.
+# Production needs the environment's approval. List the run ids: infra/step_02_configure_vm/README.MD.
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to restore'
+        required: true
+        type: choice
+        options: [staging, production]
+      run:
+        description: 'Backup run id, e.g. 20261104T030000Z'
+        required: true
+        type: string
+
+permissions:
+  contents: read # checkout only; the environment's deployment record needs no token scope
+
+jobs:
+  restore:
+    name: Restore ${{ inputs.run }} — ${{ inputs.environment }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment: ${{ inputs.environment }}
+    concurrency:
+      group: deploy-${{ inputs.environment }}
+      cancel-in-progress: false
+      queue: max # wait for running deploys/provisions instead of replacing them
+    steps:
+      - name: Check run id
+        env:
+          RUN: ${{ inputs.run }}
+        run: |
+          [[ "$RUN" =~ ^[0-9]{8}T[0-9]{6}Z$ ]] || { echo "::error::Not a run id: $RUN"; exit 1; }
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # NBGV fails on a shallow clone when building the smoke tests
+
+      - uses: ./.github/actions/setup-ansible
+        with:
+          ssh_key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+          vault_password: ${{ secrets.ANSIBLE_VAULT_PASSWORD }}
+
+      - name: Restore
+        working-directory: infra/step_02_configure_vm
+        env:
+          RUN: ${{ inputs.run }}
+          TARGET_ENV: ${{ inputs.environment }}
+        run: ansible-playbook -v -i "inventory/${TARGET_ENV}/hosts.ini" restore.yml --private-key deploy_key -e "run=${RUN}" # -v prints the script output (safety run id)
+
+      # Staging only, like deploys. Needs SMOKE_USER to exist in the restored Keycloak data.
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        if: inputs.environment == 'staging'
+        with:
+          dotnet-version: 10.x
+
+      - name: Smoke tests
+        if: inputs.environment == 'staging'
+        env:
+          ApiSettings__BaseUrl: ${{ vars.API_URL }}
+          IdentityProviderSettings__Address: ${{ vars.IDP_REALM_URL }}
+          UserSettings__UserName: ${{ secrets.SMOKE_USER }}
+          UserSettings__Password: ${{ secrets.SMOKE_PASSWORD }}
+        run: dotnet test --project api/api/tests/OweMe.Api.SmokeTests/OweMe.Api.SmokeTests.csproj --configuration Release

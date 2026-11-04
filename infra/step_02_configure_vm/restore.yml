@@ -1,0 +1,13 @@
+---
+# Restores api-db and keycloak-db from a backup run. Run by .github/workflows/restore-db.yml, not part of site.yml.
+#   ansible-playbook -i inventory/staging/hosts.ini restore.yml --private-key deploy_key -e run=20261104T030000Z
+
+- hosts: all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Restore databases from run {{ run }}
+      ansible.builtin.command:
+        argv: [/usr/local/sbin/oweme-restore.sh, "{{ run }}"]
+        stdin: restore # the workflow's environment approval is the confirmation
+      changed_when: true
