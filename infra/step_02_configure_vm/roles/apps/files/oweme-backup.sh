@@ -7,16 +7,16 @@ umask 077
 source /etc/oweme-backup.env # BACKUP_PAR_URL, the read-write PAR (ends in /o/)
 cd /opt/apps
 
-# Cron and a deploy can overlap: wait for the other run instead of racing it.
+# Cron and a deploy can overlap: wait for the other run instead of racing it, but not forever.
 exec 9>/run/oweme-backup.lock
-flock 9
+flock -w 1800 9
 
 # The migrator starts a stopped api-db itself, so never skip: start both DBs and dump them.
 # On a fresh VM this creates and dumps empty databases, which is harmless.
 docker compose up -d --wait api-db keycloak-db
 
 db_bytes() { docker compose exec -T "$1" sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select pg_database_size(current_database())"'; }
-dump() { docker compose exec -T "$1" sh -c 'pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB"' > "$tmp/$2.dump"; }
+dump() { docker compose exec -T "$1" sh -c 'pg_dump -U "$POSTGRES_USER" --lock-wait-timeout=300s -Fc "$POSTGRES_DB"' > "$tmp/$2.dump"; }
 
 # Backups share the disk with the Postgres volumes: refuse when free space is under 2x the databases.
 api_bytes=$(db_bytes api-db)      # separate assignments so set -e catches a failed psql
