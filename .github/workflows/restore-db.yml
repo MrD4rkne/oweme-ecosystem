@@ -18,8 +18,7 @@ on:
         type: string
 
 permissions:
-  contents: read
-  deployments: write
+  contents: read # checkout only; the environment's deployment record needs no token scope
 
 jobs:
   restore:

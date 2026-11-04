@@ -32,7 +32,7 @@ curl -fsS -K - <<< "url = \"$(pulumi stack output BackupCheckParUrl -s oweme-s -
 gh workflow run restore-db.yml -f environment=staging -f run=<run>
 ```
 
-Emergency path when GitHub Actions is unavailable: `sudo /usr/local/sbin/oweme-restore.sh <run>` over SSH. It asks for confirmation, but nothing stops a deploy from starting meanwhile, so disable it first (`gh workflow disable "Deploy — api"`) and wait until `gh run list --status in_progress` shows no deploy or provision for that environment; `enable` it again after the restore.
+Only when GitHub Actions itself is unavailable, restore over SSH: `sudo /usr/local/sbin/oweme-restore.sh <run>` (it asks for confirmation). With Actions down, no deploy or provision can start meanwhile; while Actions works, always use the workflow, which GitHub serializes with them.
 
 The script fully reads both dumps, asks for confirmation, stops `api` and `keycloak`, takes a safety dump of the current state, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`) and starts the api. It prints the safety run id (in the workflow log too); restoring that run undoes the restore. Before the confirmation no data is touched, though `api-db` and `keycloak-db` are started if they were stopped. If the safety dump fails, the apps that were running are started again. A failure after that leaves both apps stopped and prints the safety run to restore.
 
