@@ -33,7 +33,7 @@ curl -fsS -K - <<< "url = \"${BACKUP_PAR_URL}\"" | jq -r '.objects[].name' | gre
 oweme-restore.sh <run>
 ```
 
-The script fully reads both dumps, asks for confirmation, stops `api` and `keycloak`, takes a safety dump of the current state, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`) and starts the api. It prints the safety run id: `oweme-restore.sh <safety run>` undoes the restore. On failure both apps are left stopped.
+The script fully reads both dumps, asks for confirmation, stops `api` and `keycloak`, takes a safety dump of the current state, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`) and starts the api. It prints the safety run id: `oweme-restore.sh <safety run>` undoes the restore. A failure before the confirmation changes nothing. If the safety dump fails, the apps that were running are started again. A failure after that leaves both apps stopped and prints the safety run to restore.
 
 - Don't deploy during a restore: disable the workflow first (`gh workflow disable "Deploy — api"`, `enable` after).
 - Restore staging only from staging dumps: production dumps carry real users and client secrets.
