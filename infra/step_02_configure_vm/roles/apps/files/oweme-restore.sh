@@ -3,7 +3,7 @@
 # Replaces api-db and keycloak-db with the dump pair of <run> (issue #101). Restores both as a pair:
 # api rows are keyed by the Keycloak sub. Uses /opt/backups/<run>/ if present, otherwise downloads it from the bucket.
 # Restore only an environment's own dumps (production dumps carry real users and client secrets).
-set -eEuo pipefail # -E: the ERR trap also fires inside functions
+set -euo pipefail # no -E: the ERR trap must not also fire inside $( ) (it would run twice)
 umask 077
 
 run=${1:?usage: oweme-restore.sh <run>, e.g. 20261104T030000Z}
@@ -53,12 +53,11 @@ safety=$(/usr/local/sbin/oweme-backup.sh | tee /dev/stderr | awk '/^backup .* up
 exec 9>/run/oweme-backup.lock
 flock -w 1800 9
 
-restore() { # <service> <dump>
-  docker compose exec -T "$1" sh -c 'dropdb -U "$POSTGRES_USER" --force "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
-  docker compose exec -T "$1" sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --exit-on-error --single-transaction' < "$2"
-}
-restore api-db "$dir/api.dump"
-restore keycloak-db "$dir/keycloak.dump"
+# Inline, not a function: the ERR trap doesn't fire inside functions without -E.
+for pair in api-db:api keycloak-db:keycloak; do
+  docker compose exec -T "${pair%%:*}" sh -c 'dropdb -U "$POSTGRES_USER" --force "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
+  docker compose exec -T "${pair%%:*}" sh -c 'pg_restore -U "$POSTGRES_USER" -d "$POSTGRES_DB" --no-owner --exit-on-error --single-transaction' < "$dir/${pair##*:}.dump"
+done
 
 docker compose up -d --wait --wait-timeout 600 keycloak
 # An older dump has an older schema: migrate it forward with the current image, then start the api.
