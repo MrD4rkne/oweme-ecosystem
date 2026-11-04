@@ -6,6 +6,8 @@
       auth_realm: master
       auth_username: "{{ vault_keycloak_admin_user }}"
       auth_password: "{{ vault_keycloak_admin_password }}"
+  # Admin credentials pass through every task. Debug a failure by rerunning with no_log off.
+  no_log: true
   block:
     - name: Ensure realm exists with registration settings
       community.general.keycloak_realm:
