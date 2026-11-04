@@ -71,11 +71,19 @@ services:
       keycloak-db:
         condition: service_healthy
     networks: [web, app-backend, monitoring]
+    # Loopback only: Ansible's realm tasks and break-glass kcadm.sh.
+    ports: ["127.0.0.1:8080:8080"]
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.rule=Host(`{{ idp_hostname }}`)"
       - "traefik.http.routers.keycloak.tls.certresolver=letsencrypt"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+
+      # Admin console and master realm: break-glass only, over loopback (README).
+      - "traefik.http.routers.keycloak-admin.rule=Host(`{{ idp_hostname }}`) && (PathPrefix(`/admin`) || PathPrefix(`/realms/master`))"
+      - "traefik.http.routers.keycloak-admin.priority=100"
+      - "traefik.http.routers.keycloak-admin.service=noop@internal"
+      - "traefik.http.routers.keycloak-admin.tls.certresolver=letsencrypt"
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && printf 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '200 OK' <&3"]
       interval: 10s
