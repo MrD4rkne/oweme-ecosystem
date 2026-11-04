@@ -20,6 +20,16 @@
     mode: '0700'
   tags: [apps, deploy]
 
+# Run by hand over SSH; see README "Backups and restore".
+- name: Install restore script
+  ansible.builtin.copy:
+    src: oweme-restore.sh
+    dest: /usr/local/sbin/oweme-restore.sh
+    owner: root
+    group: root
+    mode: '0700'
+  tags: [apps, deploy]
+
 # Minimal Ubuntu images ship without cron. Installed here, not in base: the deploy fast path (--tags deploy) skips base.
 - name: Install cron
   ansible.builtin.apt:
