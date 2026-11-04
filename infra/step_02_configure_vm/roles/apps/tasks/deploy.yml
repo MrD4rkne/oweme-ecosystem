@@ -1,10 +1,11 @@
 ---
-# Production migrates unattended, so dump both DBs first (also off the VM). Same condition as the migration;
-# the script skips itself on a fresh VM (api-db not running) and fails the deploy when the disk is too full.
+# Production migrates unattended, so dump both DBs first (also off the VM). The script starts the DBs if needed
+# (empty dumps on a fresh VM) and fails the deploy when the disk is too full or the upload fails.
 - name: Back up databases before migration
   ansible.builtin.command: /usr/local/sbin/oweme-backup.sh
   changed_when: true
-  when: target_app is not defined or target_app == 'api'
+  # keycloak too: a Keycloak upgrade migrates its own schema on start.
+  when: target_app is not defined or target_app in ['api', 'keycloak']
   tags: [apps, deploy]
 
 # Runs before api is recreated, so a failed migration stops the deploy while the old api keeps serving.

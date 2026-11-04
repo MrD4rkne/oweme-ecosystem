@@ -7,17 +7,21 @@ umask 077
 source /etc/oweme-backup.env # BACKUP_PAR_URL, the read-write PAR (ends in /o/)
 cd /opt/apps
 
-# Fresh VM: nothing to back up yet.
-if [[ -z "$(docker compose ps -q --status running api-db)" ]]; then
-  echo "api-db is not running, skipping backup"
-  exit 0
-fi
+# Cron and a deploy can overlap: wait for the other run instead of racing it.
+exec 9>/run/oweme-backup.lock
+flock 9
+
+# The migrator starts a stopped api-db itself, so never skip: start both DBs and dump them.
+# On a fresh VM this creates and dumps empty databases, which is harmless.
+docker compose up -d --wait api-db keycloak-db
 
 db_bytes() { docker compose exec -T "$1" sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select pg_database_size(current_database())"'; }
 dump() { docker compose exec -T "$1" sh -c 'pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB"' > "$tmp/$2.dump"; }
 
 # Backups share the disk with the Postgres volumes: refuse when free space is under 2x the databases.
-need=$(( 2 * ($(db_bytes api-db) + $(db_bytes keycloak-db)) ))
+api_bytes=$(db_bytes api-db)      # separate assignments so set -e catches a failed psql
+kc_bytes=$(db_bytes keycloak-db)
+need=$(( 2 * (api_bytes + kc_bytes) ))
 install -d -m 700 /opt/backups
 free=$(df --output=avail -B1 /opt/backups | tail -n1)
 if (( free < need )); then
@@ -36,7 +40,9 @@ dump keycloak-db keycloak
 mv "$tmp" "/opt/backups/$run"
 
 for db in api keycloak; do
-  curl -fsS --retry 3 -T "/opt/backups/$run/$db.dump" "${BACKUP_PAR_URL}$run/$db.dump"
+  # Bounded so a stalled upload can't hold the deploy; https only so a bad vault value can't send the dump in clear.
+  # The URL goes in on stdin (-K -), not argv, so it never shows up in the process list.
+  curl -fsS --proto '=https' --retry 3 --max-time 600 -T "/opt/backups/$run/$db.dump" -K - <<< "url = \"${BACKUP_PAR_URL}$run/$db.dump\""
 done
 
 # Keep the last 3 runs locally; the bucket keeps 14 days.
