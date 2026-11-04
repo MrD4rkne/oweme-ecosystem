@@ -27,10 +27,14 @@ jobs:
     steps:
       - name: Look for a fresh dump pair
         env:
-          PAR_URL: ${{ secrets[matrix.secret] }}
+          # Static references: secrets[matrix.secret] would hand every repo secret to the runner (CodeQL).
+          # Not `a && b || c` either: an empty staging secret would fall through to the production URL.
+          BACKUP_CHECK_PAR_URL_STAGING: ${{ secrets.BACKUP_CHECK_PAR_URL_STAGING }}
+          BACKUP_CHECK_PAR_URL_PRODUCTION: ${{ secrets.BACKUP_CHECK_PAR_URL_PRODUCTION }}
           SECRET_NAME: ${{ matrix.secret }}
         run: |
           set -euo pipefail
+          PAR_URL=${!SECRET_NAME}
           if [[ -z "$PAR_URL" ]]; then
             echo "::error::Secret $SECRET_NAME is not set"
             exit 1
