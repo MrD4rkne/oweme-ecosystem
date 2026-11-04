@@ -20,6 +20,13 @@
     mode: '0700'
   tags: [apps, deploy]
 
+# Minimal Ubuntu images ship without cron. Installed here, not in base: the deploy fast path (--tags deploy) skips base.
+- name: Install cron
+  ansible.builtin.apt:
+    name: cron
+    state: present
+  tags: [apps, deploy]
+
 # Output goes to syslog (journalctl -t oweme-backup). Failures surface in .github/workflows/backup-check.yml, not here.
 - name: Schedule nightly backup (03:00 UTC)
   ansible.builtin.cron:
