@@ -127,10 +127,14 @@ class MyStack : Stack
         // Object Storage can't run lifecycle rules without this. One per stack: the duplicate statement is harmless
         // and saves picking an owner stack. IAM takes a few seconds to apply; if the first `up` fails on the
         // lifecycle rule, run it again.
+        // OCI requires this policy in the tenancy root (docs: usinglifecyclepolicies.htm, "Service Permissions").
+        // The app compartment sits directly under root, so its parent is the tenancy.
+        var tenancyId = GetCompartment.Invoke(new GetCompartmentInvokeArgs { Id = compartmentId })
+            .Apply(c => c.CompartmentId);
         var region = new Config("oci").Require("region");
         var lifecyclePolicy = new Policy("BackupLifecycleIamPolicy", new PolicyArgs
         {
-            CompartmentId = compartmentId,
+            CompartmentId = tenancyId,
             Name = Named("objectstorage-lifecycle"),
             Description = "Lets Object Storage run lifecycle rules on the oweme backup bucket",
             Statements = { $"Allow service objectstorage-{region} to manage object-family in compartment id {compartmentId}" }
