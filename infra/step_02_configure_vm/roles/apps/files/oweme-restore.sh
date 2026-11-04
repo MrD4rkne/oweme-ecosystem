@@ -36,7 +36,8 @@ read -rp "Replace the api and keycloak databases on $(hostname) with run $run? T
 # From here on, a failure leaves both apps stopped rather than half-running on a half-restored state.
 safety=""
 # Only these get restarted if the safety dump fails: after an earlier failed restore they are stopped on purpose.
-read -ra were_running <<< "$(docker compose ps --services --status running api keycloak | xargs)"
+running=$(docker compose ps --services --status running api keycloak | xargs) # own assignment: set -e stops here if ps fails
+read -ra were_running <<< "$running"
 failed() {
   if [[ -z $safety ]]; then
     if (( ${#were_running[@]} )); then docker compose up -d --no-recreate "${were_running[@]}"; fi
