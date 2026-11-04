@@ -29,8 +29,6 @@ jobs:
       force_env_render: ${{ inputs.force_env_render || false }}
     secrets: inherit
 
-  # Runs after every staging provision so production never drifts from main; the production environment's
-  # required reviewers and wait timer still gate it.
   configure-production:
     uses: ./.github/workflows/reusable-configure-vm.yml
     with:
