@@ -1,5 +1,4 @@
 using EntityFramework.Exceptions.Common;
-using Microsoft.EntityFrameworkCore;
 using OweMe.Application.Personas;
 using OweMe.Domain.Groups;
 
@@ -33,8 +32,8 @@ public static class AddGroupMemberCommandHandler
             return AddGroupMemberResult.UserNotAuthorized;
         }
 
-        if (!await personaContext.Personas.AnyAsync(x => x.Id == message.PersonaId,
-                cancellationToken: cancellationToken))
+        var persona = await personaContext.Personas.FindAsync([message.PersonaId], cancellationToken);
+        if (persona is null || !persona.CanUserAccess(userContext.Id))
         {
             return AddGroupMemberResult.PersonaNotFound;
         }
