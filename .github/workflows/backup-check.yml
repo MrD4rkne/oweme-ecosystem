@@ -1,0 +1,51 @@
+name: Backup check
+
+# Fails (and GitHub emails) when a bucket has no api+keycloak dump pair from the last 26 hours (issue #101).
+# Catches a broken cron, a dead VM, an expired PAR or a full bucket alike.
+# Secrets: BACKUP_CHECK_PAR_URL_<ENV> = Pulumi output BackupCheckParUrl (read-only PAR, safe outside the gated environments).
+
+on:
+  schedule:
+    - cron: '17 5 * * *' # after the 03:00 UTC dump; off the hour, when GitHub drops scheduled runs
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check:
+    name: Backup check — ${{ matrix.env }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - env: staging
+            secret: BACKUP_CHECK_PAR_URL_STAGING
+          - env: production
+            secret: BACKUP_CHECK_PAR_URL_PRODUCTION
+    steps:
+      - name: Look for a fresh dump pair
+        env:
+          PAR_URL: ${{ secrets[matrix.secret] }}
+          SECRET_NAME: ${{ matrix.secret }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$PAR_URL" ]]; then
+            echo "::error::Secret $SECRET_NAME is not set"
+            exit 1
+          fi
+
+          # Objects are <run>/{api,keycloak}.dump with run = UTC yyyymmddThhmmssZ, so names sort by time.
+          # The default listing limit (1000) is far above 14 days x 2 objects.
+          latest=$(curl -fsS --proto '=https' --retry 3 --max-time 60 -K - <<< "url = \"$PAR_URL\"" \
+            | jq -r '.objects[].name' \
+            | grep -E '^[0-9]{8}T[0-9]{6}Z/(api|keycloak)\.dump$' \
+            | cut -d/ -f1 | sort | uniq -c | awk '$1 == 2 { print $2 }' | tail -n1 || true)
+
+          cutoff=$(date -u -d '26 hours ago' +%Y%m%dT%H%M%SZ)
+          if [[ -z "$latest" || "$latest" < "$cutoff" ]]; then
+            echo "::error::No complete backup since $cutoff (latest complete run: ${latest:-none})"
+            exit 1
+          fi
+          echo "Latest complete backup: $latest"

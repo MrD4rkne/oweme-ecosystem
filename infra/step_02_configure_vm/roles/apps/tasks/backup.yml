@@ -20,7 +20,7 @@
     mode: '0700'
   tags: [apps, deploy]
 
-# Output goes to syslog (journalctl -t oweme-backup). Failures will surface in backup-check.yml (#101 step 6), not here.
+# Output goes to syslog (journalctl -t oweme-backup). Failures surface in .github/workflows/backup-check.yml, not here.
 - name: Schedule nightly backup (03:00 UTC)
   ansible.builtin.cron:
     name: oweme-backup
