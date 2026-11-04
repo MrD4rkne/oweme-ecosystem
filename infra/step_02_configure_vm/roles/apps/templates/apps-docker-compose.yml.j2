@@ -84,6 +84,7 @@ services:
       - "traefik.http.routers.keycloak-admin.priority=100"
       - "traefik.http.routers.keycloak-admin.service=noop@internal"
       - "traefik.http.routers.keycloak-admin.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.keycloak-admin.entrypoints=websecure"
     healthcheck:
       test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/9000 && printf 'GET /health/ready HTTP/1.1\r\nhost: localhost\r\nConnection: close\r\n\r\n' >&3 && grep -q '200 OK' <&3"]
       interval: 10s
