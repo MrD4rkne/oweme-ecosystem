@@ -44,7 +44,6 @@ jobs:
       - name: Deploy ${{ inputs.app_name }} only
         working-directory: infra/step_02_configure_vm
         env:
-          ANSIBLE_HOST_KEY_CHECKING: "False"
           IMAGE_TAG: ${{ inputs.image_tag }}
           TARGET_APP: ${{ inputs.app_name }}
           TARGET_ENV: ${{ inputs.environment_name }}
