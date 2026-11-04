@@ -2,5 +2,6 @@
 
 
 - import_tasks: env.yml
+- import_tasks: backup.yml
 - import_tasks: deploy.yml
 - import_tasks: keycloak_realm.yml
