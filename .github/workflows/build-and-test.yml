@@ -50,6 +50,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       semver: ${{ steps.nbgv.outputs.SemVer2 }}
+    env:
+      # SonarCloud plan only analyses main and PRs; elsewhere the quality-gate query fails (#120)
+      RUN_SONAR: ${{ github.ref_name == 'main' || github.event_name == 'pull_request' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -66,12 +69,14 @@ jobs:
             ${{ inputs.working_dir }}/**/*.csproj
 
       - name: Setup Java (required by sonar-scanner engine)
+        if: env.RUN_SONAR == 'true'
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           distribution: 'temurin'
           java-version: '21'
 
       - name: Cache SonarQube packages
+        if: env.RUN_SONAR == 'true'
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.sonar/cache
@@ -82,6 +87,7 @@ jobs:
         run: dotnet tool install -g Aspire.Cli
 
       - name: Install SonarScanner for .NET
+        if: env.RUN_SONAR == 'true'
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Calculate Version via NBGV
@@ -91,6 +97,7 @@ jobs:
           path: ${{ inputs.working_dir }}
 
       - name: Sonar Begin
+        if: env.RUN_SONAR == 'true'
         run: >
           dotnet-sonarscanner begin
           /k:"${{ inputs.sonar_project_key }}"
@@ -144,6 +151,7 @@ jobs:
           --ignore-exit-code 8
 
       - name: Sonar End
+        if: env.RUN_SONAR == 'true'
         run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
