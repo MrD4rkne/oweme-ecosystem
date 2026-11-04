@@ -1,0 +1,38 @@
+name: Backup check
+
+# Fails when a bucket has no api+keycloak dump pair from the last 26 hours (issue #101). GitHub notifies whoever last
+# edited the cron line; keep Settings -> Notifications -> Actions -> "failed workflows" on, with email, for that account.
+# Catches a broken cron, a dead VM, an expired PAR or a full bucket alike.
+# Secrets: BACKUP_CHECK_PAR_URL_<ENV> = Pulumi output BackupCheckParUrl (read-only PAR, safe outside the gated environments).
+
+on:
+  schedule:
+    - cron: '17 5 * * *' # after the 03:00 UTC dump; off the hour, when GitHub drops scheduled runs
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One job per environment, each with a static reference to only its own PAR: it can read that environment's dumps.
+jobs:
+  staging:
+    name: Backup check — staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: .github/scripts/backup-check.sh
+        env:
+          PAR_URL: ${{ secrets.BACKUP_CHECK_PAR_URL_STAGING }}
+          SECRET_NAME: BACKUP_CHECK_PAR_URL_STAGING
+
+  production:
+    name: Backup check — production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: .github/scripts/backup-check.sh
+        env:
+          PAR_URL: ${{ secrets.BACKUP_CHECK_PAR_URL_PRODUCTION }}
+          SECRET_NAME: BACKUP_CHECK_PAR_URL_PRODUCTION

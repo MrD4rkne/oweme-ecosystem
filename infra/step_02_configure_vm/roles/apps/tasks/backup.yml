@@ -1,0 +1,31 @@
+---
+# Nightly off-VM backups (issue #101). Tagged deploy too: deploy.yml calls the script before migrating.
+
+- name: Render backup env (bucket PAR URL)
+  ansible.builtin.template:
+    src: oweme-backup.env.j2
+    dest: /etc/oweme-backup.env
+    owner: root
+    group: root
+    mode: '0600'
+  no_log: true
+  tags: [apps, deploy, secrets]
+
+- name: Install backup script
+  ansible.builtin.copy:
+    src: oweme-backup.sh
+    dest: /usr/local/sbin/oweme-backup.sh
+    owner: root
+    group: root
+    mode: '0700'
+  tags: [apps, deploy]
+
+# Output goes to syslog (journalctl -t oweme-backup). Failures surface in .github/workflows/backup-check.yml, not here.
+- name: Schedule nightly backup (03:00 UTC)
+  ansible.builtin.cron:
+    name: oweme-backup
+    user: root
+    hour: "3"
+    minute: "0"
+    job: "/usr/local/sbin/oweme-backup.sh 2>&1 | logger -t oweme-backup"
+  tags: [apps, deploy]

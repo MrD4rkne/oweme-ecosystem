@@ -1,27 +1,11 @@
 ---
-# Production migrates unattended, so dump the DB first. Root-only (user data); keeps the last 10.
-# Backups share the disk with the Postgres volume: refuse to dump (and deploy) when free space is under 2x the DB.
-# API deploys only: on a fresh VM (full provision) api-db isn't running yet.
-- name: Back up API database before migration
-  ansible.builtin.shell: |
-    set -euo pipefail
-    umask 077
-    install -d -m 700 /opt/backups
-    cd /opt/apps
-    db_bytes=$(docker compose exec -T api-db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select pg_database_size(current_database())"')
-    free_bytes=$(df --output=avail -B1 /opt/backups | tail -n1)
-    if (( free_bytes < 2 * db_bytes )); then
-      echo "Not enough disk for a backup: free=${free_bytes} db=${db_bytes}" >&2
-      exit 1
-    fi
-    f="/opt/backups/api-$(date -u +%Y%m%dT%H%M%SZ).dump"
-    trap 'rm -f "$f.tmp"' EXIT
-    docker compose exec -T api-db sh -c 'pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB"' > "$f.tmp"
-    mv "$f.tmp" "$f"
-    ls -1t /opt/backups/api-*.dump | tail -n +11 | xargs -r rm --
-  args:
-    executable: /bin/bash
-  when: target_app is defined and target_app == 'api'
+# Production migrates unattended, so dump both DBs first (also off the VM). The script starts the DBs if needed
+# (empty dumps on a fresh VM) and fails the deploy when the disk is too full or the upload fails.
+- name: Back up databases before migration
+  ansible.builtin.command: /usr/local/sbin/oweme-backup.sh
+  changed_when: true
+  # keycloak too: a Keycloak upgrade migrates its own schema on start.
+  when: target_app is not defined or target_app in ['api', 'keycloak']
   tags: [apps, deploy]
 
 # Runs before api is recreated, so a failed migration stops the deploy while the old api keeps serving.

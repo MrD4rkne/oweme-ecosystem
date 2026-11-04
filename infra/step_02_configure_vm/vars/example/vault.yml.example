@@ -15,3 +15,6 @@ vault_keycloak_db_password: "your_keycloak_db_password"
 
 vault_grafana_admin_password: "grafana_admin_password"
 vault_crowdsec_bouncer_key: "crowdsec_bouncer_key"
+
+# Read-write backup PAR (Pulumi output BackupParUrl, ends in /o/). Rendered to /etc/oweme-backup.env.
+vault_backup_par_url: "https://<namespace>.objectstorage.<region>.oci.customer-oci.com/p/<token>/n/<namespace>/b/<stack>-backups/o/"
