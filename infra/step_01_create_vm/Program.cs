@@ -4,6 +4,7 @@ using Pulumi.Oci.Core.Inputs;
 using Pulumi.Oci.Identity;
 using Pulumi.Oci.ObjectStorage;
 using Pulumi.Oci.ObjectStorage.Inputs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 class Program
@@ -21,19 +22,22 @@ class MyStack : Stack
         var imageId = config.Require("imageId"); 
         var sshPublicKey = config.Require("sshPublicKey");
         string Named(string resource) => $"{Deployment.Instance.StackName}-{resource}"; // oweme-s-vm, oweme-p-vm
+        var tags = new Dictionary<string, string> { ["app"] = "oweme", ["environment"] = config.Require("environment") };
 
         // Virtual Cloud Network (VCN)
         var vcn = new Vcn("AppVcn", new VcnArgs
         {
             CompartmentId = compartmentId,
             CidrBlock = "10.0.0.0/16",
-            DisplayName = Named("vcn")
+            DisplayName = Named("vcn"),
+            FreeformTags = tags,
         });
 
         // Internet Gateway
         var internetGateway = new InternetGateway("AppIg", new InternetGatewayArgs
         {
             DisplayName = Named("ig"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             Enabled = true
@@ -43,6 +47,7 @@ class MyStack : Stack
         var routeTable = new RouteTable("AppRouteTable", new RouteTableArgs
         {
             DisplayName = Named("route-table"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             RouteRules = 
@@ -60,6 +65,7 @@ class MyStack : Stack
         var securityList = new SecurityList("AppSecurityList", new SecurityListArgs
         {
             DisplayName = Named("security-list"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             EgressSecurityRules = 
@@ -82,6 +88,7 @@ class MyStack : Stack
         var subnet = new Subnet("AppSubnet", new SubnetArgs
         {
             DisplayName = Named("subnet"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             CidrBlock = "10.0.1.0/24",
@@ -93,6 +100,7 @@ class MyStack : Stack
         var instance = new Instance("AppVm", new InstanceArgs
         {
             DisplayName = Named("vm"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             AvailabilityDomain = availabilityDomain,
             Shape = "VM.Standard.A1.Flex",
@@ -136,6 +144,7 @@ class MyStack : Stack
         {
             CompartmentId = tenancyId,
             Name = Named("objectstorage-lifecycle"),
+            FreeformTags = tags,
             Description = "Lets Object Storage run lifecycle rules on the oweme backup bucket",
             Statements = { $"Allow service objectstorage-{region} to manage object-family in compartment id {compartmentId}" }
         });
@@ -144,7 +153,8 @@ class MyStack : Stack
         {
             CompartmentId = compartmentId,
             Namespace = ns,
-            Name = Named("backups") // stacks share one compartment
+            Name = Named("backups"), // stacks share one compartment
+            FreeformTags = tags
         });
 
         _ = new ObjectLifecyclePolicy("BackupLifecycle", new ObjectLifecyclePolicyArgs
