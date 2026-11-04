@@ -33,4 +33,10 @@ curl -fsS -K - <<< "url = \"${BACKUP_PAR_URL}\"" | jq -r '.objects[].name' | gre
 oweme-restore.sh <run>
 ```
 
-The script checks both dumps, asks for confirmation, takes a safety dump of the current state, stops `api` and `keycloak`, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image and starts the api. To undo a restore, restore the safety run (the newest one after the restore). Restore staging only from staging dumps: production dumps carry real users and client secrets. The Keycloak admin password comes back from the dump; if the vault password changed since, update it in Keycloak before the next full provision.
+The script fully reads both dumps, asks for confirmation, stops `api` and `keycloak`, takes a safety dump of the current state, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`) and starts the api. It prints the safety run id: `oweme-restore.sh <safety run>` undoes the restore. On failure both apps are left stopped.
+
+- Don't deploy during a restore: disable the workflow first (`gh workflow disable "Deploy — api"`, `enable` after).
+- Restore staging only from staging dumps: production dumps carry real users and client secrets.
+- Keycloak data comes back as it was: the admin password and client secrets too. If either was rotated since the dump (vault, `api.env`), set it again in Keycloak. A dump from a newer Keycloak won't start on an older image.
+- The safety dump needs disk space and the bucket. If it can't run (disk full, bucket unreachable), fix that first.
+- If a restore stops after `dropdb` and before `createdb` (the database is gone), create it by hand, then rerun: `docker compose exec -T api-db sh -c 'createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'` (or `keycloak-db`).

@@ -3,7 +3,7 @@
 # Replaces api-db and keycloak-db with the dump pair of <run> (issue #101). Restores both as a pair:
 # api rows are keyed by the Keycloak sub. Uses /opt/backups/<run>/ if present, otherwise downloads it from the bucket.
 # Restore only an environment's own dumps (production dumps carry real users and client secrets).
-set -euo pipefail
+set -eEuo pipefail # -E: the ERR trap also fires inside functions
 umask 077
 
 run=${1:?usage: oweme-restore.sh <run>, e.g. 20261104T030000Z}
@@ -12,33 +12,46 @@ run=${1:?usage: oweme-restore.sh <run>, e.g. 20261104T030000Z}
 source /etc/oweme-backup.env # BACKUP_PAR_URL, the read-write PAR (ends in /o/)
 cd /opt/apps
 
-dir=/opt/backups/$run
-if [[ ! -d $dir ]]; then
-  tmp=$(mktemp -d /opt/backups/.restore.XXXXXX)
-  trap 'rm -rf "$tmp"' EXIT
+# Work on a private copy: the safety backup below prunes old local runs, possibly this one.
+dir=$(mktemp -d /opt/backups/.restore.XXXXXX)
+trap 'rm -rf "$dir"' EXIT
+if [[ -d /opt/backups/$run ]]; then
+  cp /opt/backups/"$run"/{api,keycloak}.dump "$dir"/
+else
   for db in api keycloak; do
-    curl -fsS --proto '=https' --retry 3 --max-time 600 -o "$tmp/$db.dump" -K - <<< "url = \"${BACKUP_PAR_URL}$run/$db.dump\""
+    curl -fsS --proto '=https' --retry 3 --max-time 600 -o "$dir/$db.dump" -K - <<< "url = \"${BACKUP_PAR_URL}$run/$db.dump\""
   done
-  dir=$tmp
 fi
 
-# Both dumps must be readable before anything is dropped.
+# Read both archives completely (not just their table of contents) before anything is stopped or dropped.
+docker compose up -d --wait --wait-timeout 300 --no-recreate api-db keycloak-db
 for db in api keycloak; do
-  docker compose exec -T api-db pg_restore --list > /dev/null < "$dir/$db.dump"
+  docker compose exec -T api-db pg_restore -f /dev/null < "$dir/$db.dump"
 done
 
-read -rp "Replace the api and keycloak databases on $(hostname) with run $run? Type 'restore' to continue: " answer
+read -rp "Replace the api and keycloak databases on $(hostname) with run $run? Type 'restore' to continue: " answer || true
 [[ $answer == restore ]] || { echo "Aborted"; exit 1; }
+
+# From here on, a failure leaves both apps stopped rather than half-running on a half-restored state.
+safety=""
+failed() {
+  docker compose stop api keycloak
+  if [[ -z $safety ]]; then
+    echo "Restore FAILED before any database changed (safety dump failed). Start the apps again: docker compose up -d" >&2
+  else
+    echo "Restore FAILED: api and keycloak are stopped. To go back: oweme-restore.sh $safety" >&2
+  fi
+}
+trap failed ERR
+docker compose stop api keycloak # no writes after the safety dump; also drops Keycloak's caches
 
 # Safety dump of the current state, so a bad restore can be undone with this script.
 /usr/local/sbin/oweme-backup.sh
+safety=$(find /opt/backups -mindepth 1 -maxdepth 1 -type d -name '2*' -printf '%f\n' | sort | tail -n1)
 
 # Hold the backup lock so the nightly cron can't dump half-restored databases.
 exec 9>/run/oweme-backup.lock
 flock -w 1800 9
-
-docker compose stop api keycloak # also drops Keycloak's caches
-trap 'echo "Restore FAILED: api and keycloak are stopped. Rerun with the safety run (newest in /opt/backups) to go back." >&2' ERR
 
 restore() { # <service> <dump>
   docker compose exec -T "$1" sh -c 'dropdb -U "$POSTGRES_USER" --force "$POSTGRES_DB" && createdb -U "$POSTGRES_USER" "$POSTGRES_DB"'
@@ -47,8 +60,8 @@ restore() { # <service> <dump>
 restore api-db "$dir/api.dump"
 restore keycloak-db "$dir/keycloak.dump"
 
-docker compose up -d --wait keycloak
+docker compose up -d --wait --wait-timeout 600 keycloak
 # An older dump has an older schema: migrate it forward with the current image, then start the api.
 docker compose run --rm api-migrator
-docker compose up -d --wait api
-echo "Restored run $run. Check the app; the safety dump taken before the restore is the newest run in /opt/backups."
+docker compose up -d --wait --wait-timeout 300 api
+echo "Restored run $run. Check the app. To undo: oweme-restore.sh $safety"
