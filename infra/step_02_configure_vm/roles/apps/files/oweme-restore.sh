@@ -35,10 +35,11 @@ read -rp "Replace the api and keycloak databases on $(hostname) with run $run? T
 # From here on, a failure leaves both apps stopped rather than half-running on a half-restored state.
 safety=""
 failed() {
-  docker compose stop api keycloak
   if [[ -z $safety ]]; then
-    echo "Restore FAILED before any database changed (safety dump failed). Start the apps again: docker compose up -d" >&2
+    docker compose up -d --no-recreate api keycloak
+    echo "Restore FAILED before any database changed (safety dump failed); api and keycloak started again." >&2
   else
+    docker compose stop api keycloak
     echo "Restore FAILED: api and keycloak are stopped. To go back: oweme-restore.sh $safety" >&2
   fi
 }
@@ -46,8 +47,7 @@ trap failed ERR
 docker compose stop api keycloak # no writes after the safety dump; also drops Keycloak's caches
 
 # Safety dump of the current state, so a bad restore can be undone with this script.
-/usr/local/sbin/oweme-backup.sh
-safety=$(find /opt/backups -mindepth 1 -maxdepth 1 -type d -name '2*' -printf '%f\n' | sort | tail -n1)
+safety=$(/usr/local/sbin/oweme-backup.sh | tee /dev/stderr | awk '/^backup .* uploaded$/ { print $2 }')
 
 # Hold the backup lock so the nightly cron can't dump half-restored databases.
 exec 9>/run/oweme-backup.lock
