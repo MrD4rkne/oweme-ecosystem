@@ -64,6 +64,8 @@
     content: |
       filenames:
         - /var/log/traefik/access.log
+      # Traefik may create the log after CrowdSec starts (fresh VM).
+      force_inotify: true
       labels:
         type: traefik
     mode: '0644'
