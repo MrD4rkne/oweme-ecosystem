@@ -13,10 +13,12 @@ flock -w 1800 9
 
 # The migrator starts a stopped api-db itself, so never skip: start both DBs and dump them.
 # On a fresh VM this creates and dumps empty databases, which is harmless.
-docker compose up -d --wait api-db keycloak-db
+# --no-recreate: back up the current container as it is, before a deploy applies a new image or config to it.
+docker compose up -d --wait --no-recreate api-db keycloak-db
 
 db_bytes() { docker compose exec -T "$1" sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select pg_database_size(current_database())"'; }
-dump() { docker compose exec -T "$1" sh -c 'pg_dump -U "$POSTGRES_USER" --lock-wait-timeout=300s -Fc "$POSTGRES_DB"' > "$tmp/$2.dump"; }
+# timeout runs inside the container so it kills pg_dump itself; --lock-wait-timeout only bounds getting the locks.
+dump() { docker compose exec -T "$1" sh -c 'timeout 1800 pg_dump -U "$POSTGRES_USER" --lock-wait-timeout=300s -Fc "$POSTGRES_DB"' > "$tmp/$2.dump"; }
 
 # Backups share the disk with the Postgres volumes: refuse when free space is under 2x the databases.
 api_bytes=$(db_bytes api-db)      # separate assignments so set -e catches a failed psql

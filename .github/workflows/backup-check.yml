@@ -1,6 +1,7 @@
 name: Backup check
 
-# Fails (and GitHub emails) when a bucket has no api+keycloak dump pair from the last 26 hours (issue #101).
+# Fails when a bucket has no api+keycloak dump pair from the last 26 hours (issue #101). GitHub notifies whoever last
+# edited the cron line; keep Settings -> Notifications -> Actions -> "failed workflows" on, with email, for that account.
 # Catches a broken cron, a dead VM, an expired PAR or a full bucket alike.
 # Secrets: BACKUP_CHECK_PAR_URL_<ENV> = Pulumi output BackupCheckParUrl (read-only PAR, safe outside the gated environments).
 
