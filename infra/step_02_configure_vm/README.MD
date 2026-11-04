@@ -2,6 +2,8 @@
 
 Inventories live in `inventory/staging` and `inventory/production`; secrets in each `vars/<env>/vault.yml`.
 
+The VMs are changed only through GitHub Actions (deploys, Configure Environments, Restore databases), which run one at a time per environment. SSH is for reading and for break-glass when Actions is down.
+
 ```bash
 ansible-playbook site.yml -i inventory/staging/hosts.ini --vault-password-file .vault_pass
 ```
