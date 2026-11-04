@@ -24,18 +24,18 @@ Push to `main` (api/**) deploys staging, runs `OweMe.Api.SmokeTests` against it,
 
 `/usr/local/sbin/oweme-backup.sh` dumps `api-db` and `keycloak-db` into `/opt/backups/<run>/` (root-only, last 3 runs) and uploads both to the environment's bucket (`<stack>-backups`, kept 14 days). It runs nightly at 03:00 UTC (cron, `journalctl -t oweme-backup`) and before every migration; the deploy fails if it fails. `.github/workflows/backup-check.yml` fails daily when a bucket has no fresh pair.
 
-Restore a run (both databases, as a pair: api rows are keyed by the Keycloak `sub`):
+Restore a run (both databases, as a pair: api rows are keyed by the Keycloak `sub`) with the **Restore databases** workflow (`restore-db.yml`): pick the environment and the run id. It shares the `deploy-<env>` concurrency group with deploys and provisioning, so it waits for them and they wait for it. Production needs the environment's approval. Staging ends with the smoke tests, so `SMOKE_USER` must exist in the restored data.
 
 ```bash
-sudo -i
-source /etc/oweme-backup.env
-curl -fsS -K - <<< "url = \"${BACKUP_PAR_URL}\"" | jq -r '.objects[].name' | grep -oE '^[0-9]{8}T[0-9]{6}Z' | sort -u   # runs in the bucket
-oweme-restore.sh <run>
+# Run ids in the bucket (from infra/step_01_create_vm; -s oweme-p for production)
+curl -fsS -K - <<< "url = \"$(pulumi stack output BackupCheckParUrl -s oweme-s --show-secrets)\"" | jq -r '.objects[].name' | grep -oE '^[0-9]{8}T[0-9]{6}Z' | sort -u
+gh workflow run restore-db.yml -f environment=staging -f run=<run>
 ```
 
-The script fully reads both dumps, asks for confirmation, stops `api` and `keycloak`, takes a safety dump of the current state, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`) and starts the api. It prints the safety run id: `oweme-restore.sh <safety run>` undoes the restore. A failure before the confirmation changes nothing. If the safety dump fails, the apps that were running are started again. A failure after that leaves both apps stopped and prints the safety run to restore.
+Emergency path when GitHub Actions is unavailable: `sudo /usr/local/sbin/oweme-restore.sh <run>` over SSH. It asks for confirmation, but nothing stops a deploy from starting meanwhile, so disable it first (`gh workflow disable "Deploy — api"`, `enable` after).
 
-- Don't deploy during a restore: disable the workflow first (`gh workflow disable "Deploy — api"`, `enable` after).
+The script fully reads both dumps, asks for confirmation, stops `api` and `keycloak`, takes a safety dump of the current state, recreates and restores both databases, starts Keycloak, migrates the restored api schema forward with the current image (`API_IMAGE_TAG` in `/opt/apps/.env`) and starts the api. It prints the safety run id (in the workflow log too); restoring that run undoes the restore. A failure before the confirmation changes nothing. If the safety dump fails, the apps that were running are started again. A failure after that leaves both apps stopped and prints the safety run to restore.
+
 - Restore staging only from staging dumps: production dumps carry real users and client secrets.
 - Keycloak comes back exactly as it was in the dump, admin password included (`keycloak.env` only sets the initial admin). If `vault_keycloak_admin_password` changed since, set it again in Keycloak, or the next full provision's realm step can't log in. The api uses no client secret. A dump from a newer Keycloak won't start on an older image.
 - The safety dump needs disk space and the bucket. If it can't run (disk full, bucket unreachable), fix that first.
