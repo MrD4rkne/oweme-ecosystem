@@ -5,3 +5,4 @@ config:
   OciVmInfra:sshPublicKey: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIP83bnIKYvt4nC+JFXqzi0mxFn+XiJsV1GkBHikbrVtW oweme-api-vm
   oci:configFileProfile: DEFAULT
   oci:region: eu-frankfurt-1
+  OciVmInfra:environment: production

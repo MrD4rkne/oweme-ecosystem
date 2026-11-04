@@ -1,4 +1,4 @@
-name: step_01_vm
+name: OciVmInfra
 description: Create a VM to host the oweme system.
 runtime: dotnet
 config:

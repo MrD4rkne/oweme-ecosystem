@@ -1,6 +1,10 @@
 ﻿using Pulumi;
 using Pulumi.Oci.Core;
 using Pulumi.Oci.Core.Inputs;
+using Pulumi.Oci.Identity;
+using Pulumi.Oci.ObjectStorage;
+using Pulumi.Oci.ObjectStorage.Inputs;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 class Program
@@ -17,18 +21,23 @@ class MyStack : Stack
         var availabilityDomain = config.Require("availabilityDomain");
         var imageId = config.Require("imageId"); 
         var sshPublicKey = config.Require("sshPublicKey");
+        string Named(string resource) => $"{Deployment.Instance.StackName}-{resource}"; // oweme-s-vm, oweme-p-vm
+        var tags = new Dictionary<string, string> { ["app"] = "oweme", ["environment"] = config.Require("environment") };
 
         // Virtual Cloud Network (VCN)
         var vcn = new Vcn("AppVcn", new VcnArgs
         {
             CompartmentId = compartmentId,
             CidrBlock = "10.0.0.0/16",
-            DisplayName = "app-vcn"
+            DisplayName = Named("vcn"),
+            FreeformTags = tags,
         });
 
         // Internet Gateway
         var internetGateway = new InternetGateway("AppIg", new InternetGatewayArgs
         {
+            DisplayName = Named("ig"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             Enabled = true
@@ -37,6 +46,8 @@ class MyStack : Stack
         // Route Table
         var routeTable = new RouteTable("AppRouteTable", new RouteTableArgs
         {
+            DisplayName = Named("route-table"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             RouteRules = 
@@ -53,6 +64,8 @@ class MyStack : Stack
         // Security List
         var securityList = new SecurityList("AppSecurityList", new SecurityListArgs
         {
+            DisplayName = Named("security-list"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             EgressSecurityRules = 
@@ -74,6 +87,8 @@ class MyStack : Stack
         // Public Subnet
         var subnet = new Subnet("AppSubnet", new SubnetArgs
         {
+            DisplayName = Named("subnet"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             VcnId = vcn.Id,
             CidrBlock = "10.0.1.0/24",
@@ -84,6 +99,8 @@ class MyStack : Stack
         // Ampere A1 Compute Instance
         var instance = new Instance("AppVm", new InstanceArgs
         {
+            DisplayName = Named("vm"),
+            FreeformTags = tags,
             CompartmentId = compartmentId,
             AvailabilityDomain = availabilityDomain,
             Shape = "VM.Standard.A1.Flex",
@@ -110,8 +127,81 @@ class MyStack : Stack
         });
 
         this.VmPublicIp = instance.PublicIp;
+
+        // Off-VM database backups (issue #101).
+        var ns = GetNamespace.Invoke(new GetNamespaceInvokeArgs { CompartmentId = compartmentId })
+            .Apply(r => r.Namespace);
+
+        // Object Storage can't run lifecycle rules without this. One per stack: the duplicate statement is harmless
+        // and saves picking an owner stack. IAM takes a few seconds to apply; if the first `up` fails on the
+        // lifecycle rule, run it again.
+        // OCI requires this policy in the tenancy root (docs: usinglifecyclepolicies.htm, "Service Permissions").
+        // The app compartment sits directly under root, so its parent is the tenancy.
+        var tenancyId = GetCompartment.Invoke(new GetCompartmentInvokeArgs { Id = compartmentId })
+            .Apply(c => c.CompartmentId);
+        var region = new Config("oci").Require("region");
+        var lifecyclePolicy = new Policy("BackupLifecycleIamPolicy", new PolicyArgs
+        {
+            CompartmentId = tenancyId,
+            Name = Named("objectstorage-lifecycle"),
+            FreeformTags = tags,
+            Description = "Lets Object Storage run lifecycle rules on the oweme backup bucket",
+            Statements = { $"Allow service objectstorage-{region} to manage object-family in compartment id {compartmentId}" }
+        });
+
+        var bucket = new Bucket("BackupBucket", new BucketArgs
+        {
+            CompartmentId = compartmentId,
+            Namespace = ns,
+            Name = Named("backups"), // stacks share one compartment
+            FreeformTags = tags
+        });
+
+        _ = new ObjectLifecyclePolicy("BackupLifecycle", new ObjectLifecyclePolicyArgs
+        {
+            Namespace = ns,
+            Bucket = bucket.Name,
+            Rules =
+            {
+                new ObjectLifecyclePolicyRuleArgs
+                {
+                    Name = "delete-after-14-days",
+                    Action = "DELETE",
+                    Target = "objects",
+                    TimeAmount = "14",
+                    TimeUnit = "DAYS",
+                    IsEnabled = true
+                }
+            }
+        }, new CustomResourceOptions { DependsOn = { lifecyclePolicy } });
+
+        // VM uploads and restores; the scheduled backup-check only reads.
+        this.BackupParUrl = BackupPar("BackupParReadWrite", "AnyObjectReadWrite", ns, bucket);
+        this.BackupCheckParUrl = BackupPar("BackupParRead", "AnyObjectRead", ns, bucket);
     }
+
+    // PARs can't be updated: any input change replaces the PAR and issues a new URL.
+    // Keep the expiry a literal, never DateTime.Now-based. The URL is returned only at creation.
+    static Output<string> BackupPar(string name, string accessType, Output<string> ns, Bucket bucket) =>
+        new Preauthrequest(name, new PreauthrequestArgs
+        {
+            Namespace = ns,
+            Bucket = bucket.Name,
+            Name = name,
+            AccessType = accessType,
+            BucketListingAction = "ListObjects",
+            TimeExpires = "2099-01-01T00:00:00Z"
+        }, new CustomResourceOptions
+        {
+            AdditionalSecretOutputs = { "fullPath", "accessUri" }
+        }).FullPath;
 
     [Output]
     public Output<string?> VmPublicIp { get; set; }
+
+    [Output]
+    public Output<string> BackupParUrl { get; set; }
+
+    [Output]
+    public Output<string> BackupCheckParUrl { get; set; }
 }
