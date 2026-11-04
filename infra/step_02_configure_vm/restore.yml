@@ -10,9 +10,4 @@
       ansible.builtin.command:
         argv: [/usr/local/sbin/oweme-restore.sh, "{{ run }}"]
         stdin: restore # the workflow's environment approval is the confirmation
-      register: restore_result
       changed_when: true
-
-    - name: Show restore output
-      ansible.builtin.debug:
-        var: restore_result.stdout_lines

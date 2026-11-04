@@ -51,7 +51,7 @@ jobs:
         env:
           RUN: ${{ inputs.run }}
           TARGET_ENV: ${{ inputs.environment }}
-        run: ansible-playbook -i "inventory/${TARGET_ENV}/hosts.ini" restore.yml --private-key deploy_key -e "run=${RUN}"
+        run: ansible-playbook -v -i "inventory/${TARGET_ENV}/hosts.ini" restore.yml --private-key deploy_key -e "run=${RUN}" # -v prints the script output (safety run id)
 
       # Staging only, like deploys. Needs SMOKE_USER to exist in the restored Keycloak data.
       - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
