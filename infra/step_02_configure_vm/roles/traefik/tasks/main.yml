@@ -50,11 +50,42 @@
   register: traefik_env
   tags: [traefik]
 
+# CrowdSec reads no log until told to; the traefik collection ships parsers, not acquisition.
+- name: Create CrowdSec acquisition directory
+  file:
+    path: /opt/traefik/crowdsec/config/acquis.d
+    state: directory
+    mode: '0755'
+  tags: [traefik]
+
+- name: Tell CrowdSec to read the Traefik access log
+  copy:
+    dest: /opt/traefik/crowdsec/config/acquis.d/traefik.yaml
+    content: |
+      filenames:
+        - /var/log/traefik/access.log
+      # Traefik may create the log after CrowdSec starts (fresh VM).
+      force_inotify: true
+      labels:
+        type: traefik
+    mode: '0644'
+  register: crowdsec_acquis
+  tags: [traefik]
+
 - name: Start Traefik stack
   community.docker.docker_compose_v2:
     project_src: /opt/traefik
     state: present
     pull: "{{ 'always' if (traefik_compose.changed or traefik_env.changed) else 'missing' }}"
+  tags: [traefik]
+
+# Acquisition is read only at startup.
+- name: Restart CrowdSec to load the acquisition
+  community.docker.docker_compose_v2:
+    project_src: /opt/traefik
+    services: [crowdsec]
+    state: restarted
+  when: crowdsec_acquis.changed
   tags: [traefik]
 
 - import_tasks: crowdsec.yml
