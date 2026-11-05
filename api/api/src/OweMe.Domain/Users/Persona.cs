@@ -19,4 +19,9 @@ public sealed class Persona : AuditableEntity
     public required UserId? UserId { get; init; }
 
     public required string Name { get; init; }
+
+    public bool CanUserAccess(UserId userId)
+    {
+        return CreatedBy == userId || UserId == userId;
+    }
 }
