@@ -10,6 +10,14 @@ ansible-playbook site.yml -i inventory/staging/hosts.ini --vault-password-file .
 
 Deploy only (what CI runs): add `--tags deploy -e image_tag=<tag> -e target_app=api`.
 
+## Keycloak admin
+
+Traefik refuses `/admin` and `/realms/master` from outside, and Ansible reaches Keycloak on the VM's loopback (`127.0.0.1:8080`). Change realms through the playbook. Break-glass only, on the VM:
+
+```bash
+cd /opt/apps && docker compose exec keycloak /opt/keycloak/bin/kcadm.sh config credentials --server http://localhost:8080 --realm master --user <admin>
+```
+
 ## API migrations
 
 The deploy runs `api-migrator` (the api image with the `migrate` command) before recreating `api`; a failed migration stops the deploy and the old api keeps serving.
