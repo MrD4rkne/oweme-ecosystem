@@ -15,6 +15,26 @@ public sealed class PersonaTests
             Id = new PersonaId(Guid.NewGuid()),
             UserId = userId,
             Name = "Test Persona",
+            CreatedBy = new UserId(Guid.NewGuid())
+        };
+
+        // Act
+        var result = persona.CanUserAccess(userId);
+
+        // Assert
+        result.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void CanUserAccess_ShouldReturnTrue_WhenCreatedByMatchesButLinkedToAnotherUser()
+    {
+        // Arrange
+        var userId = new UserId(Guid.NewGuid());
+        var persona = new Persona
+        {
+            Id = new PersonaId(Guid.NewGuid()),
+            UserId = new UserId(Guid.NewGuid()),
+            Name = "Test Persona",
             CreatedBy = userId
         };
 
