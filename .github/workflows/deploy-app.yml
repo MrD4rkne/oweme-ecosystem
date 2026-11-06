@@ -57,7 +57,7 @@ jobs:
             -e "target_environment=${TARGET_ENV}"
 
       # Same job as the deploy, so it holds the same concurrency slot and tests the version just deployed.
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         if: inputs.smoke_tests
         with:
           dotnet-version: 10.x
