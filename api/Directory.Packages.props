@@ -25,9 +25,9 @@
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.11.0" />
     <PackageVersion Include="StronglyTypedId" Version="1.0.0-beta08" />
-    <PackageVersion Include="WolverineFx" Version="6.56.0" />
-    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.56.0" />
-    <PackageVersion Include="WolverineFx.FluentValidation" Version="6.56.0" />
+    <PackageVersion Include="WolverineFx" Version="6.61.0" />
+    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.61.0" />
+    <PackageVersion Include="WolverineFx.FluentValidation" Version="6.61.0" />
     <!-- Monitoring -->
     <PackageVersion Include="OpenTelemetry" Version="1.20.1" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.1" />
@@ -39,7 +39,7 @@
     <!-- API Description -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.14" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="2.18.3" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.18.7" />
     <!-- Database and ORM -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.14">
