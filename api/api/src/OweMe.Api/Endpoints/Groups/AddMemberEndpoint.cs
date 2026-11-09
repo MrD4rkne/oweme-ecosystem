@@ -22,7 +22,6 @@ internal sealed class AddMemberEndpoint : IEndpoint
             .Produces(StatusCodes.Status204NoContent)
             .ProducesExtendedProblem(StatusCodes.Status400BadRequest)
             .ProducesExtendedProblem(StatusCodes.Status404NotFound)
-            .ProducesExtendedProblem(StatusCodes.Status403Forbidden)
             .WithStandardProblems()
             .RequireAuthorization(Constants.POLICY_API_SCOPE);
     }
@@ -34,11 +33,10 @@ internal sealed class AddMemberEndpoint : IEndpoint
         CancellationToken cancellationToken = default)
     {
         var addMemberCommand = new AddGroupMemberCommand(groupId, addMemberRequest.PersonaId);
-        var result = await messageBus.InvokeAsync<OneOf<Success, NotFound, Forbidden>>(addMemberCommand, cancellationToken);
+        var result = await messageBus.InvokeAsync<OneOf<Success, NotFound>>(addMemberCommand, cancellationToken);
         return result.Match(
             _ => Results.NoContent(),
-            notFound => notFound.ToProblem(),
-            forbidden => forbidden.ToProblem());
+            notFound => notFound.ToProblem());
     }
 
     internal sealed record AddGroupMemberRequest(PersonaId PersonaId);
