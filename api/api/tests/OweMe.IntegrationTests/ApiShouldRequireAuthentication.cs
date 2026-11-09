@@ -47,12 +47,15 @@ public sealed class ApiShouldRequireAuthentication(OweMeApi api, ITestOutputHelp
     }
 
     [Fact]
-    public async Task For_AddMemberEndpoint()
+    public async Task For_AnonymousAddMemberRequest_Should_ReturnUnauthorized()
     {
+        // Arrange
         var request = new AddMemberEndpoint.AddGroupMemberRequest(new PersonaId(Guid.NewGuid()));
 
+        // Act and Assert
         await VerifyEndpointRequiresAuthentication(client => client.PostAsync(
             $"/api/groups/{Guid.NewGuid()}/members",
-            new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")));
+            new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"),
+            TestContext.Current.CancellationToken));
     }
 }
