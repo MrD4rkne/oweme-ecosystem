@@ -1,11 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using OweMe.Application.Common;
 
 namespace OweMe.Application.Groups.Queries.Get;
 
 public static class GetGroupQueryHandler
 {
-    // null means the group does not exist or the user cannot access it.
-    public static async Task<GetGroupResult?> HandleAsync(
+    public static async Task<OneOf<GetGroupResult, NotFound>> HandleAsync(
         GetGroupQuery query,
         IGroupContext context,
         IUserContext userContext,
@@ -14,7 +14,7 @@ public static class GetGroupQueryHandler
         var group = await context.Groups.FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
         if (group is null || !group.CanUserAccess(userContext.Id))
         {
-            return null;
+            return new NotFound("Group not found or non accessible.");
         }
 
         return GetGroupResult.FromDomain(group);

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
         <PackageReference Include="EntityFrameworkCore.Exceptions.Common"/>
@@ -7,6 +7,7 @@
         <PackageReference Include="Microsoft.Bcl.TimeProvider"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
+        <PackageReference Include="OneOf"/>
         <PackageReference Include="WolverineFx"/>
         <PackageReference Include="WolverineFx.RuntimeCompilation"/>
         <PackageReference Include="WolverineFx.FluentValidation"/>
@@ -22,4 +23,8 @@
         </AssemblyAttribute>
     </ItemGroup>
 
+    <ItemGroup>
+        <Using Include="OneOf"/>
+        <Using Include="OneOf.Types.Success" Alias="Success"/>
+    </ItemGroup>
 </Project>
