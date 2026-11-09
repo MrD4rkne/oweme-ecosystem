@@ -2,7 +2,9 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
+using OweMe.Api.Endpoints.Groups;
 using OweMe.Application.Groups.Commands.Create;
+using OweMe.Domain.Users;
 using OweMe.IntegrationTests.Authentication;
 using Shouldly;
 
@@ -42,5 +44,15 @@ public sealed class ApiShouldRequireAuthentication(OweMeApi api, ITestOutputHelp
 
         await VerifyEndpointRequiresAuthentication(client => client.PostAsync("/api/groups",
             new StringContent(JsonSerializer.Serialize(group), Encoding.UTF8, "application/json")));
+    }
+
+    [Fact]
+    public async Task For_AddMemberEndpoint()
+    {
+        var request = new AddMemberEndpoint.AddGroupMemberRequest(new PersonaId(Guid.NewGuid()));
+
+        await VerifyEndpointRequiresAuthentication(client => client.PostAsync(
+            $"/api/groups/{Guid.NewGuid()}/members",
+            new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")));
     }
 }
