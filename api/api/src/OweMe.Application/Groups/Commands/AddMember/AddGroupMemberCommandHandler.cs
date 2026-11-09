@@ -1,4 +1,5 @@
 using EntityFramework.Exceptions.Common;
+using OweMe.Application.Common;
 using OweMe.Application.Personas;
 using OweMe.Domain.Groups;
 
@@ -6,16 +7,7 @@ namespace OweMe.Application.Groups.Commands.AddMember;
 
 public static class AddGroupMemberCommandHandler
 {
-    public enum AddGroupMemberResult
-    {
-        // Start at 1 so default(AddGroupMemberResult) is not a valid outcome.
-        GroupNotFound = 1,
-        UserNotAuthorized,
-        PersonaNotFound,
-        MemberAdded,
-    }
-
-    public static async Task<AddGroupMemberResult> Handle(AddGroupMemberCommand message,
+    public static async Task<OneOf<Success, NotFound, Forbidden>> Handle(AddGroupMemberCommand message,
         IGroupContext context,
         IPersonaContext personaContext,
         IUserContext userContext,
@@ -24,18 +16,18 @@ public static class AddGroupMemberCommandHandler
         var group = await context.Groups.FindAsync([message.GroupId], cancellationToken);
         if (group is null || !group.CanUserAccess(userContext.Id))
         {
-            return AddGroupMemberResult.GroupNotFound;
+            return new NotFound("Group not found or non accessible.");
         }
 
         if (!group.CanUserEdit(userContext.Id))
         {
-            return AddGroupMemberResult.UserNotAuthorized;
+            return new Forbidden("Only the group owner can add members.");
         }
 
         var persona = await personaContext.Personas.FindAsync([message.PersonaId], cancellationToken);
         if (persona is null || !persona.CanUserAccess(userContext.Id))
         {
-            return AddGroupMemberResult.PersonaNotFound;
+            return new NotFound("Persona not found.");
         }
 
         var member = new GroupMember
@@ -52,9 +44,9 @@ public static class AddGroupMemberCommandHandler
         catch (UniqueConstraintException)
         {
             // The member is already in the group; adding is idempotent.
-            return AddGroupMemberResult.MemberAdded;
+            return new Success();
         }
 
-        return AddGroupMemberResult.MemberAdded;
+        return new Success();
     }
 }

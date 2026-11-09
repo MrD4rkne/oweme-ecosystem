@@ -1,7 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Mvc;
 using OweMe.Api.Description;
 using OweMe.Api.Identity;
+using OweMe.Application.Common;
 using OweMe.Application.Groups.Queries.Get;
 using OweMe.Domain.Groups;
 using Wolverine;
@@ -28,12 +29,7 @@ public sealed class GetGroupByIdEndpoint : IEndpoint
         IMessageBus messageBus)
     {
         var query = new GetGroupQuery(groupId);
-        var group = await messageBus.InvokeAsync<GetGroupResult?>(query);
-        return group is null
-            ? Results.Problem(
-                statusCode: StatusCodes.Status404NotFound,
-                title: "Resource not found",
-                detail: "Group not found or non accessible.")
-            : Results.Ok(group);
+        var result = await messageBus.InvokeAsync<OneOf<GetGroupResult, NotFound>>(query);
+        return result.Match(Results.Ok, notFound => notFound.ToProblem());
     }
 }
