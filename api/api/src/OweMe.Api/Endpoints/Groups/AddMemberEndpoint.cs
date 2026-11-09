@@ -30,10 +30,11 @@ internal sealed class AddMemberEndpoint : IEndpoint
     private static async Task<IResult> AddMember(
         [FromRoute] GroupId groupId,
         [FromBody] AddGroupMemberRequest addMemberRequest,
-        IMessageBus messageBus)
+        IMessageBus messageBus,
+        CancellationToken cancellationToken = default)
     {
         var addMemberCommand = new AddGroupMemberCommand(groupId, addMemberRequest.PersonaId);
-        var result = await messageBus.InvokeAsync<OneOf<Success, NotFound, Forbidden>>(addMemberCommand);
+        var result = await messageBus.InvokeAsync<OneOf<Success, NotFound, Forbidden>>(addMemberCommand, cancellationToken);
         return result.Match(
             _ => Results.NoContent(),
             notFound => notFound.ToProblem(),
