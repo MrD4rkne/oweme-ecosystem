@@ -7,7 +7,7 @@ namespace OweMe.Application.Groups.Commands.AddMember;
 
 public static class AddGroupMemberCommandHandler
 {
-    public static async Task<OneOf<Success, NotFound, Forbidden>> Handle(AddGroupMemberCommand message,
+    public static async Task<OneOf<Success, NotFound>> Handle(AddGroupMemberCommand message,
         IGroupContext context,
         IPersonaContext personaContext,
         IUserContext userContext,
@@ -17,11 +17,6 @@ public static class AddGroupMemberCommandHandler
         if (group is null || !group.CanUserAccess(userContext.Id))
         {
             return new NotFound("Group not found or non accessible.");
-        }
-
-        if (!group.CanUserEdit(userContext.Id))
-        {
-            return new Forbidden("Only the group owner can add members.");
         }
 
         var persona = await personaContext.Personas.FindAsync([message.PersonaId], cancellationToken);
