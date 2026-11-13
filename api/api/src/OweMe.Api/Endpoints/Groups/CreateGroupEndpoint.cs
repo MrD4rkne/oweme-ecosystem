@@ -22,7 +22,7 @@ public sealed class CreateGroupEndpoint : IEndpoint
             .RequireAuthorization(Constants.POLICY_API_SCOPE);
     }
 
-    public static async Task<IResult> CreateGroup(
+    private static async Task<IResult> CreateGroup(
         [FromBody] CreateGroupCommand createGroupRequest,
         IMessageBus messageBus,
         CancellationToken cancellationToken = default)

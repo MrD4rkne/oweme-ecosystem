@@ -24,7 +24,7 @@ public sealed class GetGroupByIdEndpoint : IEndpoint
             .RequireAuthorization(Constants.POLICY_API_SCOPE);
     }
 
-    public static async Task<IResult> GetGroup(
+    private static async Task<IResult> GetGroup(
         [FromRoute] GroupId groupId,
         IMessageBus messageBus)
     {
