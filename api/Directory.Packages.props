@@ -39,7 +39,7 @@
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.3" />
     <!-- API Description -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.15" />
-    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="11.0.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.20.0" />
     <!-- Database and ORM -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
