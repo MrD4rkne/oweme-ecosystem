@@ -6,6 +6,7 @@
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions"/>
         <PackageReference Include="Microsoft.Bcl.TimeProvider"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" VersionOverride="11.0.0" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions"/>
         <PackageReference Include="OneOf"/>
         <PackageReference Include="WolverineFx"/>
