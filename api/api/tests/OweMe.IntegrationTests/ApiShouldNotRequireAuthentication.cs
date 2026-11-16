@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Mvc.Testing;
 using OweMe.Api.Description;
@@ -21,7 +22,7 @@ public sealed class ApiShouldNotRequireAuthentication(OweMeApi api, ITestOutputH
         var response = await client.GetAsync("/healthz", TestContext.Current.CancellationToken);
 
         // Assert
-        response.EnsureSuccessStatusCode();
+        response.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
     [Fact]
