@@ -10,6 +10,19 @@ updates:
       default-days: 3
     commit-message:
       prefix: "nuget"
+    # We stay on the .NET 10 LTS; moving to the next major is a deliberate, single upgrade PR.
+    ignore:
+      - dependency-name: "Microsoft.Extensions.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.AspNetCore.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.EntityFrameworkCore*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Microsoft.Bcl.*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Npgsql*"
+        update-types: ["version-update:semver-major"]
+    # Patterns overlap, so exclude explicitly: Aspire and EF Core must never land in an auto-merged group.
     groups:
       nuget-efcore:
         patterns: ["Microsoft.EntityFrameworkCore*", "Npgsql.EntityFrameworkCore*"]
@@ -19,9 +32,11 @@ updates:
         update-types: ["minor", "patch"]
       nuget-microsoft:
         patterns: ["Microsoft.*", "System.*"]
+        exclude-patterns: ["Microsoft.EntityFrameworkCore*"]
         update-types: ["minor", "patch"]
       nuget-other:
         patterns: ["*"]
+        exclude-patterns: ["Microsoft.*", "System.*", "Aspire.*", "CommunityToolkit.Aspire.*", "Npgsql.EntityFrameworkCore*"]
         update-types: ["minor", "patch"]
 
   # GitHub Actions Updates
