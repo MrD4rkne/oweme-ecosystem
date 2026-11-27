@@ -48,7 +48,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.15" />
-    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.4" />
       <PackageVersion Include="EntityFrameworkCore.Exceptions.Common" Version="10.0.2"/>
       <PackageVersion Include="EntityFrameworkCore.Exceptions.PostgreSQL" Version="10.0.2"/>
     <!-- Versioning -->
