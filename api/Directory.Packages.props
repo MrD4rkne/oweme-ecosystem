@@ -26,9 +26,9 @@
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.11.0" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="StronglyTypedId" Version="1.0.0-beta08" />
-    <PackageVersion Include="WolverineFx" Version="6.64.2" />
-    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.64.2" />
-    <PackageVersion Include="WolverineFx.FluentValidation" Version="6.64.2" />
+    <PackageVersion Include="WolverineFx" Version="6.65.1" />
+    <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.65.1" />
+    <PackageVersion Include="WolverineFx.FluentValidation" Version="6.65.1" />
     <!-- Monitoring -->
     <PackageVersion Include="OpenTelemetry" Version="1.21.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.21.0" />
@@ -36,11 +36,11 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.21.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.21.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.21.0" />
-    <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.3" />
+    <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.4" />
     <!-- API Description -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.15" />
-    <PackageVersion Include="Scalar.AspNetCore" Version="3.0.1" />
+    <PackageVersion Include="Scalar.AspNetCore" Version="3.2.0" />
     <!-- Database and ORM -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.15">
